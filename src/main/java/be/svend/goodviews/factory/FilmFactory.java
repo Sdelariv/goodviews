@@ -75,22 +75,42 @@ public class FilmFactory {
         saveFilms(List.of(pad2,emma, jp));
     }
 
-    public void saveTags(List<Tag> tags) {
+    public List<Tag> saveTags(List<Tag> tags) {
+        List<Tag> savedTags = new ArrayList<>();
+
         for (Tag tag: tags) {
-            tagRepo.save(tag);
+            if (tagRepo.findByName(tag.getName()).isEmpty()) {
+                savedTags.add(tagRepo.save(tag));
+                System.out.println("Saving " + tag.getName());
+            } else {
+                savedTags.add(tagRepo.findByName(tag.getName()).get());
+                System.out.println("Not saving " + tag.getName() + " because it already exists");
+            }
         }
+        // TODO: Remember to add this logic to the service layer later
+        return savedTags;
     }
 
-    public void saveGenres(List<Genre> genres) {
+    public List<Genre> saveGenres(List<Genre> genres) {
+        List<Genre> savedGenres = new ArrayList<>();
+
         for (Genre genre: genres) {
-            genreRepo.save(genre);
+            if (genreRepo.findByName(genre.getName()).isEmpty()) {
+                savedGenres.add(genreRepo.save(genre));
+                System.out.println("Saving " + genre.getName());
+            } else {
+                savedGenres.add(genreRepo.findByName(genre.getName()).get());
+                System.out.println("Not saving " + genre.getName() + " because it already exists");
+            }
         }
+        // TODO: Remember to add this logic to the service layer later
+        return savedGenres;
     }
 
     public void saveFilms(List<Film> films) {
         for (Film film: films) {
-            saveGenres(film.getGenres());
-            saveTags(film.getTags());
+            film.setGenres(saveGenres(film.getGenres()));
+            film.setTags(saveTags(film.getTags()));
             filmRepo.save(film);
         }
     }

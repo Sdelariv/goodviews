@@ -107,6 +107,14 @@ public class Film {
         addGenre(genre);
     }
 
+    public void setGenres(List<Genre> genres) {
+        this.genres = genres;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
+
     public List<Tag> getTags() {
         return tags;
     }

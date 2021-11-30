@@ -1,11 +1,10 @@
 package be.svend.goodviews.models;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import java.util.Objects;
+
+import javax.persistence.*;
 
 @Entity
+@Table(uniqueConstraints= @UniqueConstraint(columnNames= "name"))
 public class Genre {
 
     @Id
