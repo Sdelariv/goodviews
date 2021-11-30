@@ -1,8 +1,10 @@
 package be.svend.goodviews.factory;
 
+import be.svend.goodviews.models.Director;
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Genre;
 import be.svend.goodviews.models.Tag;
+import be.svend.goodviews.repositories.DirectorRepo;
 import be.svend.goodviews.repositories.FilmRepository;
 import be.svend.goodviews.repositories.GenreRepository;
 import be.svend.goodviews.repositories.TagRepository;
@@ -13,18 +15,21 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class FilmFactory {
     TagRepository tagRepo;
     GenreRepository genreRepo;
     FilmRepository filmRepo;
+    DirectorRepo directorRepo;
 
-    public FilmFactory(TagRepository tagRepo, GenreRepository genreRepo, FilmRepository filmRepo) {
+    public FilmFactory(TagRepository tagRepo, GenreRepository genreRepo,
+                       FilmRepository filmRepo, DirectorRepo directorRepo) {
         this.tagRepo = tagRepo;
         this.genreRepo = genreRepo;
         this.filmRepo = filmRepo;
-
+        this.directorRepo = directorRepo;
         saveTestFilms();
     }
 
@@ -79,11 +84,12 @@ public class FilmFactory {
         List<Tag> savedTags = new ArrayList<>();
 
         for (Tag tag: tags) {
-            if (tagRepo.findByName(tag.getName()).isEmpty()) {
+            Optional<Tag> foundTag = tagRepo.findByName(tag.getName());
+            if (foundTag.isEmpty()) {
                 savedTags.add(tagRepo.save(tag));
                 System.out.println("Saving " + tag.getName());
             } else {
-                savedTags.add(tagRepo.findByName(tag.getName()).get());
+                savedTags.add(foundTag.get());
                 System.out.println("Not saving " + tag.getName() + " because it already exists");
             }
         }
@@ -95,11 +101,12 @@ public class FilmFactory {
         List<Genre> savedGenres = new ArrayList<>();
 
         for (Genre genre: genres) {
-            if (genreRepo.findByName(genre.getName()).isEmpty()) {
+            Optional<Genre> foundGenre = genreRepo.findByName(genre.getName());
+            if (foundGenre.isEmpty()) {
                 savedGenres.add(genreRepo.save(genre));
                 System.out.println("Saving " + genre.getName());
             } else {
-                savedGenres.add(genreRepo.findByName(genre.getName()).get());
+                savedGenres.add(foundGenre.get());
                 System.out.println("Not saving " + genre.getName() + " because it already exists");
             }
         }
@@ -107,10 +114,30 @@ public class FilmFactory {
         return savedGenres;
     }
 
+    public List<Director> saveDirector(List<Director> directors) {
+        List<Director> savedDirectors = new ArrayList<>();
+
+        for (Director director : directors) {
+            Optional<Director> foundDirector = directorRepo.findByName(director.getName());
+
+            if (foundDirector.isEmpty()) {
+                savedDirectors.add(directorRepo.save(director));
+                System.out.println("Saving " + director.getName());
+            } else {
+                savedDirectors.add(foundDirector.get());
+                System.out.println("Not saving " + director.getName() + " because it already exists in database");
+            }
+        }
+        // TODO: Remember to add this logic to the service layer later
+
+        return savedDirectors;
+    }
+
     public void saveFilms(List<Film> films) {
         for (Film film: films) {
             film.setGenres(saveGenres(film.getGenres()));
             film.setTags(saveTags(film.getTags()));
+            film.setDirector(saveDirector(film.getDirector()));
             filmRepo.save(film);
         }
     }

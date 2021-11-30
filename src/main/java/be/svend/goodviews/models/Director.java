@@ -1,10 +1,13 @@
 package be.svend.goodviews.models;
 
-import javax.persistence.*;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import java.util.List;
 
 @Entity
-@Table(uniqueConstraints= @UniqueConstraint(columnNames= "name"))
-public class Tag {
+public class Director {
 
     @Id
     @GeneratedValue
@@ -12,17 +15,19 @@ public class Tag {
 
     private String name;
 
+
     // CONSTRUCTORS
 
-    public Tag() {
+    public Director() {
+
     }
 
-    public Tag(String name) {
+    public Director(String name) {
         this.name = name;
     }
 
-
     // GETTERS & SETTERS
+
 
     public Long getId() {
         return id;
@@ -39,4 +44,5 @@ public class Tag {
     public void setName(String name) {
         this.name = name;
     }
+
 }
