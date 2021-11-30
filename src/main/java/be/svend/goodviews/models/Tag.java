@@ -13,6 +13,16 @@ public class Tag {
 
     private String name;
 
+    // CONSTRUCTORS
+
+    public Tag() {
+    }
+
+    public Tag(String name) {
+        this.name = name;
+    }
+
+
     // GETTERS & SETTERS
 
     public Long getId() {

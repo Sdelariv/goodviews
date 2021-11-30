@@ -3,6 +3,7 @@ package be.svend.goodviews.models;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.util.Objects;
 
 @Entity
 public class Genre {
@@ -12,6 +13,15 @@ public class Genre {
     private Long id;
 
     private String name;
+
+    // CONSTRUCTORS
+
+    public Genre() {
+    }
+
+    public Genre(String name) {
+        this.name = name;
+    }
 
     // GETTERS & SETTERS
 
@@ -30,4 +40,14 @@ public class Genre {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Genre genre = (Genre) o;
+
+        return this.name.equals(genre.getName());
+    }
+
 }

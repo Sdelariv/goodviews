@@ -1,6 +1,7 @@
 package be.svend.goodviews.models;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,19 +18,32 @@ public class Film {
 
     private String translatedTitle;
 
-    private Date releaseDate;
+    private LocalDate releaseDate;
 
     private String posterUrl;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     private List<Genre> genres;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     private List<Tag> tags;
 
-    private Double averageRating;
+    private Integer averageRating; // 0-100
 
-    // TODO: Add list of Ratings
+    private String director;
+
+    private Integer runTime;
+
+    // TODO: Add list of Ratings, list of pictures, Director as an entity
+
+    // CONSTURCTORS
+
+    public Film() {
+    }
+
+    public Film(String title) {
+        this.title = title;
+    }
 
     // GETTERS & SETTERS
 
@@ -57,11 +71,11 @@ public class Film {
         this.translatedTitle = translatedTitle;
     }
 
-    public Date getReleaseDate() {
+    public LocalDate getReleaseDate() {
         return releaseDate;
     }
 
-    public void setReleaseDate(Date releaseDate) {
+    public void setReleaseDate(LocalDate releaseDate) {
         this.releaseDate = releaseDate;
     }
 
@@ -87,6 +101,12 @@ public class Film {
         }
     }
 
+    public void addGenre(String name) {
+        Genre genre = new Genre(name);
+
+        addGenre(genre);
+    }
+
     public List<Tag> getTags() {
         return tags;
     }
@@ -101,11 +121,33 @@ public class Film {
         }
     }
 
-    public Double getAverageRating() {
+    public void addTag(String name) {
+        Tag tag = new Tag(name);
+
+        addTag(tag);
+    }
+
+    public Integer getAverageRating() {
         return averageRating;
     }
 
-    public void setAverageRating(Double averageRating) {
+    public void setAverageRating(Integer averageRating) {
         this.averageRating = averageRating;
+    }
+
+    public String getDirector() {
+        return director;
+    }
+
+    public void setDirector(String director) {
+        this.director = director;
+    }
+
+    public Integer getRunTime() {
+        return runTime;
+    }
+
+    public void setRunTime(Integer runTime) {
+        this.runTime = runTime;
     }
 }
