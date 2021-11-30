@@ -32,6 +32,8 @@ public class Film {
 
     private Double averageRating;
 
+    // TODO: Add list of Ratings
+
     // GETTERS & SETTERS
 
     public Long getId() {
