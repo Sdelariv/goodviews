@@ -20,16 +20,9 @@ import java.util.List;
 
 @Component
 public class FilmFactory {
-    TagService tagService;
-    GenreService genreService;
-    DirectorService directorService;
     FilmService filmService;
 
-    public FilmFactory(TagService tagService, GenreService genreService,
-                       DirectorService directorService, FilmService filmService) {
-        this.tagService = tagService;
-        this.genreService = genreService;
-        this.directorService = directorService;
+    public FilmFactory(FilmService filmService) {
         this.filmService = filmService;
         saveTestFilms();
     }
@@ -78,22 +71,6 @@ public class FilmFactory {
         jp.setRunTime(127);
         jp.setPosterUrl("https://upload.wikimedia.org/wikipedia/en/e/e7/Jurassic_Park_poster.jpg");
 
-        saveFilms(List.of(pad2,emma, jp));
-    }
-
-    public List<Tag> saveTags(List<Tag> tags) {
-        return tagService.saveTags(tags);
-    }
-
-    public List<Genre> saveGenres(List<Genre> genres) {
-        return genreService.saveGenres(genres);
-    }
-
-    public List<Director> saveDirector(List<Director> directors) {
-        return directorService.saveDirectors(directors);
-    }
-
-    public void saveFilms(List<Film> films) {
-        filmService.saveFilms(films);
+        filmService.saveFilms(List.of(pad2,emma,jp));
     }
 }
