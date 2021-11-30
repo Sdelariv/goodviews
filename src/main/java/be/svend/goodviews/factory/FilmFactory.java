@@ -8,28 +8,29 @@ import be.svend.goodviews.repositories.DirectorRepo;
 import be.svend.goodviews.repositories.FilmRepository;
 import be.svend.goodviews.repositories.GenreRepository;
 import be.svend.goodviews.repositories.TagRepository;
+import be.svend.goodviews.services.DirectorService;
+import be.svend.goodviews.services.FilmService;
+import be.svend.goodviews.services.GenreService;
+import be.svend.goodviews.services.TagService;
 import org.springframework.stereotype.Component;
 
-import java.sql.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Optional;
+
 
 @Component
 public class FilmFactory {
-    TagRepository tagRepo;
-    GenreRepository genreRepo;
-    FilmRepository filmRepo;
-    DirectorRepo directorRepo;
+    TagService tagService;
+    GenreService genreService;
+    DirectorService directorService;
+    FilmService filmService;
 
-    public FilmFactory(TagRepository tagRepo, GenreRepository genreRepo,
-                       FilmRepository filmRepo, DirectorRepo directorRepo) {
-        this.tagRepo = tagRepo;
-        this.genreRepo = genreRepo;
-        this.filmRepo = filmRepo;
-        this.directorRepo = directorRepo;
+    public FilmFactory(TagService tagService, GenreService genreService,
+                       DirectorService directorService, FilmService filmService) {
+        this.tagService = tagService;
+        this.genreService = genreService;
+        this.directorService = directorService;
+        this.filmService = filmService;
         saveTestFilms();
     }
 
@@ -81,67 +82,18 @@ public class FilmFactory {
     }
 
     public List<Tag> saveTags(List<Tag> tags) {
-        List<Tag> savedTags = new ArrayList<>();
-
-        for (Tag tag: tags) {
-            Optional<Tag> foundTag = tagRepo.findByName(tag.getName());
-            if (foundTag.isEmpty()) {
-                savedTags.add(tagRepo.save(tag));
-                System.out.println("Saving " + tag.getName());
-            } else {
-                savedTags.add(foundTag.get());
-                System.out.println("Not saving " + tag.getName() + " because it already exists");
-            }
-        }
-        // TODO: Remember to add this logic to the service layer later
-        return savedTags;
+        return tagService.saveTags(tags);
     }
 
     public List<Genre> saveGenres(List<Genre> genres) {
-        List<Genre> savedGenres = new ArrayList<>();
-
-        for (Genre genre: genres) {
-            Optional<Genre> foundGenre = genreRepo.findByName(genre.getName());
-            if (foundGenre.isEmpty()) {
-                savedGenres.add(genreRepo.save(genre));
-                System.out.println("Saving " + genre.getName());
-            } else {
-                savedGenres.add(foundGenre.get());
-                System.out.println("Not saving " + genre.getName() + " because it already exists");
-            }
-        }
-        // TODO: Remember to add this logic to the service layer later
-        return savedGenres;
+        return genreService.saveGenres(genres);
     }
 
     public List<Director> saveDirector(List<Director> directors) {
-        List<Director> savedDirectors = new ArrayList<>();
-
-        for (Director director : directors) {
-            Optional<Director> foundDirector = directorRepo.findByName(director.getName());
-
-            if (foundDirector.isEmpty()) {
-                savedDirectors.add(directorRepo.save(director));
-                System.out.println("Saving " + director.getName());
-            } else {
-                savedDirectors.add(foundDirector.get());
-                System.out.println("Not saving " + director.getName() + " because it already exists in database");
-            }
-        }
-        // TODO: Remember to add this logic to the service layer later
-
-        return savedDirectors;
+        return directorService.saveDirectors(directors);
     }
 
     public void saveFilms(List<Film> films) {
-        for (Film film: films) {
-            film.setGenres(saveGenres(film.getGenres()));
-            film.setTags(saveTags(film.getTags()));
-            film.setDirector(saveDirector(film.getDirector()));
-            filmRepo.save(film);
-
-            System.out.println("Saved the following Film:");
-            System.out.println(film);
-        }
+        filmService.saveFilms(films);
     }
 }
