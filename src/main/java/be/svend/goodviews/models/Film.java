@@ -3,10 +3,13 @@ package be.svend.goodviews.models;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Film, which consists of a title, a translated title (if the original one is not in English),
+ * releasedate, poster, a list of genres, a list of tags, an average rating, director and runtime
+ */
 @Entity
 public class Film {
 
@@ -33,7 +36,7 @@ public class Film {
     @ManyToMany
     private List<Director> director;
 
-    private Integer runTime;
+    private Integer runTime; // in minutes
 
     // TODO: Add list of Ratings, list of pictures, Director as an entity
 
@@ -166,5 +169,23 @@ public class Film {
 
     public void setRunTime(Integer runTime) {
         this.runTime = runTime;
+    }
+
+    // OTHER
+
+    @Override
+    public String toString() {
+        return "Film{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", translatedTitle='" + translatedTitle + '\'' +
+                ", releaseDate=" + releaseDate +
+                ", posterUrl='" + posterUrl + '\'' +
+                ", genres=" + genres +
+                ", tags=" + tags +
+                ", averageRating=" + averageRating +
+                ", director=" + director +
+                ", runTime=" + runTime +
+                '}';
     }
 }

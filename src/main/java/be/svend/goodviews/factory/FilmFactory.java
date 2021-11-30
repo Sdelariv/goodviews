@@ -139,6 +139,9 @@ public class FilmFactory {
             film.setTags(saveTags(film.getTags()));
             film.setDirector(saveDirector(film.getDirector()));
             filmRepo.save(film);
+
+            System.out.println("Saved the following Film:");
+            System.out.println(film);
         }
     }
 }

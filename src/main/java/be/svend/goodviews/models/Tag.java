@@ -2,6 +2,9 @@ package be.svend.goodviews.models;
 
 import javax.persistence.*;
 
+/**
+ * Keyword to describe the film (may overlap with genre in a few cases)
+ */
 @Entity
 @Table(uniqueConstraints= @UniqueConstraint(columnNames= "name"))
 public class Tag {
@@ -38,5 +41,15 @@ public class Tag {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    // OTHER
+
+    @Override
+    public String toString() {
+        return "Tag{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

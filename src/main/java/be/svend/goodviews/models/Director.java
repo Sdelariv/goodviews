@@ -1,12 +1,10 @@
 package be.svend.goodviews.models;
 
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import java.util.List;
+import javax.persistence.*;
+
 
 @Entity
+@Table(uniqueConstraints= @UniqueConstraint(columnNames= "name"))
 public class Director {
 
     @Id
@@ -45,4 +43,13 @@ public class Director {
         this.name = name;
     }
 
+    // OTHER
+
+    @Override
+    public String toString() {
+        return "Director{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

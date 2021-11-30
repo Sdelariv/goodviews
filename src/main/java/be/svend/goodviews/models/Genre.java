@@ -3,6 +3,9 @@ package be.svend.goodviews.models;
 
 import javax.persistence.*;
 
+/**
+ * Genre of the film
+ */
 @Entity
 @Table(uniqueConstraints= @UniqueConstraint(columnNames= "name"))
 public class Genre {
@@ -49,4 +52,13 @@ public class Genre {
         return this.name.equals(genre.getName());
     }
 
+    // OTHER
+
+    @Override
+    public String toString() {
+        return "Genre{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }
