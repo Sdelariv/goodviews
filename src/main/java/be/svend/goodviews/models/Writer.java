@@ -2,34 +2,32 @@ package be.svend.goodviews.models;
 
 import javax.persistence.*;
 
-
 @Entity
 @Table(uniqueConstraints= @UniqueConstraint(columnNames= "name"))
-public class Director {
+public class Writer {
 
     @Id
     private String id;
 
     private String name;
 
-
     // CONSTRUCTORS
 
-    public Director() {
+    public Writer() {
 
     }
 
-    public Director(String name) {
+    public Writer(String name) {
+        this.id = id;
         this.name = name;
     }
 
-    public Director(String id, String name) {
+    public Writer(String id, String name) {
         this.id = id;
         this.name = name;
     }
 
     // GETTERS & SETTERS
-
 
     public String getId() {
         return id;
@@ -51,8 +49,8 @@ public class Director {
 
     @Override
     public String toString() {
-        return "Director{" +
-                "id=" + id +
+        return "Writer{" +
+                "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 '}';
     }

@@ -14,12 +14,13 @@ import java.util.stream.Collectors;
 public class Film {
 
     @Id
-    @GeneratedValue
-    private Long id;
+    private String id;
 
     private String title;
 
     private String translatedTitle;
+
+    private Integer releaseYear; // TODO: Decide between date and year
 
     private LocalDate releaseDate;
 
@@ -33,8 +34,13 @@ public class Film {
 
     private Integer averageRating; // 0-100
 
+    private Integer averageRatingImdb;
+
     @ManyToMany
     private List<Director> director;
+
+    @ManyToMany
+    private List<Writer> writer;
 
     private Integer runTime; // in minutes
 
@@ -51,11 +57,11 @@ public class Film {
 
     // GETTERS & SETTERS
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -163,12 +169,36 @@ public class Film {
         this.director = directors;
     }
 
+    public List<Writer> getWriter() {
+        return writer;
+    }
+
+    public void setWriter(List<Writer> writer) {
+        this.writer = writer;
+    }
+
     public Integer getRunTime() {
         return runTime;
     }
 
     public void setRunTime(Integer runTime) {
         this.runTime = runTime;
+    }
+
+    public Integer getReleaseYear() {
+        return releaseYear;
+    }
+
+    public void setReleaseYear(Integer releaseYear) {
+        if (releaseYear > 0 && releaseYear < 3000) this.releaseYear = releaseYear;
+    }
+
+    public Integer getAverageRatingImdb() {
+        return averageRatingImdb;
+    }
+
+    public void setAverageRatingImdb(Integer averageRatingImdb) {
+        this.averageRatingImdb = averageRatingImdb;
     }
 
     // OTHER
@@ -179,12 +209,14 @@ public class Film {
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", translatedTitle='" + translatedTitle + '\'' +
-                ", releaseDate=" + releaseDate +
+                ", releaseYear=" + releaseYear +
                 ", posterUrl='" + posterUrl + '\'' +
                 ", genres=" + genres +
                 ", tags=" + tags +
                 ", averageRating=" + averageRating +
+                ", averageRating (Imdb)=" + averageRatingImdb +
                 ", director=" + director +
+                ", writer=" + writer +
                 ", runTime=" + runTime +
                 '}';
     }

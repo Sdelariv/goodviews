@@ -29,6 +29,7 @@ public class FilmFactory {
 
     public void saveTestFilms() {
         Film pad2 = new Film("Paddington 2");
+        pad2.setId("tt4468740");
         pad2.setAverageRating(99);
         pad2.setReleaseDate(LocalDate.of(2017, 12, 9));
         pad2.setDirector("Paul King");
@@ -43,6 +44,7 @@ public class FilmFactory {
         pad2.setPosterUrl("https://upload.wikimedia.org/wikipedia/ar/8/80/Paddington_two_poster.jpg");
 
         Film emma = new Film("Emma");
+        emma.setId("tt9214832");
         emma.setAverageRating(87);
         emma.setDirector("Autumn de Wilde");
         emma.setReleaseDate(LocalDate.of(2020, 2,21));
@@ -59,6 +61,7 @@ public class FilmFactory {
 
 
         Film jp = new Film("Jurassic Park");
+        jp.setId("tt0107290");
         jp.setDirector("Steven Spielberg");
         jp.setAverageRating(92);
         jp.setReleaseDate(LocalDate.of(1993,10,20));
