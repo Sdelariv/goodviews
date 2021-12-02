@@ -1,4 +1,4 @@
-package be.svend.goodviews.test;
+package be.svend.goodviews.factory;
 
 import be.svend.goodviews.models.Director;
 import be.svend.goodviews.models.Film;

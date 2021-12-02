@@ -1,10 +1,10 @@
 package be.svend.goodviews.test;
 
 
+import be.svend.goodviews.factory.ImdbScraper;
 import be.svend.goodviews.models.Film;
 
 import java.util.List;
-import java.util.Map;
 
 public class Main {
 
