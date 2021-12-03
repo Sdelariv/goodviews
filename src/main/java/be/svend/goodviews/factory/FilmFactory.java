@@ -20,8 +20,10 @@ public class FilmFactory {
         this.filmService = filmService;
         this.imdbScraper = imdbScraper;
 
-        saveImdbFilms();
+    }
 
+    public void createDatabase() {
+        saveImdbFilms();
         saveTestFilms();
     }
 

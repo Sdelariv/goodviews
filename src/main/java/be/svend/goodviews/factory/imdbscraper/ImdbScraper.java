@@ -24,7 +24,6 @@ public class ImdbScraper {
         this.filmScraper = new FilmScraper(parentFolderPath);
         this.ratingScraper = new RatingScraper(parentFolderPath, voteMinimum);
         this.crewScraper = new CrewScraper(parentFolderPath);
-
     }
 
     // GENERAL SCRAPER
