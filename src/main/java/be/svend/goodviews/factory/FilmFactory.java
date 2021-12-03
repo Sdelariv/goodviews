@@ -1,17 +1,9 @@
 package be.svend.goodviews.factory;
 
-import be.svend.goodviews.models.Director;
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Genre;
 import be.svend.goodviews.models.Tag;
-import be.svend.goodviews.repositories.DirectorRepo;
-import be.svend.goodviews.repositories.FilmRepository;
-import be.svend.goodviews.repositories.GenreRepository;
-import be.svend.goodviews.repositories.TagRepository;
-import be.svend.goodviews.services.DirectorService;
 import be.svend.goodviews.services.FilmService;
-import be.svend.goodviews.services.GenreService;
-import be.svend.goodviews.services.TagService;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;

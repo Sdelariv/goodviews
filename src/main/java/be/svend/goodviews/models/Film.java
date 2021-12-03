@@ -37,10 +37,10 @@ public class Film {
     private Integer averageRatingImdb;
 
     @ManyToMany
-    private List<Director> director;
+    private List<Person> director;
 
     @ManyToMany
-    private List<Writer> writer;
+    private List<Person> writer;
 
     private Integer runTime; // in minutes
 
@@ -153,27 +153,27 @@ public class Film {
         this.averageRating = averageRating;
     }
 
-    public List<Director> getDirector() {
+    public List<Person> getDirector() {
         return director;
     }
 
-    public void setDirector(Director director) {
+    public void setDirector(Person director) {
         this.director = new ArrayList<>(List.of(director));
     }
 
     public void setDirector(String name) {
-        setDirector(new Director(name));
+        setDirector(new Person(name));
     }
 
-    public void setDirector(List<Director> directors) {
+    public void setDirector(List<Person> directors) {
         this.director = directors;
     }
 
-    public List<Writer> getWriter() {
+    public List<Person> getWriter() {
         return writer;
     }
 
-    public void setWriter(List<Writer> writer) {
+    public void setWriter(List<Person> writer) {
         this.writer = writer;
     }
 

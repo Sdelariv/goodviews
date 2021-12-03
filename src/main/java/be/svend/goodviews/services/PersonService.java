@@ -1,7 +1,7 @@
 package be.svend.goodviews.services;
 
-import be.svend.goodviews.models.Director;
-import be.svend.goodviews.repositories.DirectorRepo;
+import be.svend.goodviews.models.Person;
+import be.svend.goodviews.repositories.PersonRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -9,31 +9,31 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class DirectorService {
-    DirectorRepo directorRepo;
+public class PersonService {
+    PersonRepository personRepo;
 
-    public DirectorService(DirectorRepo directorRepo) {
-        this.directorRepo = directorRepo;
+    public PersonService(PersonRepository personRepo) {
+        this.personRepo = personRepo;
     }
 
-    public List<Director> saveDirectors(List<Director> directors) {
-        List<Director> savedDirectors = new ArrayList<>();
+    public List<Person> saveDirectors(List<Person> directors) {
+        List<Person> savedDirectors = new ArrayList<>();
 
-        for (Director director: directors) {
+        for (Person director: directors) {
             savedDirectors.add(saveDirector(director));
         }
 
         return savedDirectors;
     }
 
-    public Director saveDirector(Director director) {
-        Optional<Director> foundDirector = directorRepo.findByName(director.getName());
+    public Person saveDirector(Person director) {
+        Optional<Person> foundDirector = personRepo.findByName(director.getName());
 
         // TODO: deal with duplicate names
 
         if (foundDirector.isEmpty()) {
             System.out.println("Saving director: " + director.getName());
-            return directorRepo.save(director);
+            return personRepo.save(director);
         } else {
             System.out.println("Not saving " + director.getName() + " because it already exists in the database");
             return foundDirector.get();
