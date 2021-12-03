@@ -10,6 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Responsible for scraping duties based on tsv files of the database
+ * @Author: Sven Delarivière
+ */
 @Component
 public class ImdbScraper {
     private File basicData;
@@ -53,14 +57,16 @@ public class ImdbScraper {
 
     /**
      * Goes through all the relevant methods to scrape IMDB and returns a list of all the films with data
-     * @return List<Film> a list of Films with all the data
+     * @return List<Film> - a list of Films with all the data
      */
     public List<Film> scrapeImdb() {
-        // FILM INFO
+        // Gather ProjectIds with sufficient ratings
         Map<String, Integer> desiredIds = findIdsWithSufficientRatings();
-        List<Film> filmList = gatherFilmsFromIds(desiredIds);
 
-        // CREW
+        // Gather only films and their info based on those ids
+        List<Film> filmList = gatherFilmInfoFromIds(desiredIds);
+
+        // Gather crewInfo based on the films (and their ids)
         filmList = addCrewIdsToFilms(filmList);
         filmList = addCrewDataToFilmsBasedOnCrewId(filmList);
 
@@ -71,7 +77,7 @@ public class ImdbScraper {
 
     /**
      * Goes through the ratings-dataset to find films with enough ratings, and then saves that (and the average rating)
-     * @return a Map of desiredIds along with their averageRating on IMDB
+     * @return Map<String-desiredIds, Integer-averageImdbRating> - a map of filmIds with their average rating on IMDB
      */
     public Map<String, Integer> findIdsWithSufficientRatings() {
         Map<String, Integer> ids = new HashMap<>();
@@ -88,9 +94,6 @@ public class ImdbScraper {
                     ids.put(id, averageRating);
                 }
             }
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -99,9 +102,18 @@ public class ImdbScraper {
     }
 
     /**
+     * Checks whether the dataline from ratingData has enough votes
+     * @param lineItems lineItem from ratingData
+     * @return boolean - true if sufficient votes, false if not
+     */
+    private boolean HasSufficientVotesInDataLine(String[] lineItems){
+        return Integer.parseInt(lineItems[NUMBER_RATINGS_INDEX]) > this.voteMinimum;
+    }
+
+    /**
      * Takes the average rating from a dataline and converts it to an integer between 0 and 100
-     * @param lineItems
-     * @return Integer rating between 0 and 100
+     * @param lineItems String[] - the lineItem read
+     * @return Integer - integer of rating between 0 and 100
      */
     private Integer getAverageRatingImdbFromDataLine(String[] lineItems) {
         double averageRating = Double.parseDouble(lineItems[AVERAGE_RATING_INDEX]);
@@ -112,7 +124,12 @@ public class ImdbScraper {
 
     // FILM-DATA GATHERING
 
-    public List<Film> gatherFilmsFromIds(Map<String, Integer> desiredIdsWithAverageRating) {
+    /**
+     * Uses a map of filmIds (with their average rating) to create a list of films with the film-data from the dataset basicData
+     * @param desiredIdsWithAverageRating Map<String-id, Integer-averageImdbRating> - a map of filmIds and their average imdb rating
+     * @return List<Film> - a list of films with film-properties (incl average rating)
+     */
+    public List<Film> gatherFilmInfoFromIds(Map<String, Integer> desiredIdsWithAverageRating) {
         List<Film> films = new ArrayList<>();
 
         try (BufferedReader basicReader = new BufferedReader(new FileReader(basicData))) {
@@ -136,13 +153,12 @@ public class ImdbScraper {
         return films;
     }
 
-
     // CREW INFO GATHERING
 
     /**
      * Scrapes the database for directorIds and writerIds and adds them to the crew of the film based on the filmIds
-     * @param films List<Film> to use their filmIds
-     * @return List<Film> with crewIds added where they were found based on the film's Id
+     * @param films List<Film> - a list of films to add crewIds based on its filmId
+     * @return List<Film> - a list of films with crewIds added where they were found based on the film's Id
      */
     public List<Film> addCrewIdsToFilms(List<Film> films) {
         List<String> filmIds = films.stream().map(f -> f.getId()).collect(Collectors.toList());
@@ -164,8 +180,8 @@ public class ImdbScraper {
 
     /**
      * Scrapes the dataset for all the directorIds involved in a specific film (based on its id)
-     * @param filmIds
-     * @return Map<String-filmId,List<Person> of Directors> A map of filmIds and their directors
+     * @param filmIds List<String> - a list of filmIds for which you want the directorIds
+     * @return Map<String-filmId,List<Person> of Directors> - a map of filmIds and their directors
      */
     private Map<String, List<Person>> getAllDirectorIdsPerFilmId(List<String> filmIds) {
         Map<String,List<Person>> allDirectors = new HashMap<>();
@@ -201,8 +217,8 @@ public class ImdbScraper {
 
     /**
      * Scrapes the dataset for all the writerIds involved in a specific film (based on its id)
-     * @param filmIds
-     * @return Map<String-filmId,List<Person> of Writers> A map of filmIds and their writerIds
+     * @param filmIds List<String-filmIds> - a list of filmIds to recover the writerIds from
+     * @return Map<String-filmId,List<Person> of Writers> - a map of filmIds and their writerIds
      */
     private Map<String, List<Person>> getAllWriterIdsPerFilmId(List<String> filmIds) {
         Map<String,List<Person>> allWriters = new HashMap<>();
@@ -238,8 +254,8 @@ public class ImdbScraper {
 
     /**
      * Takes a list of films and returns the list with the crew filled in (provided the crew has ids)
-     * @param filmList List<Film> with crew having ids
-     * @return List<Film> of films with the writer and director data filled in where there were ids for them
+     * @param filmList List<Film> - a list of films (with crew having ids) for which the writer/director data needs filling in
+     * @return List<Film> - of films with the writer and director data filled in where there were ids for them
      */
     public List<Film> addCrewDataToFilmsBasedOnCrewId(List<Film> filmList) {
         List<String> idsDesiredCrew = getCrewIdsFromFilms(filmList);
@@ -264,10 +280,11 @@ public class ImdbScraper {
     }
 
     /**
-     * Will, given a list of people with ids fill in the names extracted from a map with ids and names
-     * @param personWithIdToBeNamed a List<Person> where Id is present and name needs filling in
-     * @param crewMapIdAndName a Map<Id-String,Name-String> from which the name will get extracted
-     * @return
+     * Will, given a list of people with ids fill in the names extracted from a map with ids and names.
+     * Can be used for all manner of crew as long as only the name needs filling in.
+     * @param personWithIdToBeNamed  List<Person> - a list of people where Id is present and name needs filling in
+     * @param crewMapIdAndName  Map<Id-String,Name-String> - a pre-made map of ids and names from which the name will get extracted
+     * @return List<Person> - a list of people with ids and names
      */
     public List<Person> extractPersonsFromCrewMap(List<Person> personWithIdToBeNamed, Map<String,String> crewMapIdAndName) {
 
@@ -282,10 +299,10 @@ public class ImdbScraper {
         return personWithIdToBeNamed;
     }
 
-
     /**
+     * Scrapes the dataset personData to create a Map of names for the desired crewIds
      * @param idsDesiredCrew (a list of id Strings for the crew that you want the info extracted of)
-     * @return a Map with the id-String and the name-String
+     * @return Map<String-crewId, String-crewName> - a Map with the id-String and the name-String
      */
     private Map<String,String> getRelevantCrewMapFromIds(List<String> idsDesiredCrew) {
         Map<String,String> relevantCrew = new HashMap<>();
@@ -310,26 +327,11 @@ public class ImdbScraper {
         return relevantCrew;
     }
 
-    private boolean isLineContainingRelevantId(String[] lineItems, List<String> idsDesired) {
-        String foundId = lineItems[ID_INDEX];
-
-        if (foundId.equals("tconst")) return false;
-
-        if (!idsDesired.contains(foundId)) return false;
-
-        return true;
-    }
-
-    private boolean isLineContainingRelevantId(String[] lineItems, Map<String,Integer> idsDesiredCrew) {
-        String foundId = lineItems[ID_INDEX];
-
-        if (foundId.equals("tconst")) return false;
-
-        if (!idsDesiredCrew.containsKey(foundId)) return false;
-
-        return true;
-    }
-
+    /**
+     * Extracts a list of only the crewIds inside a list of Films. Can be used for contains(id) methods.
+     * @param filmList List<Film> a list of Films with crewIds that need extracting
+     * @return List<String-crewId> - a list of crewIds (of the films given)
+     */
     private List<String> getCrewIdsFromFilms(List<Film> filmList) {
         List<String> crewIds = new ArrayList<>();
 
@@ -341,10 +343,60 @@ public class ImdbScraper {
         return crewIds;
     }
 
+    // VALIDATING METHODS
+
+    /**
+     * Validates whether the line is about a relevant id
+     * @param lineItems the line read from a dataset
+     * @param idsDesired List<String-id>the list of Ids that are considered relevant
+     * @return boolean - true if about a relevant id, false if not.
+     */
+    private boolean isLineContainingRelevantId(String[] lineItems, List<String> idsDesired) {
+        String foundId = lineItems[ID_INDEX];
+
+        if (foundId.equals("tconst")) return false;
+
+        if (!idsDesired.contains(foundId)) return false;
+
+        return true;
+    }
+
+    /**
+     * Validates whether the line is about a relevant id
+     * @param lineItems String[] the read lineItem
+     * @param idsDesiredCrew Map<String-id,Integer-averageRating> used solely for the ids
+     * @return boolean - true if about a relevant id, false if not.
+     */
+    private boolean isLineContainingRelevantId(String[] lineItems, Map<String,Integer> idsDesiredCrew) {
+        String foundId = lineItems[ID_INDEX];
+
+        if (foundId.equals("tconst")) return false;
+
+        if (!idsDesiredCrew.containsKey(foundId)) return false;
+
+        return true;
+    }
+
+    /**
+     * Checks whether the line in basicData is a film or not
+     * @param lineItems - a lineItem from basicData
+     * @return boolean - true if it's about a film, false if not
+     */
+    private boolean isFilmInDataLine(String[] lineItems) {
+        if (lineItems[TYPE_INDEX].equals("movie")) return true;
+        else return false;
+    }
+
+
 
     // INTERNAL METHODS
 
 
+    /**
+     * Uses a lineItem from basicData to create a Film-object with its id, titles, runtime, releasedata and genre
+     * @param lineItems - a lineItem from basicData
+     * @return Film - object with id, titles, runtime, releasedata and genre extracted from the lineItem
+     */
     private Film convertBasicDataToFilm(String[] lineItems) {
         Film film = new Film();
 
@@ -374,6 +426,11 @@ public class ImdbScraper {
         return film;
     }
 
+    /**
+     * Creates a list of Genre objects based on the lineItem of the project
+     * @param lineItems - a lineItem from basicData
+     * @return List<Genre> list of genres of the project, extracted from the lineItem
+     */
     private List<Genre> getGenres(String[] lineItems) {
         String[] genreNames = lineItems[GENRE_INDEX].split(",");
         List<Genre> genres = new ArrayList<>();
@@ -384,6 +441,11 @@ public class ImdbScraper {
         return genres;
     }
 
+    /**
+     * Creates an Integer of the runtime based on the lineItem of the project
+     * @param lineItems - a lineItem from basicData
+     * @return Integer - runtime of the project, extracted from the lineItem
+     */
     private Integer getRuntime(String[] lineItems) {
         String runtimeMinutesString = lineItems[RUNTIME_INDEX];
 
@@ -395,6 +457,11 @@ public class ImdbScraper {
         }
     }
 
+    /**
+     * Creates an Integer of the release year based on the lineItem of the project
+     * @param lineItems - a lineItem from basicData
+     * @return Integer - the year of the project, extracted from the lineItem
+     */
     private Integer getReleaseYearFromDataLine(String[] lineItems) {
         String releaseYearString = lineItems[YEAR_INDEX];
 
@@ -407,14 +474,8 @@ public class ImdbScraper {
     }
 
 
-    private boolean isFilmInDataLine(String[] lineItems) {
-        if (lineItems[TYPE_INDEX].equals("movie")) return true;
-        else return false;
-    }
 
-    private boolean HasSufficientVotesInDataLine(String[] lineItems){
-        return Integer.parseInt(lineItems[NUMBER_RATINGS_INDEX]) > this.voteMinimum;
-    }
+
 }
 
 
