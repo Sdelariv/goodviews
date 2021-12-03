@@ -1,5 +1,6 @@
 package be.svend.goodviews.factory;
 
+import be.svend.goodviews.factory.imdbscraper.ImdbScraper;
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Genre;
 import be.svend.goodviews.models.Tag;
