@@ -1,6 +1,7 @@
 package be.svend.goodviews.factory;
 
 import be.svend.goodviews.models.*;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Component
 public class ImdbScraper {
     private File basicData;
     private File ratingData;
@@ -47,15 +49,30 @@ public class ImdbScraper {
         voteMinimum = 25000;
     }
 
+    // GENERAL SCRAPER
+
+    /**
+     * Goes through all the relevant methods to scrape IMDB and returns a list of all the films with data
+     * @return List<Film> a list of Films with all the data
+     */
     public List<Film> scrapeImdb() {
-        Map<String, Integer> ids = findIdsWithSufficientRatings();
-        List<Film> filmList = gatherFilmsFromIds(ids);
+        // FILM INFO
+        Map<String, Integer> desiredIds = findIdsWithSufficientRatings();
+        List<Film> filmList = gatherFilmsFromIds(desiredIds);
+
+        // CREW
         filmList = addCrewIdsToFilms(filmList);
         filmList = addCrewDataToFilmsBasedOnCrewId(filmList);
 
         return filmList;
     }
 
+    // RATINGS-BASED GATHERING
+
+    /**
+     * Goes through the ratings-dataset to find films with enough ratings, and then saves that (and the average rating)
+     * @return a Map of desiredIds along with their averageRating on IMDB
+     */
     public Map<String, Integer> findIdsWithSufficientRatings() {
         Map<String, Integer> ids = new HashMap<>();
 
@@ -65,9 +82,9 @@ public class ImdbScraper {
                 String[] lineItems = line.split("\t");
                 if (lineItems[ID_INDEX].equals("tconst")) continue;
 
-                if (hasSufficientVotes(lineItems)) {
+                if (HasSufficientVotesInDataLine(lineItems)) {
                     String id = lineItems[ID_INDEX];
-                    Integer averageRating = getAverageRatingImdb(lineItems);
+                    Integer averageRating = getAverageRatingImdbFromDataLine(lineItems);
                     ids.put(id, averageRating);
                 }
             }
@@ -81,14 +98,21 @@ public class ImdbScraper {
         return ids;
     }
 
-    private Integer getAverageRatingImdb(String[] lineItems) {
+    /**
+     * Takes the average rating from a dataline and converts it to an integer between 0 and 100
+     * @param lineItems
+     * @return Integer rating between 0 and 100
+     */
+    private Integer getAverageRatingImdbFromDataLine(String[] lineItems) {
         double averageRating = Double.parseDouble(lineItems[AVERAGE_RATING_INDEX]);
         averageRating = averageRating * 10;
 
         return (int) averageRating;
     }
 
-    public List<Film> gatherFilmsFromIds(Map<String, Integer> ids) {
+    // FILM-DATA GATHERING
+
+    public List<Film> gatherFilmsFromIds(Map<String, Integer> desiredIdsWithAverageRating) {
         List<Film> films = new ArrayList<>();
 
         try (BufferedReader basicReader = new BufferedReader(new FileReader(basicData))) {
@@ -97,14 +121,12 @@ public class ImdbScraper {
                 String[] lineItems = line.split("\t");
                 String filmId = lineItems[ID_INDEX];
 
-                if (filmId.equals("tconst")) continue;
+                if (!isLineContainingRelevantId(lineItems,desiredIdsWithAverageRating)) continue;
 
-                if (!ids.containsKey(filmId)) continue;
-
-                if (isFilm(lineItems)) {
+                if (isFilmInDataLine(lineItems)) {
                     System.out.println("Found a film! " + lineItems[0]);
                     Film film = convertBasicDataToFilm(lineItems);
-                    film.setAverageRatingImdb(ids.get(filmId));
+                    film.setAverageRatingImdb(desiredIdsWithAverageRating.get(filmId));
                     films.add(film);
                 }
             }
@@ -114,105 +136,60 @@ public class ImdbScraper {
         return films;
     }
 
+
+    // CREW INFO GATHERING
+
+    /**
+     * Scrapes the database for directorIds and writerIds and adds them to the crew of the film based on the filmIds
+     * @param films List<Film> to use their filmIds
+     * @return List<Film> with crewIds added where they were found based on the film's Id
+     */
     public List<Film> addCrewIdsToFilms(List<Film> films) {
         List<String> filmIds = films.stream().map(f -> f.getId()).collect(Collectors.toList());
-        Map<String, List<Person>> directors = getAllDirectors(filmIds);
-        Map<String, List<Person>> writers = getAllWriters(filmIds);
+        Map<String, List<Person>> directorsPerFilmId = getAllDirectorIdsPerFilmId(filmIds);
+        Map<String, List<Person>> writersPerFilmId = getAllWriterIdsPerFilmId(filmIds);
 
         for (Film film: films) {
-            film.setDirector(directors.get(film.getId()));
-            System.out.println("Adding " + directors + " as director(s) of " + film.getTitle());
-            film.setWriter(writers.get(film.getId()));
-            System.out.println("Adding " + writers + " as writer(s) of " + film.getTitle());
+            String filmId = film.getId();
+
+            film.setDirector(directorsPerFilmId.get(filmId));
+            System.out.println("Adding " + directorsPerFilmId + " as director(s) of " + film.getTitle());
+
+            film.setWriter(writersPerFilmId.get(filmId));
+            System.out.println("Adding " + writersPerFilmId + " as writer(s) of " + film.getTitle());
         }
 
         return films;
     }
 
-
-    public List<Film> addCrewDataToFilmsBasedOnCrewId(List<Film> filmList) {
-        for (Film film: filmList) {
-            List<Person> directors = getDirectorBasedOnCrewIdsInFilm(film);
-            film.setDirector(directors);
-            System.out.println("Found full director data for " + film.getTitle() + ":" + directors);
-        }
-
-        for (Film film: filmList) {
-            List<Person> writers = getWriterBasedOnCrewIdsInFilm(film);
-            film.setWriter(writers);
-            System.out.println("Found full writer data for " + film.getTitle() + ":" + writers);
-        }
-
-        return filmList;
-    }
-
-    private List<Person> getWriterBasedOnCrewIdsInFilm(Film film) {
-        List<Person> writers = film.getWriter();
-
-        for (Person writer: writers) {
-            if (writer.getId() != null) writer.setName(getPersonNameBasedOnCrewId(writer.getId()));
-        }
-
-        return writers;
-    }
-
-    private List<Person> getDirectorBasedOnCrewIdsInFilm(Film film) {
-        List<Person> directors = film.getDirector();
-
-        for (Person director: directors) {
-            if (director.getId() != null) director.setName(getPersonNameBasedOnCrewId(director.getId()));
-        }
-
-        return directors;
-    }
-
-    private String getPersonNameBasedOnCrewId(String crewId) {
-        String name = "/";
-
-        try (BufferedReader basicReader = new BufferedReader(new FileReader(personData))) {
-            String line = null;
-            while ((line = basicReader.readLine()) != null) {
-                String[] lineItems = line.split("\t");
-                String foundCrewId = lineItems[ID_INDEX];
-
-                if (foundCrewId.equals("tconst")) continue;
-
-                if (!crewId.equals(foundCrewId)) continue;
-
-                name = lineItems[CREW_NAME_INDEX];
-                }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return name;
-    }
-
-
-    // INTERNAL METHODS
-
-    private Map<String, List<Person>> getAllDirectors(List<String> filmIds) {
+    /**
+     * Scrapes the dataset for all the directorIds involved in a specific film (based on its id)
+     * @param filmIds
+     * @return Map<String-filmId,List<Person> of Directors> A map of filmIds and their directors
+     */
+    private Map<String, List<Person>> getAllDirectorIdsPerFilmId(List<String> filmIds) {
         Map<String,List<Person>> allDirectors = new HashMap<>();
 
+        // Reading the dataset
         try (BufferedReader basicReader = new BufferedReader(new FileReader(crewData))) {
             String line = null;
             while ((line = basicReader.readLine()) != null) {
                 String[] lineItems = line.split("\t");
-                String filmId = lineItems[ID_INDEX];
-                if (filmId.equals("tconst")) continue;
 
-                if (!filmIds.contains(filmId)) continue;
+                if (!isLineContainingRelevantId(lineItems,filmIds)) continue;
 
+                // Dividing up the directorIds + checking whether the director is known
                 String[] directorIds = lineItems[DIRECTOR_INDEX].split(",");
                 if (directorIds[0].equals("\\N")) continue;
 
-
+                // Adding the ids to a list of Directors to be returned
                 List<Person> directors = new ArrayList<>();
                 for (String directorId: directorIds) {
                     System.out.println("Found director: " + directorId);
                     directors.add(new Person(directorId,null));
                 }
-                allDirectors.put(filmId,directors);
+                String foundFilmId = lineItems[ID_INDEX];
+                allDirectors.put(foundFilmId,directors);
 
             }
         } catch (Exception e) {
@@ -222,27 +199,34 @@ public class ImdbScraper {
         return allDirectors;
     }
 
-    private Map<String, List<Person>> getAllWriters(List<String> filmIds) {
+    /**
+     * Scrapes the dataset for all the writerIds involved in a specific film (based on its id)
+     * @param filmIds
+     * @return Map<String-filmId,List<Person> of Writers> A map of filmIds and their writerIds
+     */
+    private Map<String, List<Person>> getAllWriterIdsPerFilmId(List<String> filmIds) {
         Map<String,List<Person>> allWriters = new HashMap<>();
 
+        // Reading the dataset
         try (BufferedReader basicReader = new BufferedReader(new FileReader(crewData))) {
             String line = null;
             while ((line = basicReader.readLine()) != null) {
                 String[] lineItems = line.split("\t");
-                String filmId = lineItems[ID_INDEX];
-                if (filmId.equals("tconst")) continue;
 
-                if (!filmIds.contains(filmId)) continue;
+                if (!isLineContainingRelevantId(lineItems,filmIds)) continue;
 
+                // Dividing up the writerIds + checking whether the writer is known
                 String[] writerIds = lineItems[WRITER_INDEX].split(",");
                 if (writerIds[0].equals("\\N")) continue;
 
-
+                // Adding the ids to a list of Writers to be returned
                 List<Person> writers = new ArrayList<>();
                 for (String writerId: writerIds) {
                     System.out.println("Found writer: " + writerId);
                     writers.add(new Person(writerId,null));
                 }
+
+                String filmId = lineItems[ID_INDEX];
                 allWriters.put(filmId,writers);
             }
         } catch (Exception e) {
@@ -251,6 +235,115 @@ public class ImdbScraper {
 
         return allWriters;
     }
+
+    /**
+     * Takes a list of films and returns the list with the crew filled in (provided the crew has ids)
+     * @param filmList List<Film> with crew having ids
+     * @return List<Film> of films with the writer and director data filled in where there were ids for them
+     */
+    public List<Film> addCrewDataToFilmsBasedOnCrewId(List<Film> filmList) {
+        List<String> idsDesiredCrew = getCrewIdsFromFilms(filmList);
+
+        System.out.println("Scraping relevant crew");
+        Map<String, String> mapOfRelevantCrew = getRelevantCrewMapFromIds(idsDesiredCrew);
+
+        for (Film film: filmList) {
+
+            if (film.getDirector() != null) {
+                film.setDirector(extractPersonsFromCrewMap(film.getDirector(),mapOfRelevantCrew));
+                System.out.println("Added " + film.getDirector() + " to " + film.getTitle());
+            }
+
+            if (film.getWriter() != null) {
+                film.setWriter(extractPersonsFromCrewMap(film.getWriter(),mapOfRelevantCrew));
+                System.out.println("Added " + film.getDirector() + " to " + film.getTitle());
+            }
+        }
+
+        return filmList;
+    }
+
+    /**
+     * Will, given a list of people with ids fill in the names extracted from a map with ids and names
+     * @param personWithIdToBeNamed a List<Person> where Id is present and name needs filling in
+     * @param crewMapIdAndName a Map<Id-String,Name-String> from which the name will get extracted
+     * @return
+     */
+    public List<Person> extractPersonsFromCrewMap(List<Person> personWithIdToBeNamed, Map<String,String> crewMapIdAndName) {
+
+        for (Person person: personWithIdToBeNamed) {
+            String directorId = person.getId();
+
+            if (crewMapIdAndName.containsKey(directorId)) {
+                person.setName(crewMapIdAndName.get(directorId));
+            }
+        }
+
+        return personWithIdToBeNamed;
+    }
+
+
+    /**
+     * @param idsDesiredCrew (a list of id Strings for the crew that you want the info extracted of)
+     * @return a Map with the id-String and the name-String
+     */
+    private Map<String,String> getRelevantCrewMapFromIds(List<String> idsDesiredCrew) {
+        Map<String,String> relevantCrew = new HashMap<>();
+
+        try (BufferedReader basicReader = new BufferedReader(new FileReader(personData))) {
+            String line = null;
+            while ((line = basicReader.readLine()) != null) {
+                String[] lineItems = line.split("\t");
+
+                if(!isLineContainingRelevantId(lineItems,idsDesiredCrew)) continue;
+
+                String foundCrewId = lineItems[ID_INDEX];
+                String foundCrewName = lineItems[CREW_NAME_INDEX];
+
+                System.out.println("Found " + foundCrewName);
+                relevantCrew.put(foundCrewId,foundCrewName);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return relevantCrew;
+    }
+
+    private boolean isLineContainingRelevantId(String[] lineItems, List<String> idsDesired) {
+        String foundId = lineItems[ID_INDEX];
+
+        if (foundId.equals("tconst")) return false;
+
+        if (!idsDesired.contains(foundId)) return false;
+
+        return true;
+    }
+
+    private boolean isLineContainingRelevantId(String[] lineItems, Map<String,Integer> idsDesiredCrew) {
+        String foundId = lineItems[ID_INDEX];
+
+        if (foundId.equals("tconst")) return false;
+
+        if (!idsDesiredCrew.containsKey(foundId)) return false;
+
+        return true;
+    }
+
+    private List<String> getCrewIdsFromFilms(List<Film> filmList) {
+        List<String> crewIds = new ArrayList<>();
+
+        for (Film film: filmList) {
+            if (film.getDirector() != null) film.getDirector().stream().forEach(d -> crewIds.add(d.getId()));
+            if (film.getWriter() != null) film.getWriter().stream().forEach(w -> crewIds.add(w.getId()));
+        }
+
+        return crewIds;
+    }
+
+
+    // INTERNAL METHODS
+
 
     private Film convertBasicDataToFilm(String[] lineItems) {
         Film film = new Film();
@@ -273,7 +366,7 @@ public class ImdbScraper {
         film.setRunTime(getRuntime(lineItems));
 
         // ReleaseYear
-        film.setReleaseYear(getReleaseYear(lineItems));
+        film.setReleaseYear(getReleaseYearFromDataLine(lineItems));
 
         // Genres
         film.setGenres(getGenres(lineItems));
@@ -302,7 +395,7 @@ public class ImdbScraper {
         }
     }
 
-    private Integer getReleaseYear(String[] lineItems) {
+    private Integer getReleaseYearFromDataLine(String[] lineItems) {
         String releaseYearString = lineItems[YEAR_INDEX];
 
         if (!releaseYearString.equals("\\N")) {
@@ -314,12 +407,12 @@ public class ImdbScraper {
     }
 
 
-    private boolean isFilm(String[] lineItems) {
+    private boolean isFilmInDataLine(String[] lineItems) {
         if (lineItems[TYPE_INDEX].equals("movie")) return true;
         else return false;
     }
 
-    private boolean hasSufficientVotes(String[] lineItems){
+    private boolean HasSufficientVotesInDataLine(String[] lineItems){
         return Integer.parseInt(lineItems[NUMBER_RATINGS_INDEX]) > this.voteMinimum;
     }
 }

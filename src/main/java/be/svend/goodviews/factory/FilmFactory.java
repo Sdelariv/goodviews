@@ -13,10 +13,20 @@ import java.util.List;
 @Component
 public class FilmFactory {
     FilmService filmService;
+    ImdbScraper imdbScraper;
 
-    public FilmFactory(FilmService filmService) {
+    public FilmFactory(FilmService filmService, ImdbScraper imdbScraper) {
         this.filmService = filmService;
+        this.imdbScraper = imdbScraper;
+
+        saveImdbFilms();
+
         saveTestFilms();
+    }
+
+    private void saveImdbFilms() {
+        List<Film> films = imdbScraper.scrapeImdb();
+        filmService.saveFilms(films);
     }
 
     public void saveTestFilms() {
