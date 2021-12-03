@@ -16,27 +16,28 @@ public class PersonService {
         this.personRepo = personRepo;
     }
 
-    public List<Person> saveDirectors(List<Person> directors) {
-        List<Person> savedDirectors = new ArrayList<>();
+    public List<Person> savePersons(List<Person> persons) {
+        List<Person> foundPersons = new ArrayList<>();
 
-        for (Person director: directors) {
-            savedDirectors.add(saveDirector(director));
+        if (persons == null) return foundPersons;
+
+        for (Person person: persons) {
+            foundPersons.add(savePerson(person));
         }
 
-        return savedDirectors;
+        return foundPersons;
     }
+    public Person savePerson(Person person) {
+        Optional<Person> foundPerson = personRepo.findById(person.getId());
 
-    public Person saveDirector(Person director) {
-        Optional<Person> foundDirector = personRepo.findByName(director.getName());
-
-        // TODO: deal with duplicate names
-
-        if (foundDirector.isEmpty()) {
-            System.out.println("Saving director: " + director.getName());
-            return personRepo.save(director);
+        if (foundPerson.isEmpty()) {
+            System.out.println("Saving person: " + person.getName());
+            return personRepo.save(person);
         } else {
-            System.out.println("Not saving " + director.getName() + " because it already exists in the database");
-            return foundDirector.get();
+            System.out.println("Not saving " + person.getName() + " because it already exists in the database");
+            return foundPerson.get();
         }
     }
+
+
 }

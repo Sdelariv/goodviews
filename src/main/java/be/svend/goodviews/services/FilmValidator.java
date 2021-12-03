@@ -19,7 +19,8 @@ public class FilmValidator {
         // Fetches or saves the genres, tags and directors
         film.setGenres(genreService.saveGenres(film.getGenres()));
         film.setTags(tagService.saveTags(film.getTags()));
-        film.setDirector(personService.saveDirectors(film.getDirector()));
+        film.setDirector(personService.savePersons(film.getDirector()));
+        film.setWriter(personService.savePersons(film.getWriter()));
 
         return film;
     }

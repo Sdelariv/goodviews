@@ -19,6 +19,8 @@ public class GenreService {
     public List<Genre> saveGenres(List<Genre> genres) {
         List<Genre> savedGenres = new ArrayList<>();
 
+        if (genres == null) return savedGenres;
+
         for (Genre genre:genres) {
             savedGenres.add(saveGenre(genre));
         }

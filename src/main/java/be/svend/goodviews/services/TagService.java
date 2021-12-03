@@ -19,6 +19,8 @@ public class TagService {
     public List<Tag> saveTags(List<Tag> tags) {
         List<Tag> savedTags = new ArrayList<>();
 
+        if (tags == null) return savedTags;
+
         for (Tag tag : tags) {
             savedTags.add(saveTag(tag));
         }
