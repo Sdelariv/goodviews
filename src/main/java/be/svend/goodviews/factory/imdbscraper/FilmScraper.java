@@ -2,7 +2,6 @@ package be.svend.goodviews.factory.imdbscraper;
 
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Genre;
-import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.File;

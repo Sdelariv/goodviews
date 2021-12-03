@@ -3,12 +3,8 @@ package be.svend.goodviews.factory.imdbscraper;
 import be.svend.goodviews.models.*;
 import org.springframework.stereotype.Component;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Responsible for scraping duties based on tsv files of the database
