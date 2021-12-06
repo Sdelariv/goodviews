@@ -26,8 +26,8 @@ public class FilmValidator {
     public Film initialise(Film film) {
         film.setGenres(genreService.saveGenres(film.getGenres()));
         film.setTags(tagService.saveTags(film.getTags()));
-        film.setDirector(personService.savePersons(film.getDirector()));
-        film.setWriter(personService.savePersons(film.getWriter()));
+        film.setDirector(personService.createPersons(film.getDirector()));
+        film.setWriter(personService.createPersons(film.getWriter()));
 
         return film;
     }

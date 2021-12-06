@@ -11,33 +11,54 @@ import java.util.Optional;
 @Service
 public class PersonService {
     PersonRepository personRepo;
+    PersonValidator personValidator;
 
-    public PersonService(PersonRepository personRepo) {
+    public PersonService(PersonRepository personRepo, PersonValidator personValidator {
         this.personRepo = personRepo;
+        this.personValidator = personValidator;
     }
 
-    public List<Person> savePersons(List<Person> persons) {
+    public List<Person> createPersons(List<Person> persons) {
         List<Person> foundPersons = new ArrayList<>();
 
         if (persons == null) return foundPersons;
 
         for (Person person: persons) {
-            foundPersons.add(savePerson(person));
+            foundPersons.add(createPerson(person));
         }
 
         return foundPersons;
     }
-    public Person savePerson(Person person) {
-        Optional<Person> foundPerson = Optional.empty();
+    public Person createPerson(Person person) {
 
-        if (person.getId() != null) foundPerson = personRepo.findById(person.getId());
+        // Check whether id is valid
+        if (!personValidator.hasValidIdFormat(person)) return null;
 
-        if (foundPerson.isEmpty()) {
+        // Check whether person is already in db
+        Optional<Person> existingPerson = personRepo.findById(person.getId());
+
+        if (existingPerson.isEmpty()) {
             System.out.println("Saving person: " + person.getName());
             return personRepo.save(person);
         } else {
             System.out.println("Not saving " + person.getName() + " because it already exists in the database");
-            return foundPerson.get();
+            return existingPerson.get();
+        }
+    }
+
+    public Optional<Person> updatePerson(Person person) {
+        if (!personValidator.hasValidIdFormat(person)) {
+            System.out.println("Trying to update a person without a valid id");
+            return Optional.empty();
+        }
+
+        Optional<Person> existingPerson = personRepo.findById(person.getId());
+
+        if (existingPerson.isEmpty()) {
+            System.out.println("Can't update a person that is not yet in the db");
+        } else {
+            System.out.println("Updating " +person.getId());
+            return Optional.of(personRepo.save(person));
         }
     }
 
