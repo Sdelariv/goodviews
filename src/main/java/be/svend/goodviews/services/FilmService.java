@@ -5,6 +5,7 @@ import be.svend.goodviews.repositories.FilmRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FilmService {
@@ -16,19 +17,78 @@ public class FilmService {
         this.filmValidator = filmValidator;
     }
 
-    public void saveFilms(List<Film> films) {
+    public Optional<Film> findById(String id) {
+        if (id == null) return Optional.empty();
+
+        Optional<Film> foundFilm = filmRepo.findById(id);
+
+        if (foundFilm.isEmpty()) return Optional.empty();
+
+        return foundFilm;
+    }
+
+    public void createFilms(List<Film> films) {
 
         for (Film film: films) {
-            saveFilm(film);
+            createFilm(film);
         }
     }
 
-    public void saveFilm(Film film) {
-        Film validatedFilm = filmValidator.validate(film);
+    public void createFilm(Film film) {
+        if (findById(film.getId()).isPresent()) {
+            System.out.println("Can't create a film with existing id");
+            return;
+        }
 
-        filmRepo.save(validatedFilm);
+        Film initialisedFilm = filmValidator.initialise(film);
+
+        filmRepo.save(initialisedFilm);
         System.out.println("Saved the following Film:");
         System.out.println(film);
     }
 
+    public void updateFilms(List<Film> films) {
+
+        for (Film film: films) {
+            updateFilm(film);
+        }
+    }
+
+    public void updateFilm(Film film) {
+        Optional<Film> existingFilm = findFilmByFilm(film);
+
+        if (existingFilm.isEmpty()) {
+            System.out.println("Can't update a film with id not in database");
+            return;
+        } else {
+            filmRepo.save(existingFilm.get());
+            System.out.println("Saved the following Film:");
+            System.out.println(film);
+        }
+    }
+
+    public void deleteFilms(List<Film> films) {
+
+        for (Film film: films) {
+            deleteFilm(film);
+        }
+    }
+
+    public void deleteFilm(Film film) {
+        Optional<Film> existingFilm = findFilmByFilm(film);
+
+        if (existingFilm.isEmpty()) {
+            System.out.println("Can't delete a film with id not in database");
+            return;
+        } else {
+            System.out.println("Deleting " + film.getTitle());
+            filmRepo.deleteById(film.getId());
+        }
+    }
+
+    // INTERNAL
+
+    private Optional<Film> findFilmByFilm(Film film) {
+        return findById(film.getId());
+    }
 }

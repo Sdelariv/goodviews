@@ -29,7 +29,7 @@ public class FilmFactory {
 
     private void saveImdbFilms() {
         List<Film> films = imdbScraper.scrapeImdb();
-        filmService.saveFilms(films);
+        filmService.createFilms(films);
     }
 
     public void saveTestFilms() {
@@ -79,6 +79,6 @@ public class FilmFactory {
         jp.setRunTime(127);
         jp.setPosterUrl("https://upload.wikimedia.org/wikipedia/en/e/e7/Jurassic_Park_poster.jpg");
 
-        filmService.saveFilms(List.of(pad2,emma,jp));
+        filmService.createFilms(List.of(pad2,emma,jp));
     }
 }
