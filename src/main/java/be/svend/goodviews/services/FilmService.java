@@ -1,9 +1,11 @@
 package be.svend.goodviews.services;
 
 import be.svend.goodviews.models.Film;
+import be.svend.goodviews.models.Person;
 import be.svend.goodviews.repositories.FilmRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,10 +13,12 @@ import java.util.Optional;
 public class FilmService {
     FilmRepository filmRepo;
     FilmValidator filmValidator;
+    PersonService personService;
 
-    public FilmService(FilmRepository filmRepo, FilmValidator filmValidator) {
+    public FilmService(FilmRepository filmRepo, FilmValidator filmValidator, PersonService personService) {
         this.filmRepo = filmRepo;
         this.filmValidator = filmValidator;
+        this.personService = personService;
     }
 
     public Optional<Film> findById(String id) {
@@ -89,6 +93,42 @@ public class FilmService {
             System.out.println("Deleting " + film.getTitle());
             filmRepo.deleteById(film.getId());
         }
+    }
+/*
+    public List<Person> FindDirectorsByFilmId(String filmId) {
+        if (filmId == null) return Collections.emptyList();
+
+        Optional<Film> existingFilm = findById(filmId);
+
+        if (existingFilm.isEmpty()) return Collections.emptyList();
+
+        return filmRepo.findByDirectorContaining()
+    }
+
+
+ */
+    public List<Film> findFilmsByDirectorId(String directorId) {
+        if (directorId == null) return Collections.emptyList();
+
+        Optional<Person> director = personService.findPersonById(directorId);
+        if (director.isEmpty()) return Collections.emptyList();
+
+
+        List<Film> filmsByDirector = filmRepo.findFilmsByDirectorContaining(director.get());
+
+        return filmsByDirector;
+    }
+
+    public List<Film> findFilmsByWriterId(String writerId) {
+        if (writerId == null) return Collections.emptyList();
+
+        Optional<Person> director = personService.findPersonById(writerId);
+        if (director.isEmpty()) return Collections.emptyList();
+
+
+        List<Film> filmsByDirector = filmRepo.findFilmsByWriterContaining(director.get());
+
+        return filmsByDirector;
     }
 
     // INTERNAL

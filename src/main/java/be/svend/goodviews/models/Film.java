@@ -106,6 +106,7 @@ public class Film {
     }
 
     public List<Genre> getGenres() {
+        if (this.genres == null) return null;
         return genres.stream().distinct().collect(Collectors.toList());
     }
 

@@ -10,8 +10,12 @@ public class PersonValidator {
     public boolean hasValidIdFormat(Person person) {
         if (person.getId() == null) return false;
 
-        if (!person.getId().startsWith("nm")) return false;
+        if (!isValidIdFormat(person.getId())) return false;
 
         return true;
+    }
+
+    public boolean isValidIdFormat(String id) {
+        return id.startsWith("nm");
     }
 }

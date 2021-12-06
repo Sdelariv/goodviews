@@ -18,6 +18,17 @@ public class PersonService {
         this.personValidator = personValidator;
     }
 
+    public Optional<Person> findPersonById(String id) {
+       if (!personValidator.isValidIdFormat(id)) return Optional.empty();
+
+       return personRepo.findById(id);
+    }
+
+    public List<Person> FindPersonsByName(String name) {
+        return personRepo.findByName(name);
+    }
+
+
     public List<Person> createPersons(List<Person> persons) {
         List<Person> foundPersons = new ArrayList<>();
 
