@@ -35,8 +35,13 @@ public class FilmService {
     }
 
     public void createFilm(Film film) {
-        if (findById(film.getId()).isPresent()) {
+        if (findFilmByFilm(film).isPresent()) {
             System.out.println("Can't create a film with existing id");
+            return;
+        }
+
+        if (!filmValidator.hasValidIdFormat(film)) {
+            System.out.println("Can't create a film that doesn't have a valid id format");
             return;
         }
 
