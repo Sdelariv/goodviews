@@ -16,8 +16,14 @@ public class GoodviewsApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext ctx = SpringApplication.run(GoodviewsApplication.class, args);
 
+        /*
+
+        // DATABASE CREATION (WHEN NECESSARY)
+
         FilmFactory factory = new FilmFactory(ctx.getBean(FilmService.class),ctx.getBean(ImdbScraper.class));
         factory.createDatabase();
+
+         */
     }
 
 }

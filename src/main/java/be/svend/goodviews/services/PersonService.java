@@ -28,7 +28,9 @@ public class PersonService {
         return foundPersons;
     }
     public Person savePerson(Person person) {
-        Optional<Person> foundPerson = personRepo.findById(person.getId());
+        Optional<Person> foundPerson = Optional.empty();
+
+        if (person.getId() != null) foundPerson = personRepo.findById(person.getId());
 
         if (foundPerson.isEmpty()) {
             System.out.println("Saving person: " + person.getName());
