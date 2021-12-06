@@ -5,6 +5,7 @@ import be.svend.goodviews.factory.imdbscraper.ImdbScraper;
 import be.svend.goodviews.factory.svendscraper.HardcopyScraper;
 import be.svend.goodviews.factory.svendscraper.MoktokDBScraper;
 import be.svend.goodviews.models.Film;
+import be.svend.goodviews.models.Genre;
 import be.svend.goodviews.models.Person;
 import be.svend.goodviews.repositories.FilmRepository;
 import be.svend.goodviews.services.FilmService;
@@ -43,6 +44,9 @@ public class GoodviewsApplication {
         System.out.println("Finding writers:");
         List<Film> filmsWrittenByDarren = service.findFilmsByWriterId("nm0004716");
         filmsWrittenByDarren.forEach(System.out::println);
+
+        film.setGenres(List.of(new Genre("New Weird")));
+        service.updateFilm(film);
 
 /*
         FilmFactory factory = new FilmFactory(ctx.getBean(FilmService.class),ctx.getBean(ImdbScraper.class), ctx.getBean(HardcopyScraper.class));

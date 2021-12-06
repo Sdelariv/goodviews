@@ -35,9 +35,13 @@ public class FilmValidator {
     public boolean hasValidIdFormat(Film film) {
         if (film.getId() == null) return false;
 
-        if (!film.getId().startsWith("tt")) return false;
+        if (!isValidIdFormat(film.getId())) return false;
 
         return true;
+    }
+
+    public boolean isValidIdFormat(String id) {
+        return id.startsWith("tt");
     }
 
 

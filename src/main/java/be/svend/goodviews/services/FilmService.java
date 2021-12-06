@@ -70,6 +70,8 @@ public class FilmService {
             System.out.println("Can't update a film with id not in database");
             return;
         } else {
+            film = filmValidator.initialise(film); // Makes sure that the properties are fetched or saved to db
+
             filmRepo.save(existingFilm.get());
             System.out.println("Saved the following Film:");
             System.out.println(film);
