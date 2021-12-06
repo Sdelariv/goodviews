@@ -7,9 +7,7 @@ import be.svend.goodviews.models.Tag;
 import be.svend.goodviews.repositories.FilmRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class FilmService {
@@ -36,19 +34,19 @@ public class FilmService {
     }
 
     public List<Film> findByGenre(Genre genre) {
-        return filmRepo.findByGenre(genre);
+        return filmRepo.findAllByGenresContaining(genre);
     }
 
     public List<Film> findByGenres(List<Genre> genres) {
-        return filmRepo.findByGenres(genres);
+        return filmRepo.findAllByGenresIn(genres);
     }
 
     public List<Film> findByTag(Tag tag) {
-        return filmRepo.findByTag(tag);
+        return filmRepo.findAllByTagsContaining(tag);
     }
 
     public List<Film> findByTags(List<Tag> tags) {
-        return filmRepo.findByTags(tags);
+        return filmRepo.findAllByTagsIn(tags);
     }
 
 
@@ -74,6 +72,15 @@ public class FilmService {
         List<Film> filmsByDirector = filmRepo.findFilmsByWriterContaining(director.get());
 
         return filmsByDirector;
+    }
+
+
+    public List<Film> findByTitle(String name) {
+
+        List<Film> foundFilms = filmRepo.findFilmsByTitle(name);
+        foundFilms.addAll(filmRepo.findByTranslatedTitle(name));
+
+        return foundFilms;
     }
 
     // CREATE methods
@@ -153,4 +160,5 @@ public class FilmService {
     private Optional<Film> findFilmByFilm(Film film) {
         return findById(film.getId());
     }
+
 }

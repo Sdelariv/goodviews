@@ -6,6 +6,7 @@ import be.svend.goodviews.models.Person;
 import be.svend.goodviews.models.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface FilmRepository extends JpaRepository<Film, String> {
@@ -14,11 +15,15 @@ public interface FilmRepository extends JpaRepository<Film, String> {
 
     List<Film> findFilmsByWriterContaining(Person person);
 
-    List<Film> findByGenre(Genre genre);
+    List<Film> findAllByGenresContaining(Genre genre);
 
-    List<Film> findByTag(Tag tag);
+    List<Film> findAllByGenresIn(List<Genre> genres);
 
-    List<Film> findByTags(List<Tag> tags);
+    List<Film> findAllByTagsContaining(Tag tag);
 
-    List<Film> findByGenres(List<Genre> genres);
+    List<Film> findAllByTagsIn(List<Tag> tags);
+
+    List<Film> findFilmsByTitle(String title);
+
+    List<Film> findByTranslatedTitle(String title);
 }

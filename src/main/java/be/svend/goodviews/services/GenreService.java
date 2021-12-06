@@ -16,6 +16,11 @@ public class GenreService {
         this.genreRepo = genreRepo;
     }
 
+
+    public Optional<Genre> findByName(String name) {
+        return genreRepo.findByName(name);
+    }
+
     public List<Genre> saveGenres(List<Genre> genres) {
         List<Genre> savedGenres = new ArrayList<>();
 
@@ -37,5 +42,16 @@ public class GenreService {
             System.out.println("Not saving " + genre.getName() + " because it already exists");
             return foundGenre.get();
         }
+    }
+
+    public boolean deleteGenre(Genre genre) {
+
+        Optional<Genre> genreInDb = genreRepo.findByName(genre.getName());
+        if (genreInDb.isEmpty()) return false;
+
+        System.out.println("Deleting " + genre.getName());
+        genreRepo.delete(genre);
+
+        return true;
     }
 }

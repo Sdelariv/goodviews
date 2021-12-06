@@ -1,15 +1,13 @@
 package be.svend.goodviews;
 
-import be.svend.goodviews.factory.FilmFactory;
-import be.svend.goodviews.factory.imdbscraper.ImdbScraper;
-import be.svend.goodviews.factory.svendscraper.HardcopyScraper;
-import be.svend.goodviews.factory.svendscraper.MoktokDBScraper;
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Genre;
 import be.svend.goodviews.models.Person;
 import be.svend.goodviews.repositories.FilmRepository;
+import be.svend.goodviews.repositories.GenreRepository;
 import be.svend.goodviews.services.FilmService;
 import be.svend.goodviews.services.FilmValidator;
+import be.svend.goodviews.services.GenreService;
 import be.svend.goodviews.services.PersonService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -27,7 +25,7 @@ public class GoodviewsApplication {
         Person darren = new Person("nm0004716","Darren Aranovsky");
 
         Film film = new Film();
-        film.setTranslatedTitle("Pi");
+        film.setTitle("Pi");
         film.setId("tt0138704");
         film.setReleaseYear(1998);
         film.setDirector(darren);
@@ -45,8 +43,18 @@ public class GoodviewsApplication {
         List<Film> filmsWrittenByDarren = service.findFilmsByWriterId("nm0004716");
         filmsWrittenByDarren.forEach(System.out::println);
 
+        Genre genre = new Genre("New Weird");
         film.setGenres(List.of(new Genre("New Weird")));
         service.updateFilm(film);
+
+        GenreService g_service = new GenreService(ctx.getBean(GenreRepository.class));
+        g_service.deleteGenre(new Genre("New Weird"));
+
+        System.out.println("Finding films with title Pi, after deleting genre");
+        List<Film> filmsWithTitlePi = service.findByTitle("Pi");
+        filmsWithTitlePi.forEach(System.out::println);
+
+
 
 /*
         FilmFactory factory = new FilmFactory(ctx.getBean(FilmService.class),ctx.getBean(ImdbScraper.class), ctx.getBean(HardcopyScraper.class));
