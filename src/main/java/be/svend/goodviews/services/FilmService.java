@@ -8,6 +8,7 @@ import be.svend.goodviews.repositories.FilmRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
@@ -154,6 +155,8 @@ public class FilmService {
             filmRepo.deleteById(film.getId());
         }
     }
+
+
 
     // INTERNAL
 
