@@ -55,11 +55,25 @@ public class PersonService {
         Optional<Person> existingPerson = personRepo.findById(person.getId());
         if (existingPerson.isEmpty()) {
             System.out.println("Can't update a person that is not yet in the db");
+            return Optional.empty();
         }
 
         System.out.println("Updating " +person.getId());
         return Optional.of(personRepo.save(person));
     }
 
+    public boolean deletePerson(Person person) {
+        if (!personValidator.hasValidIdFormat(person)) return false;
+
+        Optional<Person> existingPerson = personRepo.findById(person.getId());
+        if (existingPerson.isEmpty()) {
+            System.out.println("Can't delete a person that is not in the db");
+            return false;
+        }
+
+        System.out.println("Updating " +person.getId());
+        personRepo.deleteById(person.getId());
+        return true;
+    }
 
 }
