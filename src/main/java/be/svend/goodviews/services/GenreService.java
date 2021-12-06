@@ -50,7 +50,7 @@ public class GenreService {
         if (genreInDb.isEmpty()) return false;
 
         System.out.println("Deleting " + genre.getName());
-        genreRepo.delete(genre);
+        genreRepo.delete(genreInDb.get());
 
         return true;
     }
