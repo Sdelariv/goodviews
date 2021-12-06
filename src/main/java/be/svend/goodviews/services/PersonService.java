@@ -13,7 +13,7 @@ public class PersonService {
     PersonRepository personRepo;
     PersonValidator personValidator;
 
-    public PersonService(PersonRepository personRepo, PersonValidator personValidator {
+    public PersonService(PersonRepository personRepo, PersonValidator personValidator) {
         this.personRepo = personRepo;
         this.personValidator = personValidator;
     }
@@ -53,13 +53,12 @@ public class PersonService {
         }
 
         Optional<Person> existingPerson = personRepo.findById(person.getId());
-
         if (existingPerson.isEmpty()) {
             System.out.println("Can't update a person that is not yet in the db");
-        } else {
-            System.out.println("Updating " +person.getId());
-            return Optional.of(personRepo.save(person));
         }
+
+        System.out.println("Updating " +person.getId());
+        return Optional.of(personRepo.save(person));
     }
 
 
