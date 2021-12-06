@@ -41,7 +41,7 @@ public class FilmService {
         }
 
         if (!filmValidator.hasValidIdFormat(film)) {
-            System.out.println("Can't create a film that doesn't have a valid id format");
+            System.out.println("Can't create a film that doesn't have a valid id format: " + film.getId());
             return;
         }
 

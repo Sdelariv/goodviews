@@ -1,6 +1,7 @@
 package be.svend.goodviews.factory;
 
 import be.svend.goodviews.factory.imdbscraper.ImdbScraper;
+import be.svend.goodviews.factory.svendscraper.HardcopyScraper;
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Genre;
 import be.svend.goodviews.models.Tag;
@@ -15,20 +16,25 @@ import java.util.List;
 public class FilmFactory {
     FilmService filmService;
     ImdbScraper imdbScraper;
+    HardcopyScraper hardcopyScraper;
 
-    public FilmFactory(FilmService filmService, ImdbScraper imdbScraper) {
+    public FilmFactory(FilmService filmService,
+                       ImdbScraper imdbScraper,
+                       HardcopyScraper hardcopyScraper) {
         this.filmService = filmService;
         this.imdbScraper = imdbScraper;
+        this.hardcopyScraper = hardcopyScraper;
 
     }
 
-    public void createDatabase() {
-        saveImdbFilms();
-        saveTestFilms();
-    }
 
-    private void saveImdbFilms() {
+    public void createDatabaseFromImdbTsv() {
         List<Film> films = imdbScraper.scrapeImdb();
+        filmService.createFilms(films);
+    }
+
+    public void createDatabaseFromHardcopy() {
+        List<Film> films = hardcopyScraper.scrapeHardCopy();
         filmService.createFilms(films);
     }
 
@@ -79,6 +85,6 @@ public class FilmFactory {
         jp.setRunTime(127);
         jp.setPosterUrl("https://upload.wikimedia.org/wikipedia/en/e/e7/Jurassic_Park_poster.jpg");
 
-        filmService.createFilms(List.of(pad2,emma,jp));
+        filmService.updateFilms(List.of(pad2,emma,jp));
     }
 }

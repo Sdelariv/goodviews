@@ -1,5 +1,8 @@
 package be.svend.goodviews.models;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -27,20 +30,24 @@ public class Film {
 
     private String posterUrl;
 
-    @ManyToMany
+    @ManyToMany (fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<Genre> genres;
 
-    @ManyToMany
+    @ManyToMany (fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<Tag> tags;
 
     private Integer averageRating; // 0-100
 
     private Integer averageRatingImdb;
 
-    @ManyToMany
+    @ManyToMany (fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<Person> director;
 
-    @ManyToMany
+    @ManyToMany (fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<Person> writer;
 
     private Integer runTime; // in minutes
