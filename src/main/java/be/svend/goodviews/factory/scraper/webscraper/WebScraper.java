@@ -20,4 +20,28 @@ public class WebScraper {
     }
 
 
+    public static Film updateFilmWithWebData(Film film) {
+        // TODO: update everything
+
+        Optional<String> posterUrl = PosterScraper.scrapePoster(film.getId());
+        if (posterUrl.isPresent()) film.setPosterUrl(posterUrl.get());
+
+        // Title
+
+        // Release Year
+
+        // Ratings
+
+        // Genres
+
+        // Director
+
+        // Writer
+
+        // Runtime
+
+        // Tags?
+
+        return film;
+    }
 }

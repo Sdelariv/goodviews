@@ -1,5 +1,6 @@
 package be.svend.goodviews.services;
 
+import be.svend.goodviews.factory.scraper.webscraper.WebScraper;
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Genre;
 import be.svend.goodviews.models.Person;
@@ -8,7 +9,6 @@ import be.svend.goodviews.repositories.FilmRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
@@ -137,6 +137,19 @@ public class FilmService {
             System.out.println("Saved the following Film:");
             System.out.println(film);
         }
+    }
+
+    public boolean updateFilmById(String filmId) {
+        if (!filmValidator.isValidIdFormat(filmId)) return false;
+
+        Optional<Film> existingFilm = findById(filmId);
+        if (findById(filmId).isEmpty()) return false;
+
+        Film updatedFilm = WebScraper.updateFilmWithWebData(existingFilm.get());
+
+        filmRepo.save(updatedFilm);
+
+        return true;
     }
 
     // DELETE methods
