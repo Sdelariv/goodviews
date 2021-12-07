@@ -1,14 +1,14 @@
 package be.svend.goodviews.factory;
 
-import be.svend.goodviews.factory.imdbscraper.ImdbScraper;
-import be.svend.goodviews.factory.svendscraper.HardcopyScraper;
+import be.svend.goodviews.factory.scraper.imdbscraper.ImdbScraper;
+import be.svend.goodviews.factory.scraper.svendscraper.HardcopyScraper;
+import be.svend.goodviews.factory.scraper.webscraper.WebScraper;
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Genre;
 import be.svend.goodviews.models.Tag;
 import be.svend.goodviews.services.FilmService;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.util.List;
 
 
@@ -18,13 +18,13 @@ public class FilmFactory {
     ImdbScraper imdbScraper;
     HardcopyScraper hardcopyScraper;
 
+
     public FilmFactory(FilmService filmService,
                        ImdbScraper imdbScraper,
                        HardcopyScraper hardcopyScraper) {
         this.filmService = filmService;
         this.imdbScraper = imdbScraper;
         this.hardcopyScraper = hardcopyScraper;
-
     }
 
 
@@ -38,11 +38,19 @@ public class FilmFactory {
         filmService.createFilms(films);
     }
 
+    public void addPostersToHardCopy() {
+        List<Film> films = hardcopyScraper.scrapeHardCopy();
+
+        WebScraper.addPosters(films);
+        HardcopyMaker.makeHardCopy(films);
+    }
+
+
+
     public void saveTestFilms() {
         Film pad2 = new Film("Paddington 2");
         pad2.setId("tt4468740");
         pad2.setAverageRating(99);
-        pad2.setReleaseDate(LocalDate.of(2017, 12, 9));
         pad2.setDirector("Paul King");
         pad2.addTag(new Tag("Bear"));
         pad2.addTag( new Tag("Heartwarming"));
@@ -58,7 +66,6 @@ public class FilmFactory {
         emma.setId("tt9214832");
         emma.setAverageRating(87);
         emma.setDirector("Autumn de Wilde");
-        emma.setReleaseDate(LocalDate.of(2020, 2,21));
         emma.addGenre(new Genre("Period"));
         emma.addGenre(new Genre("Romance"));
         emma.addGenre("Comedy");
@@ -75,7 +82,6 @@ public class FilmFactory {
         jp.setId("tt0107290");
         jp.setDirector("Steven Spielberg");
         jp.setAverageRating(92);
-        jp.setReleaseDate(LocalDate.of(1993,10,20));
         jp.addGenre("Science Fiction");
         jp.addGenre("Adventure");
         jp.addGenre("Action");

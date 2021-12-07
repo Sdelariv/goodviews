@@ -1,4 +1,4 @@
-package be.svend.goodviews.factory.imdbscraper;
+package be.svend.goodviews.factory.scraper.imdbscraper;
 
 import be.svend.goodviews.models.*;
 import org.springframework.stereotype.Component;

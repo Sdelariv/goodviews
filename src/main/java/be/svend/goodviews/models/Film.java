@@ -24,9 +24,7 @@ public class Film {
 
     private String translatedTitle;
 
-    private Integer releaseYear; // TODO: Decide between date and year
-
-    private LocalDate releaseDate;
+    private Integer releaseYear;
 
     private String posterUrl;
 
@@ -87,14 +85,6 @@ public class Film {
 
     public void setTranslatedTitle(String translatedTitle) {
         this.translatedTitle = translatedTitle;
-    }
-
-    public LocalDate getReleaseDate() {
-        return releaseDate;
-    }
-
-    public void setReleaseDate(LocalDate releaseDate) {
-        this.releaseDate = releaseDate;
     }
 
     public String getPosterUrl() {

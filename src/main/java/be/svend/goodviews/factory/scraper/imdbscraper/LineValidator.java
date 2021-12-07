@@ -1,4 +1,4 @@
-package be.svend.goodviews.factory.imdbscraper;
+package be.svend.goodviews.factory.scraper.imdbscraper;
 
 import java.util.List;
 import java.util.Map;

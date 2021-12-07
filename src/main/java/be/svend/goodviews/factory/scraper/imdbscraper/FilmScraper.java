@@ -1,5 +1,6 @@
-package be.svend.goodviews.factory.imdbscraper;
+package be.svend.goodviews.factory.scraper.imdbscraper;
 
+import be.svend.goodviews.factory.scraper.webscraper.PosterScraper;
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Genre;
 
@@ -9,9 +10,10 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-import static be.svend.goodviews.factory.imdbscraper.LineValidator.isFilmInDataLine;
-import static be.svend.goodviews.factory.imdbscraper.LineValidator.isLineContainingRelevantId;
+import static be.svend.goodviews.factory.scraper.imdbscraper.LineValidator.isFilmInDataLine;
+import static be.svend.goodviews.factory.scraper.imdbscraper.LineValidator.isLineContainingRelevantId;
 
 /**
  * Responsible for scraping duties based on tsv files of basicData
@@ -53,12 +55,16 @@ public class FilmScraper {
                     System.out.println("Found a film! " + lineItems[0]);
                     Film film = convertBasicDataToFilm(lineItems);
                     film.setAverageRatingImdb(desiredIdsWithAverageRating.get(filmId));
+
                     films.add(film);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+
+
         return films;
     }
 

@@ -84,6 +84,10 @@ public class FilmService {
         return foundFilms;
     }
 
+    public List<Film> findAllFilms() {
+        return filmRepo.findAll();
+    }
+
     // CREATE methods
 
     public void createFilms(List<Film> films) {
@@ -129,7 +133,7 @@ public class FilmService {
         } else {
             film = filmValidator.initialise(film); // Makes sure that the properties are fetched or saved to db
 
-            filmRepo.save(existingFilm.get());
+            filmRepo.save(film);
             System.out.println("Saved the following Film:");
             System.out.println(film);
         }

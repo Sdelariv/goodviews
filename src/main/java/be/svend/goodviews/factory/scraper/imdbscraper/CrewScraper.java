@@ -1,4 +1,4 @@
-package be.svend.goodviews.factory.imdbscraper;
+package be.svend.goodviews.factory.scraper.imdbscraper;
 
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Person;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static be.svend.goodviews.factory.imdbscraper.LineValidator.isLineContainingRelevantId;
+import static be.svend.goodviews.factory.scraper.imdbscraper.LineValidator.isLineContainingRelevantId;
 
 /**
  * Responsible for scraping duties based on tsv files of the crewData and personData

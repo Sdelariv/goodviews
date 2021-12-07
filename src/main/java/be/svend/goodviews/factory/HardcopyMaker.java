@@ -1,4 +1,4 @@
-package be.svend.goodviews.factory.svendscraper;
+package be.svend.goodviews.factory;
 
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.repositories.FilmRepository;
@@ -14,11 +14,11 @@ import java.util.List;
  * @Author: Sven Delarivière
  */
 @Component
-public class MoktokDBScraper {
+public class HardcopyMaker {
     FilmRepository filmRepo;
 
 
-    public MoktokDBScraper(FilmRepository filmRepo) {
+    public HardcopyMaker(FilmRepository filmRepo) {
         this.filmRepo = filmRepo;
     }
 
@@ -28,7 +28,7 @@ public class MoktokDBScraper {
         makeHardCopy(films);
     }
 
-    private void makeHardCopy(List<Film> films) {
+    public static void makeHardCopy(List<Film> films) {
         try {
             // Tab delimited file will be written to data with the name tab-file.csv
             FileWriter fos = new FileWriter("D:/moktok.hardcopy/data.tsv");

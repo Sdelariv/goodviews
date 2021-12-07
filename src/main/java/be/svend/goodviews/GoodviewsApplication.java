@@ -1,5 +1,9 @@
 package be.svend.goodviews;
 
+import be.svend.goodviews.factory.FilmFactory;
+import be.svend.goodviews.factory.scraper.imdbscraper.ImdbScraper;
+import be.svend.goodviews.factory.scraper.svendscraper.HardcopyScraper;
+import be.svend.goodviews.factory.scraper.webscraper.WebScraper;
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Genre;
 import be.svend.goodviews.models.Person;
@@ -20,6 +24,8 @@ public class GoodviewsApplication {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext ctx = SpringApplication.run(GoodviewsApplication.class, args);
+
+        /*
         FilmService service = new FilmService(ctx.getBean(FilmRepository.class),ctx.getBean(FilmValidator.class), ctx.getBean(PersonService.class));
 
         Person darren = new Person("nm0004716","Darren Aranovsky");
@@ -54,12 +60,17 @@ public class GoodviewsApplication {
         List<Film> filmsWithTitlePi = service.findByTitle("Pi");
         filmsWithTitlePi.forEach(System.out::println);
 
-
-
-/*
-        FilmFactory factory = new FilmFactory(ctx.getBean(FilmService.class),ctx.getBean(ImdbScraper.class), ctx.getBean(HardcopyScraper.class));
-        factory.createDatabaseFromHardcopy();
 */
+
+
+
+
+        FilmFactory factory = new FilmFactory(ctx.getBean(FilmService.class),ctx.getBean(ImdbScraper.class), ctx.getBean(HardcopyScraper.class));
+
+        factory.addPostersToHardCopy();
+
+        factory.createDatabaseFromHardcopy();
+
 
     }
 
