@@ -4,6 +4,8 @@ import be.svend.goodviews.models.Film;
 import be.svend.goodviews.services.FilmValidator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 import java.util.List;
@@ -77,9 +79,25 @@ public class WebScraper {
     }
 
     private static String fetchJsonBasedOnId(String id) {
-        // TODO: check whether Id exists, return null if not
-        //  fetch Json if it does
+        Document doc = null;
+        String imdbUrl = "https://www.imdb.com/title/" + id + "/";
+        Optional<String> posterUrl = Optional.empty();
 
-        return null;
+        String json = null;
+
+        try {
+            doc = Jsoup.connect(imdbUrl).get();
+
+            String fullHtml = doc.body().toString();
+
+            // TODO: fetch json;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Id doesn't exist");
+            return null;
+        }
+
+        return json;
     }
 }
