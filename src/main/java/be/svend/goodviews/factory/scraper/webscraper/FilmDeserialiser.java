@@ -9,14 +9,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
-import javax.persistence.FetchType;
-import javax.persistence.ManyToMany;
 import java.io.IOException;
-import java.time.Duration;
-import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +33,7 @@ public class FilmDeserialiser extends StdDeserializer<Film> {
         film.setId(id);
 
         String title = node.get("name").toString();
+        title = title.substring(1,title.length()-1);
         film.setTitle(title);
 
         String translatedTitle = null;
@@ -65,11 +60,21 @@ public class FilmDeserialiser extends StdDeserializer<Film> {
         node.get("genre").forEach(g -> genres.add(new Genre(g.toString().substring(1,g.toString().length()-1))));
         film.setGenres(genres);
 
-        List<Tag> tags;
+        List<Tag> tags = new ArrayList<>();
+        String[] keywords = node.get("keywords").toString().split(",");
+        for (String keyword: keywords) {
+            tags.add(new Tag(keyword));
+        }
+        film.setTags(tags);
 
-        List<Person> director;
+        List<Person> director = convertToPersonList(node.get("director"));
+        film.setDirector(director);
 
-        List<Person> writer;
+        String creatorResponse = node.get("creator").toString();
+        System.out.println(creatorResponse);
+
+        List<Person> writer = convertToPersonList(node.get("creator"));
+        film.setWriter(writer);
 
         String runtimeResponse = node.get("duration").toString();
         Integer runTime = convertToMinutes(runtimeResponse);
@@ -82,12 +87,32 @@ public class FilmDeserialiser extends StdDeserializer<Film> {
         return film;
     }
 
+    private List<Person> convertToPersonList(JsonNode directorResponses) {
+        List<Person> persons = new ArrayList<>();
+
+        for (JsonNode directorResponse: directorResponses) {
+            if (!directorResponse.get("@type").toString().equals("\"Person\"")) continue;
+
+            String directorId = directorResponse.get("url").toString().split("/")[2];
+            String name = directorResponse.get("name").toString();
+            name = trimOuterCharacters(name); // getting rid of " and "
+            Person person = new Person(directorId,name);
+            persons.add(person);
+        }
+
+        return persons;
+    }
+
     private Integer convertToMinutes(String r) {
         String[] response = r.substring(3).split("H");
         Integer hours = Integer.parseInt(response[0]);
         Integer minutes = Integer.parseInt(response[1].substring(0,response.length-1));
         Integer runTime = hours * 60 + minutes;
         return runTime;
+    }
+
+    private String trimOuterCharacters(String string) {
+        return string.substring(1,string.length()-1);
     }
 
 
