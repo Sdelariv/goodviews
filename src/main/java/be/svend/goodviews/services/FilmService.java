@@ -8,7 +8,12 @@ import be.svend.goodviews.models.Tag;
 import be.svend.goodviews.repositories.FilmRepository;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.*;
+
+
+import static be.svend.goodviews.services.FilmValidator.filmHasValidIdFormat;
+import static be.svend.goodviews.services.FilmValidator.isValidFilmIdFormat;
 
 @Service
 public class FilmService {
@@ -103,7 +108,7 @@ public class FilmService {
             return;
         }
 
-        if (!filmValidator.hasValidIdFormat(film)) {
+        if (!filmHasValidIdFormat(film)) {
             System.out.println("Can't create a film that doesn't have a valid id format: " + film.getId());
             return;
         }
@@ -115,6 +120,17 @@ public class FilmService {
         System.out.println(film);
     }
 
+    public Optional<Film> createFilmByImdbId(String imdbId) {
+
+        if (!isValidFilmIdFormat(imdbId)) return Optional.empty();
+
+        if (findById(imdbId).isPresent()) return Optional.empty();
+
+        Optional<Film> createdFilm = updateFilmByImdbId(imdbId);
+
+        return createdFilm;
+    }
+
     // UPDATE methods
 
     public void updateFilms(List<Film> films) {
@@ -124,32 +140,34 @@ public class FilmService {
         }
     }
 
-    public void updateFilm(Film film) {
+    public Optional<Film> updateFilm(Film film) {
         Optional<Film> existingFilm = findFilmByFilm(film);
 
         if (existingFilm.isEmpty()) {
             System.out.println("Can't update a film with id not in database");
-            return;
+            return Optional.empty();
         } else {
             film = filmValidator.initialise(film); // Makes sure that the properties are fetched or saved to db
 
             filmRepo.save(film);
             System.out.println("Saved the following Film:");
             System.out.println(film);
+
+            return Optional.of(film);
         }
     }
 
-    public boolean updateFilmById(String filmId) {
-        if (!filmValidator.isValidIdFormat(filmId)) return false;
+    public Optional<Film> updateFilmByImdbId(String filmId) {
+        if (!isValidFilmIdFormat(filmId)) return Optional.empty();
 
         Optional<Film> existingFilm = findById(filmId);
-        if (findById(filmId).isEmpty()) return false;
+        if (findById(filmId).isEmpty()) return Optional.empty();
 
         Film updatedFilm = WebScraper.updateFilmWithWebData(existingFilm.get());
 
         filmRepo.save(updatedFilm);
 
-        return true;
+        return Optional.of(updatedFilm);
     }
 
     // DELETE methods

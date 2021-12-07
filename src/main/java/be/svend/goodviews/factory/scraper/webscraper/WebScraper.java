@@ -1,9 +1,12 @@
 package be.svend.goodviews.factory.scraper.webscraper;
 
 import be.svend.goodviews.models.Film;
+import be.svend.goodviews.services.FilmValidator;
 
 import java.util.List;
 import java.util.Optional;
+
+import static be.svend.goodviews.services.FilmValidator.isValidFilmIdFormat;
 
 public class WebScraper {
 
@@ -18,6 +21,17 @@ public class WebScraper {
 
         return films;
     }
+
+    public static List<Film> updateFilmsWithWebData(List<Film> films) {
+
+        for (Film film: films) {
+            updateFilmWithWebData(film);
+        }
+
+        return films;
+    }
+
+
 
 
     public static Film updateFilmWithWebData(Film film) {

@@ -32,15 +32,15 @@ public class FilmValidator {
         return film;
     }
 
-    public boolean hasValidIdFormat(Film film) {
+    public static boolean filmHasValidIdFormat(Film film) {
         if (film.getId() == null) return false;
 
-        if (!isValidIdFormat(film.getId())) return false;
+        if (!isValidFilmIdFormat(film.getId())) return false;
 
         return true;
     }
 
-    public boolean isValidIdFormat(String id) {
+    public static boolean isValidFilmIdFormat(String id) {
         return id.startsWith("tt");
     }
 

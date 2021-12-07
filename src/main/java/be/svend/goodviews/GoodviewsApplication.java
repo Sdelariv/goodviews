@@ -67,8 +67,6 @@ public class GoodviewsApplication {
 
         FilmFactory factory = new FilmFactory(ctx.getBean(FilmService.class),ctx.getBean(ImdbScraper.class), ctx.getBean(HardcopyScraper.class));
 
-        factory.addPostersToHardCopy();
-
         factory.createDatabaseFromHardcopy();
 
 
