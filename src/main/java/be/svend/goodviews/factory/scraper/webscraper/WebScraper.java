@@ -2,7 +2,10 @@ package be.svend.goodviews.factory.scraper.webscraper;
 
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.services.FilmValidator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +25,16 @@ public class WebScraper {
         return films;
     }
 
+    public static Optional<Film> createFilmWithWebData(String id) {
+
+        Film film = new Film();
+        film.setId(id);
+
+        Optional<Film> createdFilm = updateFilmWithWebData(film);
+
+        return createdFilm;
+    }
+
     public static List<Film> updateFilmsWithWebData(List<Film> films) {
 
         for (Film film: films) {
@@ -32,30 +45,41 @@ public class WebScraper {
     }
 
 
+    public static Optional<Film> updateFilmWithWebData(Film film) {
 
+        String json = fetchJsonBasedOnId(film.getId());
 
-    public static Film updateFilmWithWebData(Film film) {
-        // TODO: update everything
+        if (json == null) return Optional.empty();
+
+        // Initialise TODO: Move where?
+        ObjectMapper objectMapper = new ObjectMapper();
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(Film.class,new FilmDeserialiser());
+        objectMapper.registerModule(module);
+
+        Film updatedFilm = new Film();
+
+        // Add everything
+
+        try {
+            updatedFilm = objectMapper.readValue(json, Film.class);
+            System.out.println(film);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Add smaller version of poster
 
         Optional<String> posterUrl = PosterScraper.scrapePoster(film.getId());
-        if (posterUrl.isPresent()) film.setPosterUrl(posterUrl.get());
+        if (posterUrl.isPresent()) updatedFilm.setPosterUrl(posterUrl.get());
 
-        // Title
+        return Optional.of(updatedFilm);
+    }
 
-        // Release Year
+    private static String fetchJsonBasedOnId(String id) {
+        // TODO: check whether Id exists, return null if not
+        //  fetch Json if it does
 
-        // Ratings
-
-        // Genres
-
-        // Director
-
-        // Writer
-
-        // Runtime
-
-        // Tags?
-
-        return film;
+        return null;
     }
 }

@@ -163,11 +163,12 @@ public class FilmService {
         Optional<Film> existingFilm = findById(filmId);
         if (findById(filmId).isEmpty()) return Optional.empty();
 
-        Film updatedFilm = WebScraper.updateFilmWithWebData(existingFilm.get());
+        Optional<Film> updatedFilm = WebScraper.updateFilmWithWebData(existingFilm.get());
 
-        filmRepo.save(updatedFilm);
+        if (updatedFilm.isEmpty()) return Optional.empty();
 
-        return Optional.of(updatedFilm);
+        filmRepo.save(updatedFilm.get());
+        return updatedFilm;
     }
 
     // DELETE methods
