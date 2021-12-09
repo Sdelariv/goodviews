@@ -26,6 +26,8 @@ public class WebScraper {
         return films;
     }
 
+    // CREATE FILM FROM WEB METHODS
+
     public static List<Film> createFilmsWithWebData(List<String> ids) {
         List<Film> createdFilms = new ArrayList<>();
 
@@ -68,6 +70,8 @@ public class WebScraper {
         return Optional.of(createdFilm);
     }
 
+    // UPDATE FILM FROM WEB
+
     public static List<Film> updateFilmsAddWebData(List<Film> films) {
         List<Film> updatedFilms = new ArrayList<>();
 
@@ -106,6 +110,8 @@ public class WebScraper {
         Optional<Film> updatedFilm = FilmMerger.mergeFilms(film,filmWithWebData.get());
         return updatedFilm;
     }
+
+    // INTERNAL METHODS
 
     /**
      * Goes to the IMDB page (based on filmId), gets its HTML, filters the Json bit and returns that as a string
