@@ -53,7 +53,7 @@ public class FilmDeserialiser extends StdDeserializer<Film> {
         return film;
     }
 
-    // INTERNAL METHODS
+    // ADDING FROM NODE METHODS
 
     private Film addIdFromNode(Film film, JsonNode node) {
         String id = node.get("url").toString().split("/")[2];
@@ -175,7 +175,7 @@ public class FilmDeserialiser extends StdDeserializer<Film> {
         return film;
     }
 
-    // FURTHER METHODS
+    // FURTHER INTERNAL METHODS
 
     private List<Person> convertToPersonList(JsonNode directorResponses) {
         List<Person> persons = new ArrayList<>();
