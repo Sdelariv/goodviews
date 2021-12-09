@@ -25,70 +25,157 @@ public class FilmDeserialiser extends StdDeserializer<Film> {
 
     @Override
     public Film deserialize(JsonParser jp, DeserializationContext deserializationContext) throws IOException, JacksonException {
+        // Initialising
         JsonNode node = jp.getCodec().readTree(jp);
-
         Film film = new Film();
 
+        // Setting everything up
+        film = addIdFromNode(film,node);
+
+        film = addTitlesFromNode(film,node);
+
+        film = addReleaseYearFromNode(film,node);
+
+        film = addGenresFromNode(film,node);
+
+        film = addDirectorsFromNode(film,node);
+
+        film = addWritersFromNode(film,node);
+
+        film = addRuntimeFromNode(film,node);
+
+        film = addRatingFromNode(film,node);
+
+        // film = addPosterFromNode(film,node); -  TODO: Decide whether you want a bigger poster
+
+        // film = addTagsFromNode(film,node);  - If we want imdb tags (probably not)
+
+        return film;
+    }
+
+    // INTERNAL METHODS
+
+    private Film addIdFromNode(Film film, JsonNode node) {
         String id = node.get("url").toString().split("/")[2];
         film.setId(id);
 
-        String title = node.get("name").toString();
+        return film;
+    }
+
+    private Film addPosterFromNode(Film film, JsonNode node) {
+        JsonNode returnedNode = node.get("image");
+        if (returnedNode == null) return film;
+
+        String posterUrl = returnedNode.toString();
+        film.setPosterUrl(posterUrl);
+
+        return film;
+    }
+
+
+    private Film addTitlesFromNode(Film film, JsonNode node) {
+        JsonNode returnedNode = node.get("name");
+        if (returnedNode == null) return film;
+
+        String title = returnedNode.toString();
         title = title.substring(1,title.length()-1);
         film.setTitle(title);
 
         String translatedTitle = null;
         try {
-             translatedTitle = node.get("alternateName").toString();
+            translatedTitle = node.get("alternateName").toString();
         } catch (NullPointerException e) {
         }
         film.setTranslatedTitle(translatedTitle);
 
+        return film;
+    }
+
+    private Film addReleaseYearFromNode(Film film, JsonNode node) {
+        JsonNode returnedNode = node.get("datePublished");
+        if (returnedNode == null) return film;
+
         Integer releaseYear = null;
         try {
-            releaseYear = Integer.parseInt(node.get("datePublished").toString().substring(1,5));
+            String releaseYearString = returnedNode.toString().substring(1,5);
+            if (releaseYearString != null) releaseYear = Integer.parseInt(releaseYearString);
         } catch (NumberFormatException e) {
         }
-        film.setReleaseYear(releaseYear);
 
-        /*
-        // TODO: Decide whether you want a bigger poster
-        String posterUrl = node.get("image").toString();
-        film.setPosterUrl(posterUrl);
-        */
+        film.setReleaseYear(releaseYear);
+        return film;
+    }
+
+    private Film addGenresFromNode(Film film, JsonNode node) {
+        JsonNode returnedNode = node.get("genre");
+        if (returnedNode == null) return film;
 
         List<Genre> genres = new ArrayList<>();
-        node.get("genre").forEach(g -> genres.add(new Genre(g.toString().substring(1,g.toString().length()-1))));
+        returnedNode.forEach(g -> genres.add(new Genre(g.toString().substring(1,g.toString().length()-1))));
         film.setGenres(genres);
 
-        /*
-        // If we want imdb tags (probably not)
+        return film;
+    }
+
+    private Film addTagsFromNode(Film film, JsonNode node) {
+        JsonNode returnedNode = node.get("keywords");
+        if (returnedNode == null) return film;
+
         List<Tag> tags = new ArrayList<>();
-        String[] keywords = node.get("keywords").toString().split(",");
+        String[] keywords = returnedNode.toString().split(",");
         for (String keyword: keywords) {
             tags.add(new Tag(keyword));
         }
         film.setTags(tags);
-         */
 
-        List<Person> director = convertToPersonList(node.get("director"));
-        film.setDirector(director);
+        return film;
+    }
 
-        String creatorResponse = node.get("creator").toString();
-        System.out.println(creatorResponse);
+    private Film addRatingFromNode(Film film, JsonNode node) {
+        JsonNode returnedNode = node.get("aggregateRating");
+        if (returnedNode == null) return film;
 
-        List<Person> writer = convertToPersonList(node.get("creator"));
-        film.setWriter(writer);
+        JsonNode ratingValueNode = node.get("ratingValue");
+        if (ratingValueNode == null) return film;
 
-        String runtimeResponse = node.get("duration").toString();
-        Integer runTime = convertToMinutes(runtimeResponse);
-        film.setRunTime(runTime);
-
-        Double returnedRating = node.get("aggregateRating").get("ratingValue").asDouble();
+        Double returnedRating = returnedNode.asDouble();
         Integer averageRatingImdb = (int) (returnedRating * 10);
         film.setAverageRatingImdb(averageRatingImdb);
 
         return film;
     }
+
+    private Film addDirectorsFromNode(Film film, JsonNode node) {
+        JsonNode returnedNode = node.get("director");
+        if (returnedNode == null) return film;
+
+        List<Person> director = convertToPersonList(returnedNode);
+        film.setDirector(director);
+
+        return film;
+    }
+
+    private Film addWritersFromNode(Film film, JsonNode node) {
+        JsonNode returnedNode = node.get("creator");
+        if (returnedNode == null) return film;
+
+        List<Person> writer = convertToPersonList(returnedNode);
+        film.setWriter(writer);
+
+        return film;
+    }
+
+    private Film addRuntimeFromNode(Film film, JsonNode node) {
+        JsonNode returnedNode = node.get("duration");
+        if (returnedNode == null) return film;
+
+        Integer runTime = convertToMinutes(returnedNode.toString());
+        film.setRunTime(runTime);
+
+        return film;
+    }
+
+    // FURTHER METHODS
 
     private List<Person> convertToPersonList(JsonNode directorResponses) {
         List<Person> persons = new ArrayList<>();

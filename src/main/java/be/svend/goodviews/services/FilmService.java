@@ -103,7 +103,7 @@ public class FilmService {
 
     public void createFilm(Film film) {
         if (findFilmByFilm(film).isPresent()) {
-            System.out.println("Can't create a film with existing id");
+            System.out.println("Can't create a film with an id already in the db");
             return;
         }
 
@@ -112,20 +112,24 @@ public class FilmService {
             return;
         }
 
-        Film initialisedFilm = filmValidator.initialise(film);
-
-        filmRepo.save(initialisedFilm);
-        System.out.println("Saved the following Film:");
-        System.out.println(film);
+        initialiseAndSaveFilm(film);
     }
 
+
     public Optional<Film> createFilmByImdbId(String imdbId) {
+        // Check whether existing
+        if (imdbId == null) return Optional.empty();
+        if (findById(imdbId).isPresent()) {
+            System.out.println("Can't create a film with an id that is already in the db");
+            return Optional.empty();
+        }
 
-        if (!isValidFilmIdFormat(imdbId)) return Optional.empty();
+        // Get data
+        Optional<Film> createdFilm = WebScraper.createFilmWithWebData(imdbId);
 
-        if (findById(imdbId).isPresent()) return Optional.empty();
-
-        Optional<Film> createdFilm = createFilmByImdbId(imdbId);
+        // Save if present
+        if (createdFilm.isEmpty()) return Optional.empty();
+        initialiseAndSaveFilm(createdFilm.get());
 
         return createdFilm;
     }
@@ -146,41 +150,55 @@ public class FilmService {
             System.out.println("Can't update a film with id not in database");
             return Optional.empty();
         } else {
-            film = filmValidator.initialise(film); // Makes sure that the properties are fetched or saved to db
-
-            filmRepo.save(film);
-            System.out.println("Saved the following Film:");
-            System.out.println(film);
+            initialiseAndSaveFilm(film);
 
             return Optional.of(film);
         }
     }
 
     public Optional<Film> updateFilmAddWebDataByImdbId(String filmId) {
-        if (!isValidFilmIdFormat(filmId)) return Optional.empty();
+        // Checks
+        if (!isValidFilmIdFormat(filmId)) {
+            System.out.println("Can't update a film with an invalid id");
+            return Optional.empty();
+        }
 
         Optional<Film> existingFilm = findById(filmId);
-        if (findById(filmId).isEmpty()) return Optional.empty();
+        if (findById(filmId).isEmpty()) {
+            System.out.println("Can't update af ilm that's not in the db");
+            return Optional.empty();
+        }
 
+        // Get data
         Optional<Film> updatedFilm = WebScraper.updateFilmAddWebData(existingFilm.get());
 
+        // Sava data
         if (updatedFilm.isEmpty()) return Optional.empty();
+        updatedFilm = Optional.of(initialiseAndSaveFilm(updatedFilm.get()));
 
-        filmRepo.save(updatedFilm.get());
         return updatedFilm;
     }
 
     public Optional<Film> updateFilmReplaceWithWebDataByImdbId(String filmId) {
-        if (!isValidFilmIdFormat(filmId)) return Optional.empty();
+        // Checks
+        if (!isValidFilmIdFormat(filmId)) {
+            System.out.println("Can't update a film that with an invalid id");
+            return Optional.empty();
+        }
 
         Optional<Film> existingFilm = findById(filmId);
-        if (findById(filmId).isEmpty()) return Optional.empty();
+        if (findById(filmId).isEmpty()) {
+            System.out.println("Can't update a film that is nto in the db");
+            return Optional.empty();
+        }
 
+        // Get data
         Optional<Film> updatedFilm = WebScraper.updateFilmReplaceWithWebData(existingFilm.get());
 
+        // Save data if present
         if (updatedFilm.isEmpty()) return Optional.empty();
+        updatedFilm = Optional.of(initialiseAndSaveFilm(updatedFilm.get()));
 
-        filmRepo.save(updatedFilm.get());
         return updatedFilm;
     }
 
@@ -211,6 +229,21 @@ public class FilmService {
 
     private Optional<Film> findFilmByFilm(Film film) {
         return findById(film.getId());
+    }
+
+
+    /** Saves film and all its unknown properties after all other checks have been completed
+     * @param film
+     * @return the initialised film with all its ids
+     */
+    private Film initialiseAndSaveFilm(Film film) {
+        Film initialisedFilm = filmValidator.initialise(film);
+
+        filmRepo.save(initialisedFilm);
+        System.out.println("Saved the following Film:");
+        System.out.println(film);
+
+        return film;
     }
 
 }

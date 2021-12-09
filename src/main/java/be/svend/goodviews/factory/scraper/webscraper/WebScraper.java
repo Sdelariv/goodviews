@@ -45,8 +45,10 @@ public class WebScraper {
         // Fetching information
         String json = fetchJsonBasedOnId(createdFilm.getId());
         if (json == null) return Optional.empty();
+        System.out.println("Json string found: ");
+        System.out.println(json);
 
-        // Initialise TODO: Move where?
+        // Initialise Json Decoder TODO: Move where?
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
         module.addDeserializer(Film.class,new FilmDeserialiser());
@@ -55,7 +57,6 @@ public class WebScraper {
         // Create a Film object based on the Web Data
         try {
             createdFilm = objectMapper.readValue(json, Film.class);
-            System.out.println(createdFilm);
         } catch (IOException e) {
             e.printStackTrace();
         }

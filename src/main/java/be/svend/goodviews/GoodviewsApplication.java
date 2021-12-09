@@ -25,49 +25,10 @@ public class GoodviewsApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext ctx = SpringApplication.run(GoodviewsApplication.class, args);
 
-        /*
+
         FilmService service = new FilmService(ctx.getBean(FilmRepository.class),ctx.getBean(FilmValidator.class), ctx.getBean(PersonService.class));
 
-        Person darren = new Person("nm0004716","Darren Aranovsky");
-
-        Film film = new Film();
-        film.setTitle("Pi");
-        film.setId("tt0138704");
-        film.setReleaseYear(1998);
-        film.setDirector(darren);
-
-        service.createFilm(film);
-
-        System.out.println("Finding film:");
-        System.out.println(service.findById("tt0138704").get());
-
-        System.out.println("Finding directors:");
-        List<Film> filmsByDarren = service.findFilmsByDirectorId("nm0004716");
-        filmsByDarren.forEach(System.out::println);
-
-        System.out.println("Finding writers:");
-        List<Film> filmsWrittenByDarren = service.findFilmsByWriterId("nm0004716");
-        filmsWrittenByDarren.forEach(System.out::println);
-
-        Genre genre = new Genre("New Weird");
-        film.setGenres(List.of(new Genre("New Weird")));
-        service.updateFilm(film);
-
-        GenreService g_service = new GenreService(ctx.getBean(GenreRepository.class));
-        g_service.deleteGenre(new Genre("New Weird"));
-
-        System.out.println("Finding films with title Pi, after deleting genre");
-        List<Film> filmsWithTitlePi = service.findByTitle("Pi");
-        filmsWithTitlePi.forEach(System.out::println);
-
-*/
-
-
-
-
-        FilmFactory factory = new FilmFactory(ctx.getBean(FilmService.class),ctx.getBean(ImdbScraper.class), ctx.getBean(HardcopyScraper.class));
-
-        factory.createDatabaseFromHardcopy();
+        service.createFilmByImdbId("tt16283826");
 
 
     }
