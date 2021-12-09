@@ -13,6 +13,9 @@ public class User {
 
     private String username;
 
+    private String profileUrl;
+
+
     // GETTERS & SETTERS
 
     public Integer getId() {
@@ -31,4 +34,11 @@ public class User {
         this.username = username;
     }
 
+    public String getProfileUrl() {
+        return profileUrl;
+    }
+
+    public void setProfileUrl(String profileUrl) {
+        this.profileUrl = profileUrl;
+    }
 }
