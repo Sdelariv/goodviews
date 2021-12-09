@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
 public class FilmSorter {
 
     public static List<Film> orderByRatingAscending(List<Film> films) {
-        return films.stream().sorted(Comparator.comparingInt(Film::getAverageRatingImdb)).collect(Collectors.toList());
+        return films.stream().sorted(Comparator.comparingInt(Film::getAverageRatingImdb)).distinct().collect(Collectors.toList());
     }
 
     public static List<Film> orderByRatingDescending(List<Film> films) {
-        return films.stream().sorted(Comparator.comparingInt(Film::getAverageRatingImdb).reversed()).collect(Collectors.toList());
+        return films.stream().sorted(Comparator.comparingInt(Film::getAverageRatingImdb).reversed()).distinct().collect(Collectors.toList());
     }
 }
