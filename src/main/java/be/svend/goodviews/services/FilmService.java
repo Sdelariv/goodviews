@@ -8,7 +8,6 @@ import be.svend.goodviews.models.Tag;
 import be.svend.goodviews.repositories.FilmRepository;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.*;
 
 
@@ -126,7 +125,7 @@ public class FilmService {
 
         if (findById(imdbId).isPresent()) return Optional.empty();
 
-        Optional<Film> createdFilm = updateFilmByImdbId(imdbId);
+        Optional<Film> createdFilm = createFilmByImdbId(imdbId);
 
         return createdFilm;
     }
@@ -157,13 +156,27 @@ public class FilmService {
         }
     }
 
-    public Optional<Film> updateFilmByImdbId(String filmId) {
+    public Optional<Film> updateFilmAddWebDataByImdbId(String filmId) {
         if (!isValidFilmIdFormat(filmId)) return Optional.empty();
 
         Optional<Film> existingFilm = findById(filmId);
         if (findById(filmId).isEmpty()) return Optional.empty();
 
-        Optional<Film> updatedFilm = WebScraper.updateFilmWithWebData(existingFilm.get());
+        Optional<Film> updatedFilm = WebScraper.updateFilmAddWebData(existingFilm.get());
+
+        if (updatedFilm.isEmpty()) return Optional.empty();
+
+        filmRepo.save(updatedFilm.get());
+        return updatedFilm;
+    }
+
+    public Optional<Film> updateFilmReplaceWithWebDataByImdbId(String filmId) {
+        if (!isValidFilmIdFormat(filmId)) return Optional.empty();
+
+        Optional<Film> existingFilm = findById(filmId);
+        if (findById(filmId).isEmpty()) return Optional.empty();
+
+        Optional<Film> updatedFilm = WebScraper.updateFilmReplaceWithWebData(existingFilm.get());
 
         if (updatedFilm.isEmpty()) return Optional.empty();
 

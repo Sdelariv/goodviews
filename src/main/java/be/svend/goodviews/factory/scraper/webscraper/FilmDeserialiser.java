@@ -60,12 +60,15 @@ public class FilmDeserialiser extends StdDeserializer<Film> {
         node.get("genre").forEach(g -> genres.add(new Genre(g.toString().substring(1,g.toString().length()-1))));
         film.setGenres(genres);
 
+        /*
+        // If we want imdb tags (probably not)
         List<Tag> tags = new ArrayList<>();
         String[] keywords = node.get("keywords").toString().split(",");
         for (String keyword: keywords) {
             tags.add(new Tag(keyword));
         }
         film.setTags(tags);
+         */
 
         List<Person> director = convertToPersonList(node.get("director"));
         film.setDirector(director);
@@ -104,10 +107,23 @@ public class FilmDeserialiser extends StdDeserializer<Film> {
     }
 
     private Integer convertToMinutes(String r) {
-        String[] response = r.substring(3).split("H");
-        Integer hours = Integer.parseInt(response[0]);
-        Integer minutes = Integer.parseInt(response[1].substring(0,response.length-1));
-        Integer runTime = hours * 60 + minutes;
+        Integer runTime = 0;
+
+        try {
+            r = r.substring(3, r.length() - 1); // Removing PT and surrounding "" from duration string
+
+            if (r.contains("H")) {
+                String[] response = r.split("H");
+                Integer hours = Integer.parseInt(response[0]);
+                Integer minutes = Integer.parseInt(response[1].substring(0, response.length - 1));
+                runTime = hours * 60 + minutes;
+            } else {
+                runTime = Integer.parseInt(r.substring(0, r.length() - 1));
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Something went wrong trying to convert " + r + "into a runtime");
+        }
+
         return runTime;
     }
 

@@ -23,9 +23,6 @@ public class PosterScraper {
             String img_alt = splittedHtml[1].split("</div>")[0].split("src")[1]; // Get the first url out
             posterUrl = Optional.of(img_alt.substring(2,img_alt.length()-2)); // Remove " and "
 
-            System.out.println(doc.title());
-            System.out.println(posterUrl.get());
-
         } catch (IOException e) {
             e.printStackTrace();
         }

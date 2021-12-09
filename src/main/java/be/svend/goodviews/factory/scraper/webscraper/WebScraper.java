@@ -1,17 +1,16 @@
 package be.svend.goodviews.factory.scraper.webscraper;
 
 import be.svend.goodviews.models.Film;
-import be.svend.goodviews.services.FilmValidator;
+import be.svend.goodviews.services.FilmMerger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static be.svend.goodviews.services.FilmValidator.isValidFilmIdFormat;
 
 public class WebScraper {
 
@@ -27,30 +26,24 @@ public class WebScraper {
         return films;
     }
 
-    public static Optional<Film> createFilmWithWebData(String id) {
+    public static List<Film> createFilmsWithWebData(List<String> ids) {
+        List<Film> createdFilms = new ArrayList<>();
 
-        Film film = new Film();
-        film.setId(id);
-
-        Optional<Film> createdFilm = updateFilmWithWebData(film);
-
-        return createdFilm;
-    }
-
-    public static List<Film> updateFilmsWithWebData(List<Film> films) {
-
-        for (Film film: films) {
-            updateFilmWithWebData(film);
+        for (String id: ids) {
+            Optional<Film> film = createFilmWithWebData(id);
+            if (film.isPresent()) createdFilms.add(film.get());
         }
 
-        return films;
+        return createdFilms;
     }
 
+    public static Optional<Film> createFilmWithWebData(String id) {
+        // Setting up
+        Film createdFilm = new Film();
+        createdFilm.setId(id);
 
-    public static Optional<Film> updateFilmWithWebData(Film film) {
-
-        String json = fetchJsonBasedOnId(film.getId());
-
+        // Fetching information
+        String json = fetchJsonBasedOnId(createdFilm.getId());
         if (json == null) return Optional.empty();
 
         // Initialise TODO: Move where?
@@ -59,38 +52,81 @@ public class WebScraper {
         module.addDeserializer(Film.class,new FilmDeserialiser());
         objectMapper.registerModule(module);
 
-        Film updatedFilm = new Film();
-
-        // Add everything
-
+        // Create a Film object based on the Web Data
         try {
-            updatedFilm = objectMapper.readValue(json, Film.class);
-            System.out.println(film);
+            createdFilm = objectMapper.readValue(json, Film.class);
+            System.out.println(createdFilm);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         // Add smaller version of poster
+        Optional<String> posterUrl = PosterScraper.scrapePoster(createdFilm.getId());
+        if (posterUrl.isPresent()) createdFilm.setPosterUrl(posterUrl.get());
 
-        Optional<String> posterUrl = PosterScraper.scrapePoster(film.getId());
-        if (posterUrl.isPresent()) updatedFilm.setPosterUrl(posterUrl.get());
-
-        return Optional.of(updatedFilm);
+        return Optional.of(createdFilm);
     }
 
+    public static List<Film> updateFilmsAddWebData(List<Film> films) {
+        List<Film> updatedFilms = new ArrayList<>();
+
+        for (Film film: films) {
+            Optional<Film> updatedFilm = updateFilmAddWebData(film);
+            if (updatedFilm.isPresent()) updatedFilms.add(updatedFilm.get());
+        }
+
+        return films;
+    }
+
+    public static List<Film> updateFilmsReplaceWithWebData(List<Film> films) {
+        List<Film> updatedFilms = new ArrayList<>();
+
+        for (Film film: films) {
+            Optional<Film> updatedFilm = updateFilmReplaceWithWebData(film);
+            if (updatedFilm.isPresent()) updatedFilms.add(updatedFilm.get());
+        }
+
+        return films;
+    }
+
+    public static Optional<Film> updateFilmReplaceWithWebData(Film film) {
+        Optional<Film> filmWithWebData = createFilmWithWebData(film.getId());
+        if (filmWithWebData.isEmpty()) return Optional.empty();
+
+        return filmWithWebData;
+    }
+
+
+    public static Optional<Film> updateFilmAddWebData(Film film) {
+
+        Optional<Film> filmWithWebData = createFilmWithWebData(film.getId());
+        if (filmWithWebData.isEmpty()) return Optional.empty();
+
+        Optional<Film> updatedFilm = FilmMerger.mergeFilms(film,filmWithWebData.get());
+        return updatedFilm;
+    }
+
+    /**
+     * Goes to the IMDB page (based on filmId), gets its HTML, filters the Json bit and returns that as a string
+     * @param id - the filmId (in IMDB-formatting) to fetch the url
+     * @return Json String of the film
+     */
     private static String fetchJsonBasedOnId(String id) {
-        Document doc = null;
         String imdbUrl = "https://www.imdb.com/title/" + id + "/";
-        Optional<String> posterUrl = Optional.empty();
 
         String json = null;
 
         try {
-            doc = Jsoup.connect(imdbUrl).get();
-
+            // Getting the full HTML page of the film
+            Document doc = Jsoup.connect(imdbUrl).get();
             String fullHtml = doc.body().toString();
 
-            // TODO: fetch json;
+            // Extracting the json bit
+            json = fullHtml.split("@context")[1].split("</script")[0];
+            json = "{\"@context" + json;
+
+            // Json has \ characters all over, so we're getting rid of them
+            json = json.replaceAll("\\\\","");
 
         } catch (IOException e) {
             e.printStackTrace();
