@@ -181,12 +181,17 @@ public class FilmService {
         }
 
         // Get data
-        Optional<Film> updatedFilm = WebScraper.updateFilmAddWebData(existingFilm.get());
+        System.out.println("Fetching Web data for " + existingFilm.get().getTitle());
+        Optional<Film> updatedFilm = WebScraper.addWebData(existingFilm.get());
 
         // Sava data
-        if (updatedFilm.isEmpty()) return Optional.empty();
+        if (updatedFilm.isEmpty()) {
+            System.out.println("Couldn't find webData");
+            return Optional.empty();
+        }
         updatedFilm = Optional.of(initialiseAndSaveFilm(updatedFilm.get()));
 
+        System.out.println("Updated (Added IMDB data) " + updatedFilm.get().getTitle());
         return updatedFilm;
     }
 
@@ -215,12 +220,13 @@ public class FilmService {
         }
 
         // Get data
-        Optional<Film> updatedFilm = WebScraper.updateFilmReplaceWithWebData(existingFilm.get());
+        Optional<Film> updatedFilm = WebScraper.replaceWithWebData(existingFilm.get());
 
         // Save data if present
         if (updatedFilm.isEmpty()) return Optional.empty();
         updatedFilm = Optional.of(initialiseAndSaveFilm(updatedFilm.get()));
 
+        System.out.println("Updated (Replace with IMDB data)" + updatedFilm.get().getTitle());
         return updatedFilm;
     }
 

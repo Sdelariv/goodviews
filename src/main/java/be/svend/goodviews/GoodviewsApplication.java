@@ -18,6 +18,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @SpringBootApplication
 public class GoodviewsApplication {
@@ -28,9 +29,9 @@ public class GoodviewsApplication {
 
         FilmService service = new FilmService(ctx.getBean(FilmRepository.class),ctx.getBean(FilmValidator.class), ctx.getBean(PersonService.class));
 
-        List<Film> films = service.findAllFilms();
+        List<String> filmIds = service.findAllFilms().stream().map(f -> f.getId()).collect(Collectors.toList());
 
-        service.updateFilm
+        service.updateFilmsAddWebDataByImdbId(filmIds);
 
 
     }

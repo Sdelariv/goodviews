@@ -73,19 +73,22 @@ public class FilmDeserialiser extends StdDeserializer<Film> {
     }
 
 
+    // TODO: fix translated title
     private Film addTitlesFromNode(Film film, JsonNode node) {
         JsonNode returnedNode = node.get("name");
-        if (returnedNode == null) return film;
+        if (returnedNode == null) {
+            System.out.println("Can't find name");
+            return film;
+        }
 
         String title = returnedNode.toString();
         title = title.substring(1,title.length()-1);
         film.setTitle(title);
 
-        String translatedTitle = null;
-        try {
-            translatedTitle = node.get("alternateName").toString();
-        } catch (NullPointerException e) {
-        }
+        JsonNode returnedNode2 = node.get("alternateName");
+        if (returnedNode2 == null) return film;
+
+        String translatedTitle = node.get("alternateName").toString();
         film.setTranslatedTitle(translatedTitle);
 
         return film;
@@ -135,10 +138,11 @@ public class FilmDeserialiser extends StdDeserializer<Film> {
         JsonNode returnedNode = node.get("aggregateRating");
         if (returnedNode == null) return film;
 
-        JsonNode ratingValueNode = node.get("ratingValue");
+        JsonNode ratingValueNode = returnedNode.get("ratingValue");
         if (ratingValueNode == null) return film;
 
-        Double returnedRating = returnedNode.asDouble();
+
+        Double returnedRating = ratingValueNode.asDouble();
         Integer averageRatingImdb = (int) (returnedRating * 10);
         film.setAverageRatingImdb(averageRatingImdb);
 
@@ -202,13 +206,13 @@ public class FilmDeserialiser extends StdDeserializer<Film> {
             if (r.contains("H")) {
                 String[] response = r.split("H");
                 Integer hours = Integer.parseInt(response[0]);
-                Integer minutes = Integer.parseInt(response[1].substring(0, response.length - 1));
+                Integer minutes = Integer.parseInt(response[1].substring(0, response.length ));// DELETES THE M TOO
                 runTime = hours * 60 + minutes;
             } else {
                 runTime = Integer.parseInt(r.substring(0, r.length() - 1));
             }
         } catch (NumberFormatException e) {
-            System.out.println("Something went wrong trying to convert " + r + "into a runtime");
+            System.out.println("Something went wrong trying to convert " + r + " into a runtime");
         }
 
         return runTime;

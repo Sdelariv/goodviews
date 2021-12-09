@@ -37,14 +37,14 @@ public class HardcopyMaker {
                     "filmTitle\t" +
                     "translatedTitle\t" +
                     "releaseYear\t" +
-                    "runTime\t" +
                     "posterUrl\t" +
                     "genres\t" +
                     "tags\t" +
                     "averageRating\t" +
                     "averageRating(Imdb)\t" +
                     "directors\t" +
-                    "writers");
+                    "writers\t" +
+                    "runTime");
 
             // loop through all your data and print it to the file
             for (Film film: films) {
@@ -52,14 +52,14 @@ public class HardcopyMaker {
                 dos.print(film.getTitle()+"\t");
                 dos.print(film.getTranslatedTitle()+"\t");
                 dos.print(film.getReleaseYear()+"\t");
-                dos.print(film.getRunTime()+"\t");
                 dos.print(film.getPosterUrl()+"\t");
                 dos.print(film.getGenres()+"\t");
                 dos.print(film.getTags()+"\t");
                 dos.print(film.getAverageRating()+"\t");
                 dos.print(film.getAverageRatingImdb()+"\t");
                 dos.print(film.getDirector()+"\t");
-                dos.print(film.getWriter());
+                dos.print(film.getWriter()+"\t");
+                dos.print(film.getRunTime());
                 dos.println();
             }
             dos.close();

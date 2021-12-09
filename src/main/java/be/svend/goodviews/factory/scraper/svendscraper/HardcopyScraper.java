@@ -35,6 +35,7 @@ public class HardcopyScraper {
     private final int AV_RATING_IMDB_INDEX = 8;
     private final int DIRECTOR_INDEX = 9;
     private final int WRITER_INDEX = 10;
+    private final int RUNTIME_INDEX = 11;
 
     public List<Film> scrapeHardCopy() {
         List<Film> films = new ArrayList<>();
@@ -93,6 +94,11 @@ public class HardcopyScraper {
         String writers = lineItems[WRITER_INDEX];
         film.setWriter(convertToListOfPersons(writers));
 
+        /*
+        // TODO: Add when it's added to hardcopy
+        String runtime = lineItems[RUNTIME_INDEX];
+        film.setRunTime(Integer.parseInt(runtime));
+*/
         return film;
     }
 

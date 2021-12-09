@@ -4,6 +4,7 @@ import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Genre;
 import be.svend.goodviews.models.Person;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,7 +21,8 @@ public class FilmMerger {
     public static Optional<Film> mergeFilms(Film oldFilm, Film newFilm) {
         // Check whether it is indeed the same film
         if (oldFilm.getId() == null || newFilm.getId() == null) return Optional.empty();
-        if (oldFilm.getId() != newFilm.getId()) return Optional.empty();
+
+        if (!oldFilm.getId().equals(newFilm.getId())) return Optional.empty();
 
         // Fill everything in, if it is present
         Film mergedFilm = new Film();
@@ -28,6 +30,8 @@ public class FilmMerger {
         mergedFilm.setId(oldFilm.getId());
 
         mergedFilm = mergeTitle(mergedFilm,newFilm);
+
+        mergedFilm = mergeTranslatedTitle(mergedFilm,newFilm);
 
         mergedFilm = mergePosterUrl(mergedFilm,newFilm);
 
@@ -41,12 +45,29 @@ public class FilmMerger {
 
         mergedFilm = mergeAverageRatingImdb(mergedFilm,newFilm);
 
+        mergedFilm = mergeReleaseYear(mergedFilm,newFilm);
+
+
         return Optional.of(mergedFilm);
 
     }
 
+    private static Film mergeReleaseYear(Film mergedFilm, Film newFilm) {
+        if (newFilm.getReleaseYear() == null) return mergedFilm;
+        if (newFilm.getReleaseYear() == 0) return mergedFilm;
+
+        mergedFilm.setReleaseYear(newFilm.getReleaseYear());
+
+        return mergedFilm;
+    }
+
+
     private static Film mergeAverageRatingImdb(Film mergedFilm, Film newFilm) {
-        if (newFilm.getAverageRatingImdb() != null) mergedFilm.setAverageRatingImdb(newFilm.getAverageRatingImdb());
+        System.out.println("Old average rating = " + mergedFilm.getAverageRatingImdb());
+        if (newFilm.getAverageRatingImdb() == null) return mergedFilm;
+
+        System.out.println("New average rating = " + newFilm.getAverageRatingImdb());
+        mergedFilm.setAverageRatingImdb(newFilm.getAverageRatingImdb());
 
         return mergedFilm;
     }
@@ -60,23 +81,28 @@ public class FilmMerger {
     }
 
     private static Film mergeGenres(Film mergedFilm, Film newFilm) {
-        if (newFilm.getGenres() != null) {
-            List<Genre> genres = mergedFilm.getGenres();
-            genres.addAll(newFilm.getGenres());
-            genres = genres.stream().distinct().collect(Collectors.toList());
-            mergedFilm.setGenres(genres);
-        }
+        if (newFilm.getGenres() == null) return mergedFilm;
+
+        List<Genre> genres = new ArrayList<>();
+        if (mergedFilm.getGenres() != null) genres.addAll(mergedFilm.getGenres());
+
+        genres.addAll(newFilm.getGenres());
+        genres = genres.stream().distinct().collect(Collectors.toList());
+        mergedFilm.setGenres(genres);
 
         return mergedFilm;
     }
 
     private static Film mergeDirectors(Film mergedFilm, Film newFilm) {
-        if (newFilm.getDirector() != null) {
-            List<Person> directors = mergedFilm.getDirector();
-            directors.addAll(newFilm.getDirector());
-            directors = directors.stream().distinct().collect(Collectors.toList());
-            mergedFilm.setWriter(directors);
-        }
+        if (newFilm.getDirector() == null) return mergedFilm;
+
+        List<Person> directors = new ArrayList<>();
+        if (mergedFilm.getDirector() != null) directors.addAll(mergedFilm.getDirector());
+
+        directors.addAll(newFilm.getDirector());
+        directors = directors.stream().distinct().collect(Collectors.toList());
+        mergedFilm.setDirector(directors);
+
         return mergedFilm;
     }
 
@@ -92,13 +118,21 @@ public class FilmMerger {
         return mergedFilm;
     }
 
+    private static Film mergeTranslatedTitle(Film mergedFilm, Film newFilm) {
+        if (newFilm.getTranslatedTitle() != null) mergedFilm.setTranslatedTitle(newFilm.getTranslatedTitle());
+
+        return mergedFilm;
+    }
+
     private static Film mergeWriters(Film mergedFilm, Film newFilm) {
-        if (newFilm.getWriter() != null) {
-            List<Person> writers = mergedFilm.getWriter();
-            writers.addAll(newFilm.getWriter());
-            writers = writers.stream().distinct().collect(Collectors.toList());
-            mergedFilm.setWriter(writers);
-        }
+        if (newFilm.getWriter() == null) return mergedFilm;
+
+        List<Person> writers = new ArrayList<>();
+        if (mergedFilm.getWriter() != null) writers.addAll(mergedFilm.getWriter());
+        writers.addAll(newFilm.getWriter());
+        writers = writers.stream().distinct().collect(Collectors.toList());
+        mergedFilm.setWriter(writers);
+
         return mergedFilm;
     }
 }

@@ -47,8 +47,6 @@ public class WebScraper {
         // Fetching information
         String json = fetchJsonBasedOnId(createdFilm.getId());
         if (json == null) return Optional.empty();
-        System.out.println("Json string found: ");
-        System.out.println(json);
 
         // Initialise Json Decoder TODO: Move where?
         ObjectMapper objectMapper = new ObjectMapper();
@@ -68,33 +66,36 @@ public class WebScraper {
         if (posterUrl.isPresent()) createdFilm.setPosterUrl(posterUrl.get());
 
         return Optional.of(createdFilm);
+
+        // Add Translated title
+        // TODO add based on html?
     }
 
     // UPDATE FILM FROM WEB
 
-    public static List<Film> updateFilmsAddWebData(List<Film> films) {
+    public static List<Film> addAllWithWebData(List<Film> films) {
         List<Film> updatedFilms = new ArrayList<>();
 
         for (Film film: films) {
-            Optional<Film> updatedFilm = updateFilmAddWebData(film);
+            Optional<Film> updatedFilm = addWebData(film);
             if (updatedFilm.isPresent()) updatedFilms.add(updatedFilm.get());
         }
 
         return films;
     }
 
-    public static List<Film> updateFilmsReplaceWithWebData(List<Film> films) {
+    public static List<Film> replaceAllWithWebData(List<Film> films) {
         List<Film> updatedFilms = new ArrayList<>();
 
         for (Film film: films) {
-            Optional<Film> updatedFilm = updateFilmReplaceWithWebData(film);
+            Optional<Film> updatedFilm = replaceWithWebData(film);
             if (updatedFilm.isPresent()) updatedFilms.add(updatedFilm.get());
         }
 
         return films;
     }
 
-    public static Optional<Film> updateFilmReplaceWithWebData(Film film) {
+    public static Optional<Film> replaceWithWebData(Film film) {
         Optional<Film> filmWithWebData = createFilmWithWebData(film.getId());
         if (filmWithWebData.isEmpty()) return Optional.empty();
 
@@ -102,10 +103,13 @@ public class WebScraper {
     }
 
 
-    public static Optional<Film> updateFilmAddWebData(Film film) {
+    public static Optional<Film> addWebData(Film film) {
 
         Optional<Film> filmWithWebData = createFilmWithWebData(film.getId());
         if (filmWithWebData.isEmpty()) return Optional.empty();
+
+        System.out.println("Full web data object:");
+        System.out.println(filmWithWebData.get());
 
         Optional<Film> updatedFilm = FilmMerger.mergeFilms(film,filmWithWebData.get());
         return updatedFilm;
