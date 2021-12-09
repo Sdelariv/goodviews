@@ -156,6 +156,17 @@ public class FilmService {
         }
     }
 
+    public List<Film> updateFilmsAddWebDataByImdbId(List<String> filmIds) {
+        List<Film> films = new ArrayList<>();
+
+        for (String id: filmIds) {
+            Optional<Film> film = updateFilmAddWebDataByImdbId(id);
+            if (film.isPresent()) films.add(film.get());
+        }
+
+        return films;
+    }
+
     public Optional<Film> updateFilmAddWebDataByImdbId(String filmId) {
         // Checks
         if (!isValidFilmIdFormat(filmId)) {
@@ -177,6 +188,17 @@ public class FilmService {
         updatedFilm = Optional.of(initialiseAndSaveFilm(updatedFilm.get()));
 
         return updatedFilm;
+    }
+
+    public List<Film> updateFilmsReplaceWithWebDataByImdbId(List<String> filmIds) {
+        List<Film> films = new ArrayList<>();
+
+        for (String id: filmIds) {
+            Optional<Film> film = updateFilmReplaceWithWebDataByImdbId(id);
+            if (film.isPresent()) films.add(film.get());
+        }
+
+        return films;
     }
 
     public Optional<Film> updateFilmReplaceWithWebDataByImdbId(String filmId) {
