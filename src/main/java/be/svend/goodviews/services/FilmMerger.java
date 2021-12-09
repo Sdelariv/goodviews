@@ -25,9 +25,7 @@ public class FilmMerger {
         if (!oldFilm.getId().equals(newFilm.getId())) return Optional.empty();
 
         // Fill everything in, if it is present
-        Film mergedFilm = new Film();
-
-        mergedFilm.setId(oldFilm.getId());
+        Film mergedFilm = oldFilm;
 
         mergedFilm = mergeTitle(mergedFilm,newFilm);
 
@@ -63,10 +61,8 @@ public class FilmMerger {
 
 
     private static Film mergeAverageRatingImdb(Film mergedFilm, Film newFilm) {
-        System.out.println("Old average rating = " + mergedFilm.getAverageRatingImdb());
         if (newFilm.getAverageRatingImdb() == null) return mergedFilm;
 
-        System.out.println("New average rating = " + newFilm.getAverageRatingImdb());
         mergedFilm.setAverageRatingImdb(newFilm.getAverageRatingImdb());
 
         return mergedFilm;

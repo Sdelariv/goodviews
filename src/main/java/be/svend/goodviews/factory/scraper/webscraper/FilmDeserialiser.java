@@ -199,21 +199,27 @@ public class FilmDeserialiser extends StdDeserializer<Film> {
 
     private Integer convertToMinutes(String r) {
         Integer runTime = 0;
+        Integer hours = 0;
+        Integer minutes = 0;
 
         try {
             r = r.substring(3, r.length() - 1); // Removing PT and surrounding "" from duration string
 
             if (r.contains("H")) {
+
                 String[] response = r.split("H");
-                Integer hours = Integer.parseInt(response[0]);
-                Integer minutes = Integer.parseInt(response[1].substring(0, response.length ));// DELETES THE M TOO
-                runTime = hours * 60 + minutes;
+                hours = Integer.parseInt(response[0]);
+                if (r.contains("M")) {
+                    minutes = Integer.parseInt(response[1].split("M")[0]);// DELETES THE M TOO
+                }
             } else {
                 runTime = Integer.parseInt(r.substring(0, r.length() - 1));
             }
         } catch (NumberFormatException e) {
             System.out.println("Something went wrong trying to convert " + r + " into a runtime");
         }
+
+        runTime = hours * 60 + minutes;
 
         return runTime;
     }

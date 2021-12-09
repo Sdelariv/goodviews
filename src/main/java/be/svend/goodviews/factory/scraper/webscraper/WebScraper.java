@@ -65,10 +65,10 @@ public class WebScraper {
         Optional<String> posterUrl = PosterScraper.scrapePoster(createdFilm.getId());
         if (posterUrl.isPresent()) createdFilm.setPosterUrl(posterUrl.get());
 
-        return Optional.of(createdFilm);
-
         // Add Translated title
-        // TODO add based on html?
+        createdFilm = addTitles(createdFilm);
+
+        return Optional.of(createdFilm);
     }
 
     // UPDATE FILM FROM WEB
@@ -108,9 +108,6 @@ public class WebScraper {
         Optional<Film> filmWithWebData = createFilmWithWebData(film.getId());
         if (filmWithWebData.isEmpty()) return Optional.empty();
 
-        System.out.println("Full web data object:");
-        System.out.println(filmWithWebData.get());
-
         Optional<Film> updatedFilm = FilmMerger.mergeFilms(film,filmWithWebData.get());
         return updatedFilm;
     }
@@ -146,5 +143,46 @@ public class WebScraper {
         }
 
         return json;
+    }
+
+    private static Film addTitles(Film film) {
+        String id = film.getId();
+        String imdbUrl = "https://www.imdb.com/title/" + id + "/releaseinfo";
+
+        // Getting the full HTML page of the film
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(imdbUrl).get();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String fullHtml = doc.body().toString();
+
+        film = extractTitlesFromHtmlString(film,fullHtml);
+
+        return film;
+    }
+
+    private static Film extractTitlesFromHtmlString(Film film, String fullHtml) {
+        fullHtml = fullHtml.split("id=\"akas\"")[1];
+
+        try {
+            // Extracting the original title
+            String originalTitleBit = fullHtml.split("original title")[1].split("/tr")[0];
+            String originalTitle = originalTitleBit.split("title\">")[1].split("</td")[0];
+
+            // Extracting English title
+            String translatedTitleBit = fullHtml.split("UK")[1].split("/tr")[0];
+            String translatedTitle = translatedTitleBit.split("title\">")[1].split("</td")[0];
+
+            if (!translatedTitle.equals(originalTitle)) {
+                film.setTranslatedTitle(translatedTitle);
+            }
+
+
+        } catch (ArrayIndexOutOfBoundsException e) {
+        }
+
+        return film;
     }
 }

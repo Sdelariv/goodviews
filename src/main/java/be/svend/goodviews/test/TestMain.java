@@ -20,13 +20,20 @@ import java.util.stream.Collectors;
 
 public class TestMain {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
-        Optional<Film> film = WebScraper.createFilmWithWebData("tt0107290");
-        System.out.println(film);
+        String id = "tt0010323";
+        String imdbUrl = "https://www.imdb.com/title/" + id + "/releaseinfo";
 
-        Optional<Film> film2 = WebScraper.createFilmWithWebData("tt3765512");
-        System.out.println(film2);
+
+        // Getting the full HTML page of the film
+        Document doc = Jsoup.connect(imdbUrl).get();
+        String fullHtml = doc.body().toString();
+
+        // Extracting the world wide title
+
+
+
 
 
 

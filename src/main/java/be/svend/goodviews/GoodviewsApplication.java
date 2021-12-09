@@ -29,9 +29,13 @@ public class GoodviewsApplication {
 
         FilmService service = new FilmService(ctx.getBean(FilmRepository.class),ctx.getBean(FilmValidator.class), ctx.getBean(PersonService.class));
 
+        service.updateFilmAddWebDataByImdbId("tt0046359");
+
         List<String> filmIds = service.findAllFilms().stream().map(f -> f.getId()).collect(Collectors.toList());
 
         service.updateFilmsAddWebDataByImdbId(filmIds);
+
+
 
 
     }
