@@ -12,9 +12,11 @@ public class Rating {
 
     private Integer ratingValue;
 
+    private LocalDate dateOfRating;
+
     private String review;
 
-    private LocalDate dateOfRating;
+    private LocalDate dateOfReview;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private User user;
@@ -38,6 +40,7 @@ public class Rating {
 
     public void setRatingValue(Integer ratingValue) {
         this.ratingValue = ratingValue;
+
     }
 
     public String getReview() {
@@ -46,6 +49,14 @@ public class Rating {
 
     public void setReview(String review) {
         this.review = review;
+    }
+
+    public LocalDate getDateOfReview() {
+        return dateOfReview;
+    }
+
+    public void setDateOfReview(LocalDate dateOfReview) {
+        this.dateOfReview = dateOfReview;
     }
 
     public LocalDate getDateOfRating() {
