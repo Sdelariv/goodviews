@@ -14,11 +14,10 @@ import java.util.Optional;
 
 public class WebScraper {
 
-
     public static List<Film> addPosters(List<Film> films) {
 
         for (Film film: films) {
-            Optional<String> posterUrl = PosterScraper.scrapePoster(film.getId());
+            Optional<String> posterUrl = scrapePoster(film.getId());
 
             if (posterUrl.isPresent()) film.setPosterUrl(posterUrl.get());
         }
@@ -62,7 +61,7 @@ public class WebScraper {
         }
 
         // Add smaller version of poster
-        Optional<String> posterUrl = PosterScraper.scrapePoster(createdFilm.getId());
+        Optional<String> posterUrl = scrapePoster(createdFilm.getId());
         if (posterUrl.isPresent()) createdFilm.setPosterUrl(posterUrl.get());
 
         // Add Translated title
@@ -184,5 +183,28 @@ public class WebScraper {
         }
 
         return film;
+    }
+
+
+    public static Optional<String> scrapePoster(String id) {
+        Document doc = null;
+        String imdbUrl = "https://www.imdb.com/title/" + id + "/";
+        Optional<String> posterUrl = Optional.empty();
+
+        try {
+            doc = Jsoup.connect(imdbUrl).get();
+
+            String fullHtml = doc.body().toString();
+
+            String[] splittedHtml = fullHtml.split("img alt"); // Locate the img alt div
+
+            String img_alt = splittedHtml[1].split("</div>")[0].split("src")[1]; // Get the first url out
+            posterUrl = Optional.of(img_alt.substring(2,img_alt.length()-2)); // Remove " and "
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return posterUrl;
     }
 }
