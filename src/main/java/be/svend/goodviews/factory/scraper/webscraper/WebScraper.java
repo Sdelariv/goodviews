@@ -171,7 +171,7 @@ public class WebScraper {
             String originalTitle = originalTitleBit.split("title\">")[1].split("</td")[0];
 
             // Extracting English title
-            String translatedTitleBit = fullHtml.split("UK")[1].split("/tr")[0];
+            String translatedTitleBit = fullHtml.split("UK<")[1].split("/tr")[0];
             String translatedTitle = translatedTitleBit.split("title\">")[1].split("</td")[0];
 
             if (!translatedTitle.equals(originalTitle)) {
