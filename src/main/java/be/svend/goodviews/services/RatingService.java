@@ -61,6 +61,8 @@ public class RatingService {
         if (createdRating.isPresent()) System.out.println("Created " + createdRating.get());
         else System.out.println("Couldn't create this new rating " + rating);
 
+        // TODO: update average rating
+
         return createdRating;
     }
 
@@ -84,6 +86,15 @@ public class RatingService {
         ratingRepo.save(rating);
         return rating;
     }
+
+    // UPDATE METHODS
+
+    // TODO: Add
+
+
+    // DELETE METHODS
+
+    // TODO: Add
 
     // OTHER METHODS
 
