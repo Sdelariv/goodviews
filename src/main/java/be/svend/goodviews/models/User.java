@@ -30,4 +30,14 @@ public class User {
     public void setProfileUrl(String profileUrl) {
         this.profileUrl = profileUrl;
     }
+
+    // OTHER
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                ", profileUrl='" + profileUrl + '\'' +
+                '}';
+    }
 }

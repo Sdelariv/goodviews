@@ -90,4 +90,26 @@ public class Rating {
         this.id = this.getUser().getUsername() + this.getFilm().getId();
         return Optional.of(this.id);
     }
+
+    // OTHER METHODS
+
+
+    @Override
+    public String toString() {
+        String userName = "/";
+        if (user != null) if (user.getUsername() != null) userName = user.getUsername();
+
+        String filmTitle = "/";
+        if (film != null) if (film.getTitle() != null) filmTitle = film.getTitle();
+
+        return "Rating{" +
+                "id='" + id + '\'' +
+                ", ratingValue=" + ratingValue +
+                ", dateOfRating=" + dateOfRating +
+                ", review='" + review + '\'' +
+                ", dateOfReview=" + dateOfReview +
+                ", user=" + userName +
+                ", film=" + filmTitle +
+                '}';
+    }
 }
