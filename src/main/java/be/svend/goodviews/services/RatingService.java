@@ -18,6 +18,24 @@ public class RatingService {
         this.ratingValidator = ratingValidator;
     }
 
+    // FIND METHODS
+
+    public Optional<Rating> findById(String filmId) {
+        Optional<Rating> foundRating = ratingRepo.findById(filmId);
+
+        if (foundRating.isPresent()) System.out.println("Found rating: " + foundRating);
+
+        return foundRating;
+    }
+
+    public List<Rating> findByFilmId(String filmId) {
+        List<Rating> foundRatings = ratingRepo.findByFilm_Id(filmId);
+
+        if (!foundRatings.isEmpty()) System.out.println("Found this many ratings: " + foundRatings.size());
+
+        return foundRatings;
+    }
+
     // CREATE METHODS
 
     public Optional<Rating> createNewRating(Rating rating) {
@@ -25,7 +43,7 @@ public class RatingService {
 
         if (!ratingValidator.isValidNewRating(rating)) return Optional.empty();
 
-        rating.updateId();
+        rating.updateId(); // If rating is valid, then its id can be created
 
         Optional<Rating> createdRating = saveRating(rating);
         if (createdRating.isPresent()) System.out.println("Created " + createdRating.get());
