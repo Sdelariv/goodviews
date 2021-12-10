@@ -15,6 +15,8 @@ public class UserValidator {
     }
 
     public boolean isValidNewUser(User user) {
+        if (user == null) return false;
+
         if (!hasValidNewId(user)) {
             System.out.println("Invalid id present");
             return false;

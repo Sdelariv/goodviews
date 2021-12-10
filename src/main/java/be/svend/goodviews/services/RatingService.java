@@ -9,9 +9,11 @@ import java.util.Optional;
 @Service
 public class RatingService {
     RatingRepository ratingRepo;
+    RatingValidator ratingValidator;
 
-    public RatingService(RatingRepository ratingRepo) {
+    public RatingService(RatingRepository ratingRepo, RatingValidator ratingValidator) {
         this.ratingRepo = ratingRepo;
+        this.ratingValidator = ratingValidator;
     }
 
     // CREATE METHODS
