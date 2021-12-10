@@ -36,8 +36,19 @@ public class RatingValidator {
             return false;
         }
 
+        if (ratingInDatabase(rating)) {
+            System.out.println("Rating already exists");
+            return false;
+        }
+
         return true;
 
+    }
+
+    private boolean ratingInDatabase(Rating rating) {
+        if (ratingRepo.findById(rating.getId()).isPresent()) return true;
+
+        return false;
     }
 
     private boolean ratingHasValidUser(Rating rating) {

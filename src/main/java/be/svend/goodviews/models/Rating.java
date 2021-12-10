@@ -85,7 +85,10 @@ public class Rating {
 
     public Optional<String> updateId() {
         if (this.getFilm() == null) return Optional.empty();
+        if (this.getFilm().getId() == null) return Optional.empty();
+
         if (this.getUser() == null) return Optional.empty();
+        if (this.getUser().getUsername() == null) return Optional.empty();
 
         this.id = this.getUser().getUsername() + this.getFilm().getId();
         return Optional.of(this.id);

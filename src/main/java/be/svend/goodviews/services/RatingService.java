@@ -41,10 +41,14 @@ public class RatingService {
     public Optional<Rating> createNewRating(Rating rating) {
         System.out.println("Trying to create a new rating");
 
+        // Check whether the rating is new and valid
+        if (rating.updateId().isEmpty()) {
+            System.out.println("Can't create new Rating without a user or film");
+            return Optional.empty();
+        }
         if (!ratingValidator.isValidNewRating(rating)) return Optional.empty();
 
-        rating.updateId(); // If rating is valid, then its id can be created
-
+        // Saving Rating
         Optional<Rating> createdRating = saveRating(rating);
         if (createdRating.isPresent()) System.out.println("Created " + createdRating.get());
         else System.out.println("Couldn't create this new rating " + rating);
