@@ -14,10 +14,12 @@ import java.util.Optional;
 public class RatingService {
     RatingRepository ratingRepo;
     RatingValidator ratingValidator;
+    FilmService filmService;
 
-    public RatingService(RatingRepository ratingRepo, RatingValidator ratingValidator) {
+    public RatingService(RatingRepository ratingRepo, RatingValidator ratingValidator, FilmService filmService) {
         this.ratingRepo = ratingRepo;
         this.ratingValidator = ratingValidator;
+        this.filmService = filmService;
     }
 
     // FIND METHODS
@@ -63,7 +65,7 @@ public class RatingService {
         if (createdRating.isPresent()) System.out.println("Created " + createdRating.get());
         else System.out.println("Couldn't create this new rating " + rating);
 
-        // TODO: update average rating
+        filmService.calculateAndUpdateAverageRatingByFilmId(rating.getFilm().getId()); // TODO: take out if you don't want the dependency
 
         return createdRating;
     }
@@ -120,6 +122,8 @@ public class RatingService {
         Rating ratingToUpdate = existingRating.get();;
         ratingToUpdate.setRatingValue(ratingValue);
         ratingToUpdate.setDateOfRating(LocalDate.now());
+
+        filmService.calculateAndUpdateAverageRatingByFilmId(filmId); // TODO: delete if you don't want to have a filmservice dependency
 
         return updateRating(ratingToUpdate);
     }

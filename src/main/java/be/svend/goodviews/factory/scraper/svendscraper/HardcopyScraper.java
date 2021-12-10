@@ -94,11 +94,9 @@ public class HardcopyScraper {
         String writers = lineItems[WRITER_INDEX];
         film.setWriter(convertToListOfPersons(writers));
 
-        /*
-        // TODO: Add when it's added to hardcopy
         String runtime = lineItems[RUNTIME_INDEX];
         film.setRunTime(Integer.parseInt(runtime));
-*/
+
         return film;
     }
 

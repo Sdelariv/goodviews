@@ -50,7 +50,6 @@ public class Film {
 
     private Integer runTime; // in minutes
 
-    // TODO: Add list of Ratings, list of pictures, Director as an entity
 
     // CONSTURCTORS
 
