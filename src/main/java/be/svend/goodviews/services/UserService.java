@@ -19,7 +19,13 @@ public class UserService {
 
     // CREATE METHODS
 
-    public Optional<User> createUser(User user) {
+    private Optional<User> saveUser(User user) {
+        userRepo.save(user);
+        System.out.println("Saving " + user.getUsername());
+        return userRepo.findByUsername(user.getUsername());
+    }
+
+    public Optional<User> createNewUser(User user) {
 
         if (!userValidator.validNewId(user)) {
             System.out.println("Can't create user. Invalid id present");
@@ -36,9 +42,8 @@ public class UserService {
             return Optional.empty();
         }
 
-        userRepo.save(user);
-        System.out.println("Created new user: " + user.getUsername());
-
-        return Optional.of(user);
+        Optional<User> createdUser = saveUser(user);
+        if (createdUser.isPresent()) System.out.println("Created " + createdUser.get().getUsername());
+        return createdUser;
     }
 }
