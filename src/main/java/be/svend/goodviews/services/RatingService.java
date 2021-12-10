@@ -4,6 +4,8 @@ import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.repositories.RatingRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,6 +30,17 @@ public class RatingService {
         else System.out.println("Couldn't create this new rating " + rating);
 
         return createdRating;
+    }
+
+    public List<Rating> createNewRatings(List<Rating> ratings) {
+        List<Rating> createdRatings = new ArrayList<>();
+
+        for (Rating rating: ratings) {
+            Optional<Rating> createdRating = createNewRating(rating);
+            if (createdRating.isPresent()) createdRatings.add(createdRating.get());
+        }
+
+        return createdRatings;
     }
 
     // INTERNAL METHODS
