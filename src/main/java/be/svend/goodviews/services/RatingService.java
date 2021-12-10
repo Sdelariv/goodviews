@@ -25,6 +25,8 @@ public class RatingService {
 
         if (!ratingValidator.isValidNewRating(rating)) return Optional.empty();
 
+        rating.updateId();
+
         Optional<Rating> createdRating = saveRating(rating);
         if (createdRating.isPresent()) System.out.println("Created " + createdRating.get());
         else System.out.println("Couldn't create this new rating " + rating);
@@ -43,6 +45,17 @@ public class RatingService {
         return createdRatings;
     }
 
+    /**
+     * Only meant to be used when recreating ratings that got lost in db but are saved elsewhere
+     * @param rating
+     * @return
+     */
+    public Rating recreateOldRating(Rating rating) {
+        ratingRepo.save(rating);
+        return rating;
+    }
+
+
     // INTERNAL METHODS
 
     private Optional<Rating> saveRating(Rating rating) {
@@ -50,6 +63,8 @@ public class RatingService {
         System.out.println("Saving " + rating);
         return ratingRepo.findById(savedRating.getId());
     }
+
+
 
 
 }

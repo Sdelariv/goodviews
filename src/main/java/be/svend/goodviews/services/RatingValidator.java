@@ -42,8 +42,8 @@ public class RatingValidator {
 
     private boolean ratingHasValidUser(Rating rating) {
         if (rating.getUser() == null) return false;
-        if (rating.getUser().getId() == null) return false;
-        if (userRepo.findById(rating.getUser().getId()).isEmpty()) return false;
+        if (rating.getUser().getUsername() == null) return false;
+        if (userRepo.findByUsername(rating.getUser().getUsername()).isEmpty()) return false;
 
         return true;
     }

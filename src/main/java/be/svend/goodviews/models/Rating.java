@@ -2,13 +2,13 @@ package be.svend.goodviews.models;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Entity
 public class Rating {
 
     @Id
-    @GeneratedValue
-    private Long id;
+    private String id;
 
     private Integer ratingValue;
 
@@ -26,11 +26,11 @@ public class Rating {
 
     // GETTERS & SETTERS
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -81,5 +81,13 @@ public class Rating {
 
     public void setFilm(Film film) {
         this.film = film;
+    }
+
+    public Optional<String> updateId() {
+        if (this.getFilm() == null) return Optional.empty();
+        if (this.getUser() == null) return Optional.empty();
+
+        this.id = this.getUser().getUsername() + this.getFilm().getId();
+        return Optional.of(this.id);
     }
 }

@@ -17,11 +17,6 @@ public class UserValidator {
     public boolean isValidNewUser(User user) {
         if (user == null) return false;
 
-        if (!hasValidNewId(user)) {
-            System.out.println("Invalid id present");
-            return false;
-        }
-
         if (!hasValidNewUsername(user)) {
             System.out.println("Username already exists.");
             return false;
@@ -33,15 +28,6 @@ public class UserValidator {
         }
 
         return true;
-    }
-
-
-    public boolean hasValidNewId(User user) {
-        if (user == null) return false;
-
-        if (user.getId() == null) return true;
-
-        return false;
     }
 
     public boolean hasValidNewUsername(User user) {
@@ -64,7 +50,7 @@ public class UserValidator {
     }
 
     public Optional<User> isExistingUser(User user) {
-        Optional<User> existingUser = userRepo.findById(user.getId());
+        Optional<User> existingUser = userRepo.findByUsername(user.getUsername());
         if (existingUser.isEmpty()) return Optional.empty();
 
         return existingUser;

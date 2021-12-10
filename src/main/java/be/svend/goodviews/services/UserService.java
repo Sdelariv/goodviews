@@ -29,14 +29,6 @@ public class UserService {
         return foundUser;
     }
 
-    public Optional<User> findById(Long id) {
-        Optional<User> foundUser = userRepo.findById(id);
-
-        if (foundUser.isPresent()) System.out.println("Found user: " + foundUser.get().getUsername());
-
-        return foundUser;
-    }
-
     /**
      * Uses the username in the object to find the user in the db and returns it if present
      * @param user user of which the username will be used to search
@@ -75,19 +67,6 @@ public class UserService {
         return createdUsers;
     }
 
-    /**
-     * This method is intended for recreating users that got lost in the db but saved elsewhere
-     * @param user
-     * @return
-     */
-    public User recreateOldUser(User user) {
-        User initialisedUser = initialise(user);
-
-        userRepo.save(initialisedUser);
-        return initialisedUser;
-    }
-
-
     // UPDATE METHODS
 
     public Optional<User> updateUser(User user) {
@@ -109,7 +88,7 @@ public class UserService {
 
         // Delete and check whether it worked
         userRepo.delete(existingUser.get());
-        if (findById(user.getId()).isEmpty()) {
+        if (findByUsername(user.getUsername()).isEmpty()) {
             System.out.println(user.getUsername() + " succesfully deleted");
             return true;
         }
@@ -124,13 +103,6 @@ public class UserService {
     }
 
     // INTERNAL METHODS
-
-    private User initialise(User user) {
-
-        // TODO: fill in with initialising of Rating
-
-        return user;
-    }
 
     private Optional<User> saveUser(User user) {
         userRepo.save(user);
