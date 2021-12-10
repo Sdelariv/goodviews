@@ -37,6 +37,11 @@ public class UserService {
         return foundUser;
     }
 
+    /**
+     * Uses the username in the object to find the user in the db and returns it if present
+     * @param user user of which the username will be used to search
+     * @return Optional<User>
+     */
     public Optional<User> findByUserObject(User user) {
         return findByUsername(user.getUsername());
     }
