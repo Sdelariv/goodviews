@@ -36,6 +36,14 @@ public class RatingService {
         return foundRatings;
     }
 
+    public List<Rating> findByUserId(String userId) {
+        List<Rating> foundRatings = ratingRepo.findByUser_Username(userId);
+
+        if (!foundRatings.isEmpty()) System.out.println("Found this many ratings: " + foundRatings.size());
+
+        return foundRatings;
+    }
+
     // CREATE METHODS
 
     public Optional<Rating> createNewRating(Rating rating) {
