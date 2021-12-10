@@ -46,6 +46,10 @@ public class UserService {
         return findByUsername(user.getUsername());
     }
 
+    public List<User> findAllUsers() {
+        return userRepo.findAll();
+    }
+
     // CREATE METHODS
 
     private Optional<User> saveUser(User user) {
