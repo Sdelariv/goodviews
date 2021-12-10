@@ -37,6 +37,10 @@ public class UserService {
         return foundUser;
     }
 
+    public Optional<User> findByUserObject(User user) {
+        return findByUsername(user.getUsername());
+    }
+
     // CREATE METHODS
 
     private Optional<User> saveUser(User user) {
@@ -67,4 +71,6 @@ public class UserService {
 
         return createdUsers;
     }
+
+    //
 }
