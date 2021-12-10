@@ -4,6 +4,8 @@ import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -35,5 +37,16 @@ public class UserService {
         else System.out.println("Couldn't create new user");
 
         return createdUser;
+    }
+
+    public List<User> createNewUsers(List<User> users) {
+        List<User> createdUsers = new ArrayList<>();
+
+        for (User user: users) {
+            Optional<User> createdUser = createNewUser(user);
+            if (createdUser.isPresent()) createdUsers.add(createdUser.get());
+        }
+
+        return createdUsers;
     }
 }
