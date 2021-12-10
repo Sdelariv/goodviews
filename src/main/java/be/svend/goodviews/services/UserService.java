@@ -81,5 +81,15 @@ public class UserService {
         return createdUsers;
     }
 
-    //
+    // UPDATE METHODS
+
+    public Optional<User> updateUser(User user) {
+
+        Optional<User> existingUser = userValidator.isExistingUser(user);
+        if (existingUser.isEmpty()) return Optional.empty();
+
+        userRepo.save(existingUser.get());
+
+        return existingUser;
+    }
 }

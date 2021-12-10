@@ -60,4 +60,11 @@ public class UserValidator {
 
         return true;
     }
+
+    public Optional<User> isExistingUser(User user) {
+        Optional<User> existingUser = userRepo.findById(user.getId());
+        if (existingUser.isEmpty()) return Optional.empty();
+
+        return existingUser;
+    }
 }
