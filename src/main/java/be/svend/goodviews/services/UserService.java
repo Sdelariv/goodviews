@@ -19,6 +19,24 @@ public class UserService {
         this.userValidator = userValidator;
     }
 
+    // FIND METHODS
+
+    public Optional<User> findByUsername(String username) {
+        Optional<User> foundUser = userRepo.findByUsername(username);
+
+        if (foundUser.isPresent()) System.out.println("Found user: " + foundUser.get().getUsername());
+
+        return foundUser;
+    }
+
+    public Optional<User> findById(Long id) {
+        Optional<User> foundUser = userRepo.findById(id);
+
+        if (foundUser.isPresent()) System.out.println("Found user: " + foundUser.get().getUsername());
+
+        return foundUser;
+    }
+
     // CREATE METHODS
 
     private Optional<User> saveUser(User user) {

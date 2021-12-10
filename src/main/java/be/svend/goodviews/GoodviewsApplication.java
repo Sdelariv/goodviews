@@ -10,6 +10,7 @@ import be.svend.goodviews.models.Genre;
 import be.svend.goodviews.models.Person;
 import be.svend.goodviews.repositories.FilmRepository;
 import be.svend.goodviews.repositories.GenreRepository;
+import be.svend.goodviews.repositories.PersonRepository;
 import be.svend.goodviews.services.FilmService;
 import be.svend.goodviews.services.FilmValidator;
 import be.svend.goodviews.services.GenreService;
@@ -27,7 +28,11 @@ public class GoodviewsApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext ctx = SpringApplication.run(GoodviewsApplication.class, args);
 
+        PersonRepository personRepo = ctx.getBean(PersonRepository.class);
 
+        System.out.println(personRepo.findByName(null));
+
+/*
         FilmService service = new FilmService(ctx.getBean(FilmRepository.class),ctx.getBean(FilmValidator.class),ctx.getBean(PersonService.class));
         service.createFilmByImdbId("tt3765512");
         service.createFilmByImdbId("tt16283826");
@@ -35,7 +40,7 @@ public class GoodviewsApplication {
         List<Film> films = service.findAllFilms();
 
         HardcopyMaker.makeHardCopy(films);
-
+*/
 
     }
 
