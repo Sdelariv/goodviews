@@ -52,12 +52,6 @@ public class UserService {
 
     // CREATE METHODS
 
-    private Optional<User> saveUser(User user) {
-        userRepo.save(user);
-        System.out.println("Saving " + user.getUsername());
-        return userRepo.findByUsername(user.getUsername());
-    }
-
     public Optional<User> createNewUser(User user) {
         System.out.println("Trying to create a new user");
 
@@ -81,6 +75,19 @@ public class UserService {
         return createdUsers;
     }
 
+    /**
+     * This method is intended for recreating users that got lost in the db but saved elsewhere
+     * @param user
+     * @return
+     */
+    public User recreateOldUser(User user) {
+        User initialisedUser = initialise(user);
+
+        userRepo.save(initialisedUser);
+        return initialisedUser;
+    }
+
+
     // UPDATE METHODS
 
     public Optional<User> updateUser(User user) {
@@ -92,4 +99,20 @@ public class UserService {
 
         return existingUser;
     }
+
+    // INTERNAL METHODS
+
+    private User initialise(User user) {
+
+        // TODO: fill in with initialising of Rating
+
+        return user;
+    }
+
+    private Optional<User> saveUser(User user) {
+        userRepo.save(user);
+        System.out.println("Saving " + user.getUsername());
+        return userRepo.findByUsername(user.getUsername());
+    }
+
 }
