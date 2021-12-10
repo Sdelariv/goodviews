@@ -100,6 +100,29 @@ public class UserService {
         return existingUser;
     }
 
+    // DELETE METHODS
+
+    public boolean deleteUser(User user) {
+        // See if user exists
+        Optional<User> existingUser = userValidator.isExistingUser(user);
+        if (existingUser.isEmpty()) return false;
+
+        // Delete and check whether it worked
+        userRepo.delete(existingUser.get());
+        if (findById(user.getId()).isEmpty()) {
+            System.out.println(user.getUsername() + " succesfully deleted");
+            return true;
+        }
+        System.out.println("Something went wrong while deleting");
+        return true;
+    }
+
+    public void deleteUsers(List<User> users) {
+        for (User user: users) {
+            deleteUser(user);
+        }
+    }
+
     // INTERNAL METHODS
 
     private User initialise(User user) {
