@@ -1,6 +1,7 @@
 package be.svend.goodviews;
 
 import be.svend.goodviews.factory.FilmFactory;
+import be.svend.goodviews.factory.HardcopyMaker;
 import be.svend.goodviews.factory.scraper.imdbscraper.ImdbScraper;
 import be.svend.goodviews.factory.scraper.svendscraper.HardcopyScraper;
 import be.svend.goodviews.factory.scraper.webscraper.WebScraper;
@@ -27,13 +28,13 @@ public class GoodviewsApplication {
         ConfigurableApplicationContext ctx = SpringApplication.run(GoodviewsApplication.class, args);
 
 
-        FilmService service = new FilmService(ctx.getBean(FilmRepository.class),ctx.getBean(FilmValidator.class), ctx.getBean(PersonService.class));
+        FilmService service = new FilmService(ctx.getBean(FilmRepository.class),ctx.getBean(FilmValidator.class),ctx.getBean(PersonService.class));
+        service.createFilmByImdbId("tt3765512");
+        service.createFilmByImdbId("tt16283826");
 
-        List<String> filmIds = service.findAllFilms().stream().map(f -> f.getId()).collect(Collectors.toList());
+        List<Film> films = service.findAllFilms();
 
-        service.updateFilmsAddWebDataByImdbId(filmIds);
-
-
+        HardcopyMaker.makeHardCopy(films);
 
 
     }

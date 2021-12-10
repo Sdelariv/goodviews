@@ -35,7 +35,7 @@ public class FilmFactory {
 
     public void createDatabaseFromHardcopy() {
         List<Film> films = hardcopyScraper.scrapeHardCopy();
-        filmService.createFilms(films);
+        List<Film> createdFilms = filmService.createFilms(films);
     }
 
     public void addPostersToHardCopy() {

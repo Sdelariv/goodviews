@@ -213,7 +213,9 @@ public class FilmDeserialiser extends StdDeserializer<Film> {
                     minutes = Integer.parseInt(response[1].split("M")[0]);// DELETES THE M TOO
                 }
             } else {
-                runTime = Integer.parseInt(r.substring(0, r.length() - 1));
+                if (r.contains("M")) {
+                    minutes = Integer.parseInt(r.split("M")[0]);// DELETES THE M TOO
+                }
             }
         } catch (NumberFormatException e) {
             System.out.println("Something went wrong trying to convert " + r + " into a runtime");

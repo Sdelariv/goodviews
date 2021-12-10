@@ -4,6 +4,7 @@ import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Genre;
 import be.svend.goodviews.models.Person;
 import be.svend.goodviews.models.Tag;
+import be.svend.goodviews.services.FilmService;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;

@@ -94,25 +94,31 @@ public class FilmService {
 
     // CREATE methods
 
-    public void createFilms(List<Film> films) {
+    public List<Film> createFilms(List<Film> films) {
+        List<Film> createdFilms = new ArrayList<>();
 
         for (Film film: films) {
-            createFilm(film);
+            Optional<Film> createdFilm = createFilm(film);
+            if (createdFilm.isPresent()) createdFilm = updateFilmAddWebDataByImdbId(createdFilm.get().getId()); // TODO: Take out if you don't want this to be automatic
+            if (createdFilm.isPresent()) createdFilms.add(createdFilm.get());
         }
+
+        return createdFilms;
     }
 
-    public void createFilm(Film film) {
+    public Optional<Film> createFilm(Film film) {
         if (findFilmByFilm(film).isPresent()) {
             System.out.println("Can't create a film with an id already in the db");
-            return;
+            return Optional.empty();
         }
 
         if (!filmHasValidIdFormat(film)) {
             System.out.println("Can't create a film that doesn't have a valid id format: " + film.getId());
-            return;
+            return Optional.empty();
         }
 
-        initialiseAndSaveFilm(film);
+        Film createdFilm = initialiseAndSaveFilm(film);
+        return Optional.of(createdFilm);
     }
 
 
