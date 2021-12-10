@@ -55,4 +55,5 @@ public class UserValidator {
 
         return existingUser;
     }
+
 }

@@ -1,9 +1,11 @@
 package be.svend.goodviews.services;
 
 import be.svend.goodviews.models.Rating;
+import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.RatingRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +38,7 @@ public class RatingService {
         return foundRatings;
     }
 
-    public List<Rating> findByUserId(String userId) {
+    public List<Rating> findByUsername(String userId) {
         List<Rating> foundRatings = ratingRepo.findByUser_Username(userId);
 
         if (!foundRatings.isEmpty()) System.out.println("Found this many ratings: " + foundRatings.size());
@@ -78,23 +80,88 @@ public class RatingService {
     }
 
     /**
-     * Only meant to be used when recreating ratings that got lost in db but are saved elsewhere
-     * @param rating
-     * @return
+     * Only meant to be used when recreating ratings that got lost in db but are saved elsewhere.
+     * Only use after users and films have been recreated too.
+     * @param ratings - The list of ratings that need saving again
+     * @return List<Rating> - The list of ratings that have been saved
      */
-    public Rating recreateOldRating(Rating rating) {
-        ratingRepo.save(rating);
-        return rating;
+    public List<Rating> recreateOldRatings(List<Rating> ratings) {
+        List<Rating> savedRatings = new ArrayList<>();
+
+        for (Rating rating: ratings) {
+            savedRatings.add(ratingRepo.save(rating));
+        }
+
+        return savedRatings;
     }
 
     // UPDATE METHODS
 
-    // TODO: Add
+    public Optional<Rating> updateRating(Rating rating) {
+
+        Optional<Rating> existingRating = ratingValidator.ratingInDatabase(rating);
+        if (existingRating.isEmpty()) return Optional.empty();
+
+        if (ratingValidator.isValidRating(rating)) {
+            System.out.println("Made invalid changes to rating");
+            return Optional.empty();
+        }
+        return saveRating(rating);
+    }
+
+    // TODO: Figure out whether this is the best place and tactic:
+
+    public Optional<Rating> updateRatingValueByUserAndFilmId(String userId, String filmId, Integer ratingValue) {
+        if (!ratingValidator.isValidRatingValue(ratingValue)) return Optional.empty();
+
+        Optional<Rating> existingRating = ratingValidator.ratingIdInDatabase(userId+filmId);
+        if (existingRating.isEmpty()) return Optional.empty();
+
+        Rating ratingToUpdate = existingRating.get();;
+        ratingToUpdate.setRatingValue(ratingValue);
+        ratingToUpdate.setDateOfRating(LocalDate.now());
+
+        return updateRating(ratingToUpdate);
+    }
+
+    public Optional<Rating> updateReviewByUserAndFilmId(String userId, String filmId, String review) {
+        Optional<Rating> existingRating = ratingValidator.ratingIdInDatabase(userId+filmId);
+        if (existingRating.isEmpty()) return Optional.empty();
+
+        Rating ratingToUpdate = existingRating.get();;
+        ratingToUpdate.setReview(review);
+        ratingToUpdate.setDateOfReview(LocalDate.now());
+
+        return updateRating(ratingToUpdate);
+    }
 
 
     // DELETE METHODS
 
-    // TODO: Add
+    public void deleteRatingById(String ratingId) {
+        System.out.println("Trying to delete a rating with id:" + ratingId);
+        Optional<Rating> foundRating = findById(ratingId);
+        if (foundRating.isEmpty()) System.out.println("Failed");
+        ratingRepo.delete(foundRating.get());
+        System.out.println("Succesfully deleted the rating");
+    }
+
+    public void deleteRatingsById(List<String> ratingIds) {
+        for (String ratingId: ratingIds) {
+            deleteRatingById(ratingId);
+        }
+    }
+
+    public void deleteRating(Rating rating) {
+        ratingRepo.delete(rating);
+        System.out.println("Deleted rating");
+    }
+
+    public void deleteAllRating(List<Rating> ratings) {
+        for (Rating rating: ratings) {
+            deleteRatingById(rating.getId());
+        }
+    }
 
     // OTHER METHODS
 

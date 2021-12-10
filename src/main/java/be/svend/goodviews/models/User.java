@@ -12,6 +12,10 @@ public class User {
 
     private String profileUrl;
 
+    private String firstName;
+
+    private String lastName;
+
 
     // GETTERS & SETTERS
 
@@ -31,6 +35,22 @@ public class User {
         this.profileUrl = profileUrl;
     }
 
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
     // OTHER
 
     @Override
@@ -38,6 +58,8 @@ public class User {
         return "User{" +
                 "username='" + username + '\'' +
                 ", profileUrl='" + profileUrl + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 '}';
     }
 }

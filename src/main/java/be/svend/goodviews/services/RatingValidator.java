@@ -6,6 +6,8 @@ import be.svend.goodviews.repositories.RatingRepository;
 import be.svend.goodviews.repositories.UserRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class RatingValidator {
     RatingRepository ratingRepo;
@@ -19,9 +21,21 @@ public class RatingValidator {
     }
 
     public boolean isValidNewRating(Rating rating) {
+        if (!isValidRating(rating)) return false;
+
+        if (ratingInDatabase(rating).isPresent()) {
+            System.out.println("Rating already exists");
+            return false;
+        }
+
+        return true;
+
+    }
+
+    public boolean isValidRating(Rating rating) {
         if (rating == null) return false;
 
-        if (rating.getRatingValue() == null) {
+        if (!isValidRatingValue(rating.getRatingValue())) {
             System.out.println("Invalid ratingValue");
             return false;
         }
@@ -32,23 +46,27 @@ public class RatingValidator {
         }
 
         if (!ratingHasValidUser(rating)){
-            System.out.println("Rating has no user");
-            return false;
-        }
-
-        if (ratingInDatabase(rating)) {
-            System.out.println("Rating already exists");
+            System.out.println("Rating has no valid user");
             return false;
         }
 
         return true;
-
     }
 
-    private boolean ratingInDatabase(Rating rating) {
-        if (ratingRepo.findById(rating.getId()).isPresent()) return true;
+    public boolean isValidRatingValue(Integer ratingValue) {
+        if (ratingValue == null) return false;
+        if (ratingValue < 0) return false;
+        if (ratingValue > 100) return false;
 
-        return false;
+        return true;
+    }
+
+    public Optional<Rating> ratingInDatabase(Rating rating) {
+        return ratingIdInDatabase(rating.getId());
+    }
+
+    public Optional<Rating> ratingIdInDatabase(String ratingId) {
+        return ratingRepo.findById(ratingId);
     }
 
     private boolean ratingHasValidUser(Rating rating) {
@@ -66,4 +84,5 @@ public class RatingValidator {
 
         return true;
     }
+
 }

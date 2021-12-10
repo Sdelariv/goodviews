@@ -13,6 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SpringBootApplication
@@ -22,10 +23,24 @@ public class GoodviewsApplication {
         ConfigurableApplicationContext ctx = SpringApplication.run(GoodviewsApplication.class, args);
 
         RatingService ratingService = new RatingService(ctx.getBean(RatingRepository.class),ctx.getBean(RatingValidator.class));
-        UserService userService = new UserService(ctx.getBean(UserRepository.class),ctx.getBean(UserValidator.class));
+        UserService userService = new UserService(ctx.getBean(UserRepository.class),ctx.getBean(UserValidator.class), ctx.getBean(RatingService.class));
         FilmService filmService = new FilmService(ctx.getBean(FilmRepository.class),ctx.getBean(FilmValidator.class),ctx.getBean(PersonService.class),ctx.getBean(RatingService.class));
 
-        filmService.calculateAndUpdateAverageRatingByFilmId("tt4468740");
+        User user = new User();
+        user.setUsername("sdelariv");
+        userService.createNewUser(user);
+
+        Film film = new Film();
+        film.setId("tt4468740");
+
+        Rating rating = new Rating();
+        rating.setUser(user);
+        rating.setFilm(film);
+        rating.setRatingValue(100);
+        ratingService.createNewRating(rating);
+
+
+        userService.changeUsername(user,"sdelariv2");
 
 /*
         FilmService service = new FilmService(ctx.getBean(FilmRepository.class),ctx.getBean(FilmValidator.class),ctx.getBean(PersonService.class));
