@@ -4,6 +4,8 @@ import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.UserRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class UserValidator {
     UserRepository userRepo;
@@ -12,8 +14,27 @@ public class UserValidator {
         this.userRepo = userRepo;
     }
 
+    public boolean isValidNewUser(User user) {
+        if (!hasValidNewId(user)) {
+            System.out.println("Invalid id present");
+            return false;
+        }
 
-    public boolean validNewId(User user) {
+        if (!hasValidNewUsername(user)) {
+            System.out.println("Username already exists.");
+            return false;
+        }
+
+        if (!hasValidPassword(user)) {
+            System.out.println("No valid password.");
+            return false;
+        }
+
+        return true;
+    }
+
+
+    public boolean hasValidNewId(User user) {
         if (user == null) return false;
 
         if (user.getId() == null) return true;
@@ -21,7 +42,7 @@ public class UserValidator {
         return false;
     }
 
-    public boolean validNewUsername(User user) {
+    public boolean hasValidNewUsername(User user) {
         if (user == null) return false;
 
         if (user.getUsername() == null) return false;
@@ -32,7 +53,7 @@ public class UserValidator {
     }
 
 
-    public boolean validPassword(User user) {
+    public boolean hasValidPassword(User user) {
         if (user == null) return false;
 
         // TODO: fill in

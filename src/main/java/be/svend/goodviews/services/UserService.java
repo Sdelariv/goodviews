@@ -26,24 +26,14 @@ public class UserService {
     }
 
     public Optional<User> createNewUser(User user) {
+        System.out.println("Trying to create a new user");
 
-        if (!userValidator.validNewId(user)) {
-            System.out.println("Can't create user. Invalid id present");
-            return Optional.empty();
-        }
-
-        if (!userValidator.validNewUsername(user)) {
-            System.out.println("Can't create user. Username already exists.");
-            return Optional.empty();
-        }
-
-        if (!userValidator.validPassword(user)) {
-            System.out.println("Can't create user. No valid password.");
-            return Optional.empty();
-        }
+        if (!userValidator.isValidNewUser(user)) return Optional.empty();
 
         Optional<User> createdUser = saveUser(user);
         if (createdUser.isPresent()) System.out.println("Created " + createdUser.get().getUsername());
+        else System.out.println("Couldn't create new user");
+
         return createdUser;
     }
 }
