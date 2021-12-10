@@ -142,11 +142,15 @@ public class FilmService {
 
     // UPDATE methods
 
-    public void updateFilms(List<Film> films) {
+    public List<Film> updateFilms(List<Film> films) {
+        List<Film> updatedFilms = new ArrayList<>();
 
         for (Film film: films) {
-            updateFilm(film);
+            Optional<Film> updatedFilm = updateFilm(film);
+            if (updatedFilm.isPresent()) updatedFilms.add(updatedFilm.get());
         }
+
+        return updatedFilms;
     }
 
     public Optional<Film> updateFilm(Film film) {
