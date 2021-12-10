@@ -26,9 +26,13 @@ public class GoodviewsApplication {
         UserService userService = new UserService(ctx.getBean(UserRepository.class),ctx.getBean(UserValidator.class), ctx.getBean(RatingService.class));
         FilmService filmService = new FilmService(ctx.getBean(FilmRepository.class),ctx.getBean(FilmValidator.class),ctx.getBean(PersonService.class),ctx.getBean(RatingService.class));
 
+
         User user = new User();
         user.setUsername("sdelariv");
+        user.setFirstName("Sven");
+        user.setLastName("Delarivière");
         userService.createNewUser(user);
+
 
         Film film = new Film();
         film.setId("tt4468740");
@@ -40,7 +44,7 @@ public class GoodviewsApplication {
         ratingService.createNewRating(rating);
 
 
-        userService.changeUsername(user,"sdelariv2");
+
 
 /*
         FilmService service = new FilmService(ctx.getBean(FilmRepository.class),ctx.getBean(FilmValidator.class),ctx.getBean(PersonService.class));

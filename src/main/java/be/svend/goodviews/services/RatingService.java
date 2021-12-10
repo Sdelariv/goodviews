@@ -182,7 +182,6 @@ public class RatingService {
 
     private Optional<Rating> saveRating(Rating rating) {
         Rating savedRating = ratingRepo.save(rating);
-        System.out.println("Saving " + rating);
         return ratingRepo.findById(savedRating.getId());
     }
 

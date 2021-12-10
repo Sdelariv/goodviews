@@ -16,6 +16,12 @@ public class TagService {
         this.tagRepo = tagrepo;
     }
 
+    // FIND METHODS
+
+    public Optional<Tag> findByName(String name) {
+        return tagRepo.findByName(name);
+    }
+
     public List<Tag> saveTags(List<Tag> tags) {
         List<Tag> savedTags = new ArrayList<>();
 
@@ -37,5 +43,12 @@ public class TagService {
             System.out.println("Not saving " + tag.getName() + " because it already exists");
             return foundTag.get();
         }
+    }
+
+    public void deleteTag(Tag tag) {
+        if (tag == null || tag.getName() == null) return;
+
+        Optional<Tag> tagToDelete = findByName(tag.getName());
+        if (tagToDelete.isPresent()) tagRepo.delete(tag);
     }
 }
