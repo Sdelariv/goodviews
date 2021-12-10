@@ -1,10 +1,7 @@
 package be.svend.goodviews.services;
 
 import be.svend.goodviews.factory.scraper.webscraper.WebScraper;
-import be.svend.goodviews.models.Film;
-import be.svend.goodviews.models.Genre;
-import be.svend.goodviews.models.Person;
-import be.svend.goodviews.models.Tag;
+import be.svend.goodviews.models.*;
 import be.svend.goodviews.repositories.FilmRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +16,16 @@ public class FilmService {
     FilmRepository filmRepo;
     FilmValidator filmValidator;
     PersonService personService;
+    RatingService ratingService;
 
-    public FilmService(FilmRepository filmRepo, FilmValidator filmValidator, PersonService personService) {
+    public FilmService(FilmRepository filmRepo,
+                       FilmValidator filmValidator,
+                       PersonService personService,
+                       RatingService ratingService) {
         this.filmRepo = filmRepo;
         this.filmValidator = filmValidator;
         this.personService = personService;
+        this.ratingService = ratingService;
     }
 
     // FIND methods
@@ -238,6 +240,19 @@ public class FilmService {
 
         System.out.println("Updated (Replace with IMDB data)" + updatedFilm.get().getTitle());
         return updatedFilm;
+    }
+
+    public Optional<Film> calculateAndUpdateAverageRatingByFilmId(String filmId) {
+        Optional<Film> film = findById(filmId);
+
+        if (film.isEmpty()) return Optional.empty();
+
+        Integer calculatedAverage = ratingService.calculateAverageRatingByFilmId(filmId);
+        film.get().setAverageRating(calculatedAverage);
+
+        filmRepo.save(film.get());
+        System.out.println("Average updated");
+        return film;
     }
 
     // DELETE methods

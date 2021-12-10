@@ -23,10 +23,9 @@ public class GoodviewsApplication {
 
         RatingService ratingService = new RatingService(ctx.getBean(RatingRepository.class),ctx.getBean(RatingValidator.class));
         UserService userService = new UserService(ctx.getBean(UserRepository.class),ctx.getBean(UserValidator.class));
+        FilmService filmService = new FilmService(ctx.getBean(FilmRepository.class),ctx.getBean(FilmValidator.class),ctx.getBean(PersonService.class),ctx.getBean(RatingService.class));
 
-
-        System.out.println(ratingService.findByFilmId("tt4468740"));
-        System.out.println(ratingService.findByUserId("sdelariv"));
+        filmService.calculateAndUpdateAverageRatingByFilmId("tt4468740");
 
 /*
         FilmService service = new FilmService(ctx.getBean(FilmRepository.class),ctx.getBean(FilmValidator.class),ctx.getBean(PersonService.class));
