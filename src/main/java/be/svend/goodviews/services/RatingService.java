@@ -167,20 +167,6 @@ public class RatingService {
         }
     }
 
-    // OTHER METHODS
-
-    public Integer calculateAverageRatingByFilmId(String filmId) {
-        List<Rating> ratings = findByFilmId(filmId);
-
-        if (ratings.size() == 0) return null;
-
-        Integer runningTotal = 0;
-        for (Rating rating: ratings) {
-            runningTotal = runningTotal + rating.getRatingValue();
-        }
-
-        return runningTotal / ratings.size();
-    }
 
     // INTERNAL METHODS
 

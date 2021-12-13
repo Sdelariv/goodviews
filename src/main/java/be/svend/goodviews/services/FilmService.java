@@ -3,6 +3,8 @@ package be.svend.goodviews.services;
 import be.svend.goodviews.factory.scraper.webscraper.WebScraper;
 import be.svend.goodviews.models.*;
 import be.svend.goodviews.repositories.FilmRepository;
+import be.svend.goodviews.repositories.GenreRepository;
+import be.svend.goodviews.repositories.RatingRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -16,16 +18,19 @@ public class FilmService {
     FilmRepository filmRepo;
     FilmValidator filmValidator;
     PersonService personService;
-    RatingService ratingService;
+    RatingRepository ratingRepo;
+    GenreRepository genreRepo;
 
     public FilmService(FilmRepository filmRepo,
                        FilmValidator filmValidator,
                        PersonService personService,
-                       RatingService ratingService) {
+                       RatingRepository ratingRepo,
+                       GenreRepository genreRepo) {
         this.filmRepo = filmRepo;
         this.filmValidator = filmValidator;
         this.personService = personService;
-        this.ratingService = ratingService;
+        this.ratingRepo = ratingRepo;
+        this.genreRepo = genreRepo;
     }
 
     // FIND methods
@@ -41,6 +46,10 @@ public class FilmService {
     }
 
     public List<Film> findByGenre(Genre genre) {
+        if (genre.getId() == null) {
+            Optional<Genre> foundGenre = genreRepo.findByName(genre.getName());
+            if (foundGenre.isPresent()) return filmRepo.findAllByGenresContaining(foundGenre.get());
+        }
         return filmRepo.findAllByGenresContaining(genre);
     }
 
@@ -247,7 +256,7 @@ public class FilmService {
 
         if (film.isEmpty()) return Optional.empty();
 
-        Integer calculatedAverage = ratingService.calculateAverageRatingByFilmId(filmId);
+        Integer calculatedAverage = calculateAverageRatingByFilmId(filmId);
         film.get().setAverageRating(calculatedAverage);
 
         filmRepo.save(film.get());
@@ -299,4 +308,18 @@ public class FilmService {
         return film;
     }
 
+
+
+    public Integer calculateAverageRatingByFilmId(String filmId) {
+        List<Rating> ratings = ratingRepo.findByFilm_Id(filmId);
+
+        if (ratings.size() == 0) return null;
+
+        Integer runningTotal = 0;
+        for (Rating rating: ratings) {
+            runningTotal = runningTotal + rating.getRatingValue();
+        }
+
+        return runningTotal / ratings.size();
+    }
 }
