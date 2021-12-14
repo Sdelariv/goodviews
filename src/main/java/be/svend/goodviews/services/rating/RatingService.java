@@ -147,18 +147,13 @@ public class RatingService {
     }
 
     public boolean deleteCommentFromRating(Comment comment) {
-        System.out.println("Deleting comment from rating");
-
         // Looking for rating
         Optional<Rating> ratingWithComment = ratingRepo.findRatingByCommentListContaining(comment);
         if (ratingWithComment.isEmpty()) return false;
         Rating foundRatingWithComment = ratingWithComment.get();
-        System.out.println("Found comment in this rating: " + foundRatingWithComment);
 
         // Deleting comment
         foundRatingWithComment.deleteComment(comment);
-        System.out.println("Comment post deleteComment");
-        foundRatingWithComment.getCommentList().forEach(System.out::println);
 
         saveRating(foundRatingWithComment);
 
