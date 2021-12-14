@@ -1,4 +1,4 @@
-package be.svend.goodviews.services;
+package be.svend.goodviews.services.film.properties;
 
 import be.svend.goodviews.models.Genre;
 import be.svend.goodviews.repositories.GenreRepository;

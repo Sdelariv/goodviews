@@ -5,7 +5,7 @@ import be.svend.goodviews.models.*;
 import be.svend.goodviews.repositories.FilmRepository;
 import be.svend.goodviews.repositories.GenreRepository;
 import be.svend.goodviews.repositories.RatingRepository;
-import be.svend.goodviews.services.TagService;
+import be.svend.goodviews.services.film.properties.TagService;
 import be.svend.goodviews.services.crew.PersonService;
 import org.springframework.stereotype.Service;
 

@@ -1,4 +1,4 @@
-package be.svend.goodviews.services;
+package be.svend.goodviews.services.film.properties;
 
 import be.svend.goodviews.models.Tag;
 import be.svend.goodviews.repositories.TagRepository;

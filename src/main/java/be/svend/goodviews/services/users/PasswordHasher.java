@@ -1,4 +1,4 @@
-package be.svend.goodviews.services;
+package be.svend.goodviews.services.users;
 
 public class PasswordHasher {
 

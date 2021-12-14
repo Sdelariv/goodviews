@@ -6,7 +6,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 
-import static be.svend.goodviews.services.PasswordHasher.hashPassword;
+import static be.svend.goodviews.services.users.PasswordHasher.hashPassword;
 
 @Entity
 public class User {

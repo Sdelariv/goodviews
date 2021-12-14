@@ -1,9 +1,9 @@
 package be.svend.goodviews.services.film;
 
 import be.svend.goodviews.models.Film;
-import be.svend.goodviews.services.GenreService;
+import be.svend.goodviews.services.film.properties.GenreService;
 import be.svend.goodviews.services.crew.PersonService;
-import be.svend.goodviews.services.TagService;
+import be.svend.goodviews.services.film.properties.TagService;
 import org.springframework.stereotype.Component;
 
 
