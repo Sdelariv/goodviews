@@ -1,11 +1,10 @@
 package be.svend.goodviews.services.users;
 
-import be.svend.goodviews.models.Comment;
 import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.models.TypeOfUser;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.UserRepository;
-import be.svend.goodviews.services.RatingService;
+import be.svend.goodviews.services.rating.RatingService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

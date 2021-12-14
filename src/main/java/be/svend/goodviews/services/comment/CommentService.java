@@ -1,10 +1,10 @@
-package be.svend.goodviews.services;
+package be.svend.goodviews.services.comment;
 
 import be.svend.goodviews.models.Comment;
 import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.repositories.CommentRepository;
-import be.svend.goodviews.repositories.GenreRepository;
 import be.svend.goodviews.repositories.RatingRepository;
+import be.svend.goodviews.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -16,11 +16,14 @@ import java.util.Optional;
 public class CommentService {
     CommentRepository commentRepo;
     RatingRepository ratingRepo;
+    UserRepository userRepo;
 
     public CommentService(CommentRepository commentRepo,
-                          RatingRepository ratingRepo) {
+                          RatingRepository ratingRepo,
+                          UserRepository userRepo) {
         this.commentRepo = commentRepo;
         this.ratingRepo = ratingRepo;
+        this.userRepo = userRepo;
     }
 
     // FIND METHODS
@@ -52,21 +55,50 @@ public class CommentService {
         return savedComment;
     }
 
-    private Comment initialiseAndValidateComment(Comment comment) {
-        comment.setDate(LocalDate.now());
+    // UPDATE METHODS
 
-        if (comment.getId() != null) comment.setId(null);
+    public Optional<Comment> updateComment(Comment comment) {
+        Optional<Comment> existingComment = findById(comment.getId());
+        if (existingComment.isEmpty()) return Optional.empty();
 
-        return comment;
+        Comment updatedComment = CommentMerger.updateCommentWithNewData(existingComment.get(),comment);
+        return saveComment(updatedComment);
     }
 
-    // TODO: fill in
+    public List<Comment> deleteUserFromCommentsByUsername(String username) {
+        List<Comment> commentsOfUser = findByUsername(username);
 
+        for (Comment comment: commentsOfUser) {
+            comment.setUser(null);
+            commentRepo.save(comment);
+        }
+
+        return commentsOfUser;
+    }
+
+    // DELETE
+
+    public boolean deleteComment(Comment comment) {
+        Optional<Comment> existingComment = findById(comment.getId());
+        if (existingComment.isEmpty()) return false;
+
+        System.out.println("Deleting comment: " + comment.getComment());
+        commentRepo.delete(comment);
+        return true;
+    }
 
     // INTERNAL
 
     private Optional<Comment> saveComment(Comment comment) {
         Comment savedComment = commentRepo.save(comment);
         return findById(savedComment.getId());
+    }
+
+    private Comment initialiseAndValidateComment(Comment comment) {
+        comment.setDate(LocalDate.now());
+
+        if (comment.getId() != null) comment.setId(null);
+
+        return comment;
     }
 }

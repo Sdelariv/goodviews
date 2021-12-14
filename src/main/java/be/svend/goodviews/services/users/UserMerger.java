@@ -9,11 +9,11 @@ public class UserMerger {
     public static Optional<User> mergeUserWithNewData(User existingUser, User user) {
         User mergedUser = existingUser;
 
-        if (user.getFirstName() != null) existingUser.setFirstName(user.getFirstName());
-        if (user.getLastName() != null) existingUser.setLastName(user.getLastName());
-        if (user.getProfileUrl() != null) existingUser.setProfileUrl(user.getProfileUrl());
-        if (user.getProfileUrl() != null) existingUser.setPasswordHash(user.getPasswordHash());
-        if (user.getTypeOfUser() != null) existingUser.setTypeOfUser(user.getTypeOfUser());
+        if (user.getFirstName() != null) mergedUser.setFirstName(user.getFirstName());
+        if (user.getLastName() != null) mergedUser.setLastName(user.getLastName());
+        if (user.getProfileUrl() != null) mergedUser.setProfileUrl(user.getProfileUrl());
+        if (user.getProfileUrl() != null) mergedUser.setPasswordHash(user.getPasswordHash());
+        if (user.getTypeOfUser() != null) mergedUser.setTypeOfUser(user.getTypeOfUser());
 
         return Optional.of(mergedUser);
     }

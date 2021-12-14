@@ -6,6 +6,8 @@ import be.svend.goodviews.services.*;
 import be.svend.goodviews.services.crew.PersonService;
 import be.svend.goodviews.services.film.FilmService;
 import be.svend.goodviews.services.film.FilmValidator;
+import be.svend.goodviews.services.rating.RatingService;
+import be.svend.goodviews.services.rating.RatingValidator;
 import be.svend.goodviews.services.users.UserService;
 import be.svend.goodviews.services.users.UserValidator;
 import org.springframework.boot.SpringApplication;

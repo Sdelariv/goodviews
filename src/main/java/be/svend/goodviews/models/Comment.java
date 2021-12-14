@@ -14,6 +14,8 @@ public class Comment {
 
     private LocalDate date;
 
+    private LocalDate updated;
+
     @ManyToOne
     private User user;
 
@@ -50,6 +52,14 @@ public class Comment {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public LocalDate getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(LocalDate updated) {
+        this.updated = updated;
     }
 
     // OTHER

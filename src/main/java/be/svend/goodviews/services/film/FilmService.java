@@ -258,7 +258,6 @@ public class FilmService {
 
     public Optional<Film> calculateAndUpdateAverageRatingByFilmId(String filmId) {
         Optional<Film> film = findById(filmId);
-
         if (film.isEmpty()) return Optional.empty();
 
         Integer calculatedAverage = calculateAverageRatingByFilmId(filmId);
@@ -358,6 +357,12 @@ public class FilmService {
         for (Rating rating: ratings) {
             runningTotal = runningTotal + rating.getRatingValue();
         }
+
+        System.out.println("runningTotal: " + runningTotal);
+        System.out.println("/");
+        System.out.println("ratings.size(): " + ratings.size());
+        System.out.println("=");
+        System.out.println(runningTotal / ratings.size());
 
         return runningTotal / ratings.size();
     }

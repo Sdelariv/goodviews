@@ -25,6 +25,14 @@ public class User {
     @Enumerated(EnumType.STRING)
     private TypeOfUser typeOfUser;
 
+    // CONSTRUCTORS
+
+    public User() {
+    }
+
+    public User(String username) {
+        this.username = username;
+    }
 
     // GETTERS & SETTERS
 

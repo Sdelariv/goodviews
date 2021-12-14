@@ -1,4 +1,4 @@
-package be.svend.goodviews.services;
+package be.svend.goodviews.services.rating;
 
 import be.svend.goodviews.models.Comment;
 import be.svend.goodviews.models.Rating;
@@ -62,6 +62,7 @@ public class RatingService {
         if (!ratingValidator.isValidNewRating(rating)) return Optional.empty();
 
         // Saving Rating
+        rating.setDateOfRating(LocalDate.now());
         Optional<Rating> createdRating = saveRating(rating);
         if (createdRating.isPresent()) System.out.println("Created " + createdRating.get());
         else System.out.println("Couldn't create this new rating " + rating);
@@ -162,9 +163,13 @@ public class RatingService {
         }
     }
 
-    public void deleteRating(Rating rating) {
-        ratingRepo.delete(rating);
+    public boolean deleteRating(Rating rating) {
+        Optional<Rating> ratingToDelete = findById(rating.getId());
+        if (ratingToDelete.isEmpty()) return false;
+
+        ratingRepo.delete(ratingToDelete.get());
         System.out.println("Deleted rating");
+        return true;
     }
 
     public void deleteAllRating(List<Rating> ratings) {

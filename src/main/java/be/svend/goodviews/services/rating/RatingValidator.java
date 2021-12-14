@@ -1,4 +1,4 @@
-package be.svend.goodviews.services;
+package be.svend.goodviews.services.rating;
 
 import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.repositories.FilmRepository;
