@@ -25,6 +25,8 @@ public class FilmService {
 
     PersonService personService; // Using PersonService to find a films with a perticular director or writer, but could use Repo I think
 
+    // CONSTRUCTOR
+
     public FilmService(FilmRepository filmRepo,
                        FilmValidator filmValidator,
                        PersonService personService,
@@ -39,7 +41,7 @@ public class FilmService {
         this.tagService = tagService;
     }
 
-    // FIND methods
+    // FIND METHODS
 
     public Optional<Film> findById(String id) {
         if (id == null) return Optional.empty();
@@ -90,9 +92,7 @@ public class FilmService {
         Optional<Person> director = personService.findPersonById(writerId);
         if (director.isEmpty()) return Collections.emptyList();
 
-
         List<Film> filmsByDirector = filmRepo.findFilmsByWriterContaining(director.get());
-
         return filmsByDirector;
     }
 
@@ -109,7 +109,7 @@ public class FilmService {
         return filmRepo.findAll();
     }
 
-    // CREATE methods
+    // CREATE METHODS
 
     public List<Film> createFilms(List<Film> films) {
         List<Film> createdFilms = new ArrayList<>();
@@ -157,7 +157,7 @@ public class FilmService {
         return createdFilm;
     }
 
-    // UPDATE methods
+    // UPDATE METHODS
 
     public List<Film> updateFilms(List<Film> films) {
         List<Film> updatedFilms = new ArrayList<>();
@@ -348,6 +348,11 @@ public class FilmService {
     }
 
 
+    /**
+     * Goes through all the ratings of the film in the db, calculates the average and returns that average
+     * @param filmId - the Id of the film from which the average-calculation is requested
+     * @return Integer - the average
+     */
     public Integer calculateAverageRatingByFilmId(String filmId) {
         List<Rating> ratings = ratingRepo.findByFilm_Id(filmId);
 
@@ -357,12 +362,6 @@ public class FilmService {
         for (Rating rating: ratings) {
             runningTotal = runningTotal + rating.getRatingValue();
         }
-
-        System.out.println("runningTotal: " + runningTotal);
-        System.out.println("/");
-        System.out.println("ratings.size(): " + ratings.size());
-        System.out.println("=");
-        System.out.println(runningTotal / ratings.size());
 
         return runningTotal / ratings.size();
     }
