@@ -1,5 +1,6 @@
 package be.svend.goodviews.services;
 
+import be.svend.goodviews.models.Admin;
 import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.UserRepository;
@@ -125,6 +126,17 @@ public class UserService {
         return Optional.of(newUser);
     }
 
+    public Optional<Admin> upgradeUserToAdmin(User user) {
+        // Look for user
+        Optional<User> foundUser = findByUsername(user.getUsername());
+        if (foundUser.isEmpty()) return Optional.empty();
+
+        // Create admin
+        Admin createdAdmin = createAdmin(user);
+        if (findAdmin(createdAdmin)) deleteUser(user);
+
+        return Optional.of(createdAdmin);
+    }
 
     // DELETE METHODS
 
