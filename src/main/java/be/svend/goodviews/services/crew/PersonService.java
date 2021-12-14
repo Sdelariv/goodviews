@@ -13,13 +13,17 @@ public class PersonService {
     PersonRepository personRepo;
     PersonValidator personValidator;
 
+    // CONSTRUCTORS
+
     public PersonService(PersonRepository personRepo, PersonValidator personValidator) {
         this.personRepo = personRepo;
         this.personValidator = personValidator;
     }
 
+    // FIND METHODS
+
     public Optional<Person> findPersonById(String id) {
-       if (!personValidator.isValidIdFormat(id)) return Optional.empty();
+       if (!personValidator.isValidIdFormat(id)) return Optional.empty(); // TODO: Delete this?
 
        return personRepo.findById(id);
     }
@@ -28,6 +32,7 @@ public class PersonService {
         return personRepo.findByName(name);
     }
 
+    // CREATE METHODS
 
     public List<Person> createPersons(List<Person> persons) {
         List<Person> foundPersons = new ArrayList<>();
@@ -41,21 +46,23 @@ public class PersonService {
         return foundPersons;
     }
     public Person createPerson(Person person) {
-
         // Check whether id is valid
         if (!personValidator.hasValidIdFormat(person)) return null;
 
         // Check whether person is already in db
         Optional<Person> existingPerson = personRepo.findById(person.getId());
-
-        if (existingPerson.isEmpty()) {
-            System.out.println("Saving person: " + person.getName());
-            return personRepo.save(person);
-        } else {
+        if (existingPerson.isPresent()) {
             System.out.println("Not saving " + person.getName() + " because it already exists in the database");
             return existingPerson.get();
         }
+
+        // Saving person
+        System.out.println("Saving person: " + person.getName());
+        return personRepo.save(person);
+
     }
+
+    // UPDATE METHODS
 
     public Optional<Person> updatePerson(Person person) {
         if (!personValidator.hasValidIdFormat(person)) {
@@ -72,6 +79,8 @@ public class PersonService {
         System.out.println("Updating " +person.getId());
         return Optional.of(personRepo.save(person));
     }
+
+    // DELETE METHODS
 
     public boolean deletePerson(Person person) {
         if (!personValidator.hasValidIdFormat(person)) return false;
