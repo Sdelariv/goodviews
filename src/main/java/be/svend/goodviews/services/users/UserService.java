@@ -4,6 +4,7 @@ import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.models.TypeOfUser;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.UserRepository;
+import be.svend.goodviews.services.comment.CommentService;
 import be.svend.goodviews.services.rating.RatingService;
 import org.springframework.stereotype.Service;
 
@@ -20,14 +21,17 @@ public class UserService {
     UserRepository userRepo;
     UserValidator userValidator;
     RatingService ratingService;
+    CommentService commentService;
 
 
     public UserService(UserRepository userRepo,
                        UserValidator userValidator,
-                       RatingService ratingService) {
+                       RatingService ratingService,
+                       CommentService commentService) {
         this.userRepo = userRepo;
         this.userValidator = userValidator;
         this.ratingService = ratingService;
+        this.commentService = commentService;
     }
 
     // FIND METHODS
@@ -186,7 +190,7 @@ public class UserService {
         if (existingUser.isEmpty()) return false;
 
         // Delete their ratings and their comments (or replace comments with deletedUser)
-        // TODO: fill in
+        commentService.deleteUserFromCommentsByUsername(user.getUsername());
 
         // Delete and check whether it worked
         userRepo.delete(existingUser.get());

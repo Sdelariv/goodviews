@@ -20,7 +20,7 @@ class UserServiceTest {
     static void generalInit() {
         System.out.println("General initialisation");
         ConfigurableApplicationContext ctx = SpringApplication.run(GoodviewsApplication.class);
-        userService = new UserService(ctx.getBean(UserRepository.class),ctx.getBean(UserValidator.class), ctx.getBean(RatingService.class));
+        userService = ctx.getBean(UserService.class);
         System.out.println("Success");
     }
 
