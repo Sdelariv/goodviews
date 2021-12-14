@@ -67,7 +67,7 @@ public class RatingService {
         if (createdRating.isPresent()) System.out.println("Created " + createdRating.get());
         else System.out.println("Couldn't create this new rating " + rating);
 
-        filmService.calculateAndUpdateAverageRatingByFilmId(rating.getFilm().getId()); // TODO: take out if you don't want the dependency
+        filmService.calculateAndUpdateAverageRatingByFilmId(rating.getFilm().getId());
 
         return createdRating;
     }
@@ -125,7 +125,7 @@ public class RatingService {
         ratingToUpdate.setRatingValue(ratingValue);
         ratingToUpdate.setDateOfRating(LocalDate.now());
 
-        filmService.calculateAndUpdateAverageRatingByFilmId(filmId); // TODO: delete if you don't want to have a filmservice dependency
+        filmService.calculateAndUpdateAverageRatingByFilmId(filmId);
 
         return updateRating(ratingToUpdate);
     }
@@ -149,12 +149,22 @@ public class RatingService {
 
     // DELETE METHODS
 
-    public void deleteRatingById(String ratingId) {
+    public boolean deleteRatingById(String ratingId) {
         System.out.println("Trying to delete a rating with id:" + ratingId);
+        if (ratingId == null) return false;
+
+        // Find the rating
         Optional<Rating> foundRating = findById(ratingId);
         if (foundRating.isEmpty()) System.out.println("Failed");
+
+        // Delete the rating
+        String filmId = foundRating.get().getFilm().getId();
+
         ratingRepo.delete(foundRating.get());
         System.out.println("Succesfully deleted the rating");
+
+        filmService.calculateAndUpdateAverageRatingByFilmId(filmId);
+        return true;
     }
 
     public void deleteRatingsById(List<String> ratingIds) {
@@ -164,11 +174,10 @@ public class RatingService {
     }
 
     public boolean deleteRating(Rating rating) {
-        Optional<Rating> ratingToDelete = findById(rating.getId());
-        if (ratingToDelete.isEmpty()) return false;
+        if (rating == null) return false;
+        if (rating.getId() == null) return false;
 
-        ratingRepo.delete(ratingToDelete.get());
-        System.out.println("Deleted rating");
+        deleteRatingById(rating.getId());
         return true;
     }
 
