@@ -29,14 +29,26 @@ public class GoodviewsApplication {
         user.setFirstName("Sven");
         user.setUsername("sdelariv");
 
-        System.out.println("Creating user");
+        User user2 = new User();
+        user.setFirstName("Bibi");
+        user.setLastName("The Bear");
+        user.setUsername("bibi");
+
+        System.out.println("Creating users");
         userService.createNewUser(user);
+        userService.createNewUser(user2);
 
         System.out.println("Finding user");
         Optional<User> foundUser = userService.findByUsername("sdelariv");
 
         System.out.println("Upgrading user");
         userService.upgradeUserToAdmin(foundUser.get());
+
+        System.out.println("Regular users:");
+        userService.findAllRegularUsers().forEach(System.out::println);
+
+        System.out.println("Admins:");
+        userService.findAllAdmins().forEach(System.out::println);
 
 
 

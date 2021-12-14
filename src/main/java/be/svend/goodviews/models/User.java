@@ -1,9 +1,12 @@
 package be.svend.goodviews.models;
 
+
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
+
+import static be.svend.goodviews.services.PasswordHasher.hashPassword;
 
 @Entity
 public class User {
@@ -63,6 +66,10 @@ public class User {
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+    public void setPassword(String password) {
+        this.passwordHash = hashPassword(password);
     }
 
     public boolean hasPasswordHash(String passwordHash) {
