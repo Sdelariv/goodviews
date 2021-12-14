@@ -53,6 +53,18 @@ public class UserService {
         return userRepo.findAll();
     }
 
+    public List<User> findAllAdmins() {
+        return userRepo.findByTypeOfUser(TypeOfUser.ADMIN);
+    }
+
+    public List<User> findAllRegularUsers() {
+        return userRepo.findByTypeOfUser(TypeOfUser.USER);
+    }
+
+    public List<User> findAllArchitects() {
+        return userRepo.findByTypeOfUser(TypeOfUser.ARCHITECT);
+    }
+
     // CREATE METHODS
 
     public Optional<User> createNewUser(User user) {
@@ -136,6 +148,26 @@ public class UserService {
         if (userInDb.isEmpty()) return Optional.empty();
 
         userInDb.get().setTypeOfUser(TypeOfUser.ADMIN);
+
+        return Optional.of(userRepo.save(userInDb.get()));
+    }
+
+    public Optional<User> upgradeUserToArchitect(User user) {
+        Optional<User> userInDb = findByUsername(user.getUsername());
+
+        if (userInDb.isEmpty()) return Optional.empty();
+
+        userInDb.get().setTypeOfUser(TypeOfUser.ARCHITECT);
+
+        return Optional.of(userRepo.save(userInDb.get()));
+    }
+
+    public Optional<User> downgradeUserToUser(User user) {
+        Optional<User> userInDb = findByUsername(user.getUsername());
+
+        if (userInDb.isEmpty()) return Optional.empty();
+
+        userInDb.get().setTypeOfUser(TypeOfUser.USER);
 
         return Optional.of(userRepo.save(userInDb.get()));
     }
