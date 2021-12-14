@@ -1,4 +1,4 @@
-package be.svend.goodviews.services;
+package be.svend.goodviews.services.crew;
 
 import be.svend.goodviews.models.Person;
 import org.springframework.stereotype.Component;

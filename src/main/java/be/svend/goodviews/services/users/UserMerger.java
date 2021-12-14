@@ -1,4 +1,4 @@
-package be.svend.goodviews.services;
+package be.svend.goodviews.services.users;
 
 import be.svend.goodviews.models.User;
 
@@ -12,6 +12,8 @@ public class UserMerger {
         if (user.getFirstName() != null) existingUser.setFirstName(user.getFirstName());
         if (user.getLastName() != null) existingUser.setLastName(user.getLastName());
         if (user.getProfileUrl() != null) existingUser.setProfileUrl(user.getProfileUrl());
+        if (user.getProfileUrl() != null) existingUser.setPasswordHash(user.getPasswordHash());
+        if (user.getTypeOfUser() != null) existingUser.setTypeOfUser(user.getTypeOfUser());
 
         return Optional.of(mergedUser);
     }

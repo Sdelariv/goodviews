@@ -1,7 +1,7 @@
 package be.svend.goodviews.scraper.webscraper;
 
 import be.svend.goodviews.models.Film;
-import be.svend.goodviews.services.FilmMerger;
+import be.svend.goodviews.services.film.FilmMerger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.jsoup.Jsoup;

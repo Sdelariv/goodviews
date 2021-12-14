@@ -1,4 +1,4 @@
-package be.svend.goodviews.services;
+package be.svend.goodviews.services.film;
 
 import be.svend.goodviews.models.Film;
 import org.springframework.stereotype.Component;

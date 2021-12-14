@@ -6,7 +6,7 @@ import be.svend.goodviews.scraper.webscraper.WebScraper;
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Genre;
 import be.svend.goodviews.models.Tag;
-import be.svend.goodviews.services.FilmService;
+import be.svend.goodviews.services.film.FilmService;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

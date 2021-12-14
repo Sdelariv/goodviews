@@ -1,4 +1,4 @@
-package be.svend.goodviews.services;
+package be.svend.goodviews.services.users;
 
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.UserRepository;

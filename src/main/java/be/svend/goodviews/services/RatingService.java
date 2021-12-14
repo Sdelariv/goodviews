@@ -1,8 +1,8 @@
 package be.svend.goodviews.services;
 
 import be.svend.goodviews.models.Rating;
-import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.RatingRepository;
+import be.svend.goodviews.services.film.FilmService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;

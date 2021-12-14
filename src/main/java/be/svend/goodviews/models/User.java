@@ -1,6 +1,8 @@
 package be.svend.goodviews.models;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 
 @Entity
@@ -16,6 +18,9 @@ public class User {
     private String lastName;
 
     private String passwordHash;
+
+    @Enumerated(EnumType.STRING)
+    private TypeOfUser typeOfUser;
 
 
     // GETTERS & SETTERS
@@ -65,7 +70,15 @@ public class User {
         return false;
     }
 
-    // OTHER
+    public TypeOfUser getTypeOfUser() {
+        return typeOfUser;
+    }
+
+    public void setTypeOfUser(TypeOfUser typeOfUser) {
+        this.typeOfUser = typeOfUser;
+    }
+
+// OTHER
 
     @Override
     public String toString() {

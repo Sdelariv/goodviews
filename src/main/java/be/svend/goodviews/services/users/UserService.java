@@ -1,9 +1,10 @@
-package be.svend.goodviews.services;
+package be.svend.goodviews.services.users;
 
-import be.svend.goodviews.models.Admin;
 import be.svend.goodviews.models.Rating;
+import be.svend.goodviews.models.TypeOfUser;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.UserRepository;
+import be.svend.goodviews.services.RatingService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static be.svend.goodviews.services.UserMerger.mergeUserWithNewData;
+import static be.svend.goodviews.services.users.UserMerger.mergeUserWithNewData;
 
 
 @Service
@@ -20,7 +21,10 @@ public class UserService {
     UserValidator userValidator;
     RatingService ratingService;
 
-    public UserService(UserRepository userRepo, UserValidator userValidator, RatingService ratingService) {
+
+    public UserService(UserRepository userRepo,
+                       UserValidator userValidator,
+                       RatingService ratingService) {
         this.userRepo = userRepo;
         this.userValidator = userValidator;
         this.ratingService = ratingService;
@@ -126,16 +130,14 @@ public class UserService {
         return Optional.of(newUser);
     }
 
-    public Optional<Admin> upgradeUserToAdmin(User user) {
-        // Look for user
-        Optional<User> foundUser = findByUsername(user.getUsername());
-        if (foundUser.isEmpty()) return Optional.empty();
+    public Optional<User> upgradeUserToAdmin(User user) {
+        Optional<User> userInDb = findByUsername(user.getUsername());
 
-        // Create admin
-        Admin createdAdmin = createAdmin(user);
-        if (findAdmin(createdAdmin)) deleteUser(user);
+        if (userInDb.isEmpty()) return Optional.empty();
 
-        return Optional.of(createdAdmin);
+        userInDb.get().setTypeOfUser(TypeOfUser.ADMIN);
+
+        return Optional.of(userRepo.save(userInDb.get()));
     }
 
     // DELETE METHODS
