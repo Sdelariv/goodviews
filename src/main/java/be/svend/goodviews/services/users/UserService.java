@@ -1,5 +1,6 @@
 package be.svend.goodviews.services.users;
 
+import be.svend.goodviews.models.Comment;
 import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.models.TypeOfUser;
 import be.svend.goodviews.models.User;
@@ -137,6 +138,9 @@ public class UserService {
             newRating.updateId();
         }
 
+        // Changing id in comments
+        // TODO: fix
+
         ratingService.deleteRatingsById(ratingIdsToDelete);
         deleteUser(existingUser.get());
 
@@ -182,6 +186,9 @@ public class UserService {
         Optional<User> existingUser = userValidator.isExistingUser(user);
         if (existingUser.isEmpty()) return false;
 
+        // Delete their ratings and their comments (or replace comments with deletedUser)
+        // TODO: fill in
+
         // Delete and check whether it worked
         userRepo.delete(existingUser.get());
         if (findByUsername(user.getUsername()).isEmpty()) {
@@ -213,6 +220,7 @@ public class UserService {
         newUser.setFirstName(existingUser.getFirstName());
         newUser.setLastName(existingUser.getLastName());
         newUser.setUsername(existingUser.getUsername());
+        newUser.setPasswordHash(existingUser.getPasswordHash());
 
         return newUser;
     }

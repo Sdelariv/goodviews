@@ -7,6 +7,7 @@ import be.svend.goodviews.repositories.GenreRepository;
 import be.svend.goodviews.repositories.RatingRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +42,31 @@ public class CommentService {
 
     // CREATE METHODS
 
+    public Optional<Comment> createNewComment(Comment comment) {
+        System.out.println("Trying to create new comment");
+
+        Comment validatedComment = initialiseAndValidateComment(comment);
+
+        Optional<Comment> savedComment = saveComment(comment);
+
+        return savedComment;
+    }
+
+    private Comment initialiseAndValidateComment(Comment comment) {
+        comment.setDate(LocalDate.now());
+
+        if (comment.getId() != null) comment.setId(null);
+
+        return comment;
+    }
+
     // TODO: fill in
 
+
+    // INTERNAL
+
+    private Optional<Comment> saveComment(Comment comment) {
+        Comment savedComment = commentRepo.save(comment);
+        return findById(savedComment.getId());
+    }
 }

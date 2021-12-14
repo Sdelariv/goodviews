@@ -1,5 +1,6 @@
 package be.svend.goodviews.services;
 
+import be.svend.goodviews.models.Comment;
 import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.repositories.RatingRepository;
 import be.svend.goodviews.services.film.FilmService;
@@ -137,6 +138,11 @@ public class RatingService {
         ratingToUpdate.setDateOfReview(LocalDate.now());
 
         return updateRating(ratingToUpdate);
+    }
+
+    public Optional<Rating> addCommentToRating(Rating rating, Comment comment) {
+        rating.addComment(comment);
+        return saveRating(rating);
     }
 
 

@@ -106,6 +106,12 @@ public class Rating {
         this.commentList = commentList;
     }
 
+    public void addComment(Comment comment) {
+        if (this.getCommentList().contains(comment)) return;
+
+        this.commentList.add(comment);
+    }
+
     // OTHER METHODS
 
 
@@ -127,4 +133,6 @@ public class Rating {
                 ", film=" + filmTitle +
                 '}';
     }
+
+
 }
