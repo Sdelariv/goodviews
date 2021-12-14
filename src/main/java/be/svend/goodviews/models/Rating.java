@@ -112,6 +112,20 @@ public class Rating {
         this.commentList.add(comment);
     }
 
+    public void deleteComment(Comment comment) {
+        System.out.println("COMMENTS");
+        this.getCommentList().forEach(System.out::println);
+        System.out.println("");
+        System.out.println("COMMENT TO DELETE:");
+        System.out.println(comment);
+
+        if (!this.getCommentList().contains(comment)) {
+            System.out.println("Can't find the comment to delete");
+            return;
+        }
+        this.commentList.remove(comment);
+    }
+
     // OTHER METHODS
 
 
@@ -133,6 +147,7 @@ public class Rating {
                 ", film=" + filmTitle +
                 '}';
     }
+
 
 
 }

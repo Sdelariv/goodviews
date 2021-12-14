@@ -2,6 +2,7 @@ package be.svend.goodviews.models;
 
 
 import javax.persistence.*;
+import java.util.Objects;
 
 /**
  * Genre of the film
@@ -43,14 +44,6 @@ public class Genre {
         this.name = name;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Genre genre = (Genre) o;
-
-        return this.name.equals(genre.getName());
-    }
 
     // OTHER
 
@@ -61,4 +54,16 @@ public class Genre {
                 ", name='" + name + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Genre genre = (Genre) o;
+        if (genre.getName().equals(this.getName())) return true;
+
+        return false;
+    }
+
+
 }

@@ -5,6 +5,7 @@ import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.repositories.CommentRepository;
 import be.svend.goodviews.repositories.RatingRepository;
 import be.svend.goodviews.repositories.UserRepository;
+import be.svend.goodviews.services.rating.RatingService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,13 +18,16 @@ public class CommentService {
     CommentRepository commentRepo;
     RatingRepository ratingRepo;
     UserRepository userRepo;
+    RatingService ratingService;
 
     public CommentService(CommentRepository commentRepo,
                           RatingRepository ratingRepo,
-                          UserRepository userRepo) {
+                          UserRepository userRepo,
+                          RatingService ratingService) {
         this.commentRepo = commentRepo;
         this.ratingRepo = ratingRepo;
         this.userRepo = userRepo;
+        this.ratingService = ratingService;
     }
 
     // FIND METHODS
@@ -45,13 +49,16 @@ public class CommentService {
 
     // CREATE METHODS
 
-    public Optional<Comment> createNewComment(Comment comment) {
+    public Optional<Comment> createNewComment(Comment comment, String ratingId) {
         System.out.println("Trying to create new comment");
 
-        Comment validatedComment = initialiseAndValidateComment(comment);
+        Optional<Rating> ratingToComment = ratingRepo.findById(ratingId);
+        if (ratingToComment.isEmpty()) return Optional.empty();
 
+        Comment validatedComment = initialiseAndValidateComment(comment);
         Optional<Comment> savedComment = saveComment(comment);
 
+        ratingService.addCommentToRating(ratingToComment.get(),comment);
         return savedComment;
     }
 
@@ -79,9 +86,14 @@ public class CommentService {
     // DELETE
 
     public boolean deleteComment(Comment comment) {
+        // Find comment
         Optional<Comment> existingComment = findById(comment.getId());
         if (existingComment.isEmpty()) return false;
 
+        // Deleting comment from Rating
+        ratingService.deleteCommentFromRating(comment);
+
+        // Deleting comment
         System.out.println("Deleting comment: " + comment.getComment());
         commentRepo.delete(comment);
         return true;

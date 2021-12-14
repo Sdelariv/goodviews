@@ -2,6 +2,7 @@ package be.svend.goodviews.models;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 public class Comment {
@@ -73,4 +74,14 @@ public class Comment {
                 ", comment='" + comment +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Comment commentToCompare = (Comment) o;
+        if (commentToCompare.getId() == this.getId()) return true;
+        return false;
+    }
+
 }

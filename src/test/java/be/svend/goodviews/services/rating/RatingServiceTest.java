@@ -32,10 +32,13 @@ class RatingServiceTest {
         userService = ctx.getBean(UserService.class);
 
         rating = new Rating();
-        rating.setRatingValue(95);
-        rating.setFilm(filmService.findById("tt4468740").get());
-        rating.setUser(userService.findByUsername("sdelariv").get());
-        rating = ratingService.createNewRating(rating).get();
+        if (ratingService.findById("sdelarivtt4468740").isPresent()) rating = ratingService.findById("sdelarivtt4468740").get();
+        else {
+            rating.setRatingValue(95);
+            rating.setFilm(filmService.findById("tt4468740").get());
+            rating.setUser(userService.findByUsername("sdelariv").get());
+            rating = ratingService.createNewRating(rating).get();
+        }
 
         ratingToCreate = new Rating();
         ratingToCreate.setRatingValue(100);
@@ -47,8 +50,6 @@ class RatingServiceTest {
         ratingToDelete.setFilm(filmService.findById("tt16283826").get());
         ratingToDelete.setUser(userService.findByUsername("sdelariv").get());
         ratingToDelete = ratingService.createNewRating(ratingToDelete).get();
-
-
     }
 
     @Test
