@@ -7,6 +7,11 @@ import org.springframework.stereotype.Component;
 public class PersonValidator {
 
 
+    /**
+     * Checks whether id is null and whether it is valid (starts with "nm")
+     * @param person - the Person to check the id of
+     * @return true if valid, false if not
+     */
     public boolean hasValidIdFormat(Person person) {
         if (person.getId() == null) return false;
 
@@ -15,6 +20,11 @@ public class PersonValidator {
         return true;
     }
 
+    /**
+     * Checks whether the id has a valid format (starts with "nm")
+     * @param id
+     * @return
+     */
     public boolean isValidIdFormat(String id) {
         return id.startsWith("nm");
     }
