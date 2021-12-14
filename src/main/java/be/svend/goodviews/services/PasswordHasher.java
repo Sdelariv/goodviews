@@ -5,7 +5,7 @@ public class PasswordHasher {
 
     public static String hashPassword(String password) {
 
-        String passwordHash = ""; // TODO: fill in
+        String passwordHash = "hash of " + password; // TODO: fill in
 
         return passwordHash;
     }

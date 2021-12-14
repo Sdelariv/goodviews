@@ -73,6 +73,7 @@ public class UserService {
         if (!userValidator.isValidNewUser(user)) return Optional.empty();
 
         if (user.getTypeOfUser() == null) user.setTypeOfUser(TypeOfUser.USER);
+        // TODO: hash the password?
 
         Optional<User> createdUser = saveUser(user);
         if (createdUser.isPresent()) System.out.println("Created " + createdUser.get().getUsername());

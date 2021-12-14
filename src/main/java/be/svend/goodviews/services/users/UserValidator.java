@@ -39,8 +39,6 @@ public class UserValidator {
 
         if (userRepo.findByUsername(user.getUsername()).isPresent()) return false;
 
-        if (hasInvalidCharacter(user.getUsername())) return false;
-
         return true;
     }
 
@@ -59,7 +57,9 @@ public class UserValidator {
     public boolean hasValidPassword(User user) {
         if (user == null) return false;
 
-        // TODO: fill in
+        if (user.getPasswordHash() == null) return false;
+
+        if (hasInvalidCharacter(user.getUsername())) return false;
 
         return true;
     }

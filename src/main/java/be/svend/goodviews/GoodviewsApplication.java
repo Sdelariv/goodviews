@@ -28,14 +28,18 @@ public class GoodviewsApplication {
         user.setLastName("Delarivière");
         user.setFirstName("Sven");
         user.setUsername("sdelariv");
+        user.setPassword("myPassword");
 
         User user2 = new User();
-        user.setFirstName("Bibi");
-        user.setLastName("The Bear");
-        user.setUsername("bibi");
+        user2.setFirstName("Bibi");
+        user2.setLastName("The Bear");
+        user2.setUsername("bibi");
+        user2.setPassword("herPassword");
 
         System.out.println("Creating users");
+        System.out.println("- Saving Sven:");
         userService.createNewUser(user);
+        System.out.println("- Saving Bibi");
         userService.createNewUser(user2);
 
         System.out.println("Finding user");
