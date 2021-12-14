@@ -9,9 +9,12 @@ import be.svend.goodviews.services.rating.RatingService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CommentService {
@@ -40,7 +43,7 @@ public class CommentService {
         Optional<Rating> ratingInDb = ratingRepo.findById(ratingId);
         if (ratingInDb.isEmpty()) return Collections.emptyList();
 
-        return ratingInDb.get().getCommentList();
+        return ratingInDb.get().getCommentList().stream().sorted(Comparator.comparing(c -> c.getDateTime())).collect(Collectors.toList());
     }
 
     public List<Comment> findByUsername(String username) {
@@ -107,7 +110,7 @@ public class CommentService {
     }
 
     private Comment initialiseAndValidateComment(Comment comment) {
-        comment.setDate(LocalDate.now());
+        comment.setDateTime(LocalDateTime.now());
 
         if (comment.getId() != null) comment.setId(null);
 

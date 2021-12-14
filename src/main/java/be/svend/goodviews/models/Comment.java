@@ -2,7 +2,7 @@ package be.svend.goodviews.models;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Objects;
+import java.time.LocalDateTime;
 
 @Entity
 public class Comment {
@@ -13,9 +13,9 @@ public class Comment {
 
     private String comment;
 
-    private LocalDate date;
+    private LocalDateTime dateTime;
 
-    private LocalDate updated;
+    private LocalDateTime updated;
 
     @ManyToOne
     private User user;
@@ -39,12 +39,12 @@ public class Comment {
         this.comment = comment;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public LocalDateTime getDateTime() {
+        return dateTime;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
     }
 
     public User getUser() {
@@ -55,11 +55,11 @@ public class Comment {
         this.user = user;
     }
 
-    public LocalDate getUpdated() {
+    public LocalDateTime getUpdated() {
         return updated;
     }
 
-    public void setUpdated(LocalDate updated) {
+    public void setUpdated(LocalDateTime updated) {
         this.updated = updated;
     }
 
@@ -69,7 +69,7 @@ public class Comment {
     public String toString() {
         return "Comment{" +
                 "id=" + id +
-                ", date=" + date +
+                ", date=" + dateTime +
                 ", user=" + user + '\'' +
                 ", comment='" + comment +
                 '}';
