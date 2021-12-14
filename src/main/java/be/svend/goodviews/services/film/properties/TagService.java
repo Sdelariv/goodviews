@@ -22,6 +22,8 @@ public class TagService {
         return tagRepo.findByName(name);
     }
 
+    // SAVE METHODS
+
     public List<Tag> saveTags(List<Tag> tags) {
         List<Tag> savedTags = new ArrayList<>();
 
@@ -44,6 +46,8 @@ public class TagService {
             return foundTag.get();
         }
     }
+
+    // DELETE METHODS
 
     public void deleteTag(Tag tag) {
         if (tag == null || tag.getName() == null) return;
