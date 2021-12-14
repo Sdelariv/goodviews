@@ -1,20 +1,11 @@
 package be.svend.goodviews;
 
-import be.svend.goodviews.factory.FilmFactory;
-import be.svend.goodviews.factory.HardcopyMaker;
-import be.svend.goodviews.factory.scraper.imdbscraper.ImdbScraper;
-import be.svend.goodviews.factory.scraper.svendscraper.HardcopyScraper;
-import be.svend.goodviews.factory.scraper.webscraper.WebScraper;
 import be.svend.goodviews.models.*;
 import be.svend.goodviews.repositories.*;
 import be.svend.goodviews.services.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @SpringBootApplication
 public class GoodviewsApplication {

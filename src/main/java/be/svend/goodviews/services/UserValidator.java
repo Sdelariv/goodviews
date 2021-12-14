@@ -4,6 +4,8 @@ import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.UserRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -37,7 +39,20 @@ public class UserValidator {
 
         if (userRepo.findByUsername(user.getUsername()).isPresent()) return false;
 
+        if (hasInvalidCharacter(user.getUsername())) return false;
+
         return true;
+    }
+
+    private boolean hasInvalidCharacter(String username) {
+        List<String> invalidCharacters = new ArrayList<>(
+                List.of(";","\\"));
+
+        for (String invalidCharacter: invalidCharacters) {
+            if (username.contains(invalidCharacter)) return true;
+        }
+
+        return false;
     }
 
 

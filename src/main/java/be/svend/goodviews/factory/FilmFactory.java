@@ -1,8 +1,8 @@
 package be.svend.goodviews.factory;
 
-import be.svend.goodviews.factory.scraper.imdbscraper.ImdbScraper;
-import be.svend.goodviews.factory.scraper.svendscraper.HardcopyScraper;
-import be.svend.goodviews.factory.scraper.webscraper.WebScraper;
+import be.svend.goodviews.scraper.imdbscraper.ImdbScraper;
+import be.svend.goodviews.scraper.svendscraper.HardcopyScraper;
+import be.svend.goodviews.scraper.webscraper.WebScraper;
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Genre;
 import be.svend.goodviews.models.Tag;

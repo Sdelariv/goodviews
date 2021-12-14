@@ -1,4 +1,4 @@
-package be.svend.goodviews.factory.scraper.webscraper;
+package be.svend.goodviews.scraper.webscraper;
 
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.services.FilmMerger;

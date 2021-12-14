@@ -1,10 +1,9 @@
-package be.svend.goodviews.factory.scraper.svendscraper;
+package be.svend.goodviews.scraper.svendscraper;
 
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Genre;
 import be.svend.goodviews.models.Person;
 import be.svend.goodviews.models.Tag;
-import be.svend.goodviews.services.FilmService;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -14,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static be.svend.goodviews.factory.scraper.imdbscraper.LineValidator.isLineContainingRelevantId;
+import static be.svend.goodviews.scraper.imdbscraper.LineValidator.isLineContainingRelevantId;
 
 /**
  * Responsible for scraping duties based on the moktok Server and exporting to a tsv harcopy (for ease)

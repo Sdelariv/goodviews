@@ -1,4 +1,4 @@
-package be.svend.goodviews.factory.scraper.imdbscraper;
+package be.svend.goodviews.scraper.imdbscraper;
 
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Genre;
@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static be.svend.goodviews.factory.scraper.imdbscraper.LineValidator.isFilmInDataLine;
-import static be.svend.goodviews.factory.scraper.imdbscraper.LineValidator.isLineContainingRelevantId;
+import static be.svend.goodviews.scraper.imdbscraper.LineValidator.isFilmInDataLine;
+import static be.svend.goodviews.scraper.imdbscraper.LineValidator.isLineContainingRelevantId;
 
 /**
  * Responsible for scraping duties based on tsv files of basicData

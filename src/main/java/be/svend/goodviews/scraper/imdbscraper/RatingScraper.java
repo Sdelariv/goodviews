@@ -1,4 +1,4 @@
-package be.svend.goodviews.factory.scraper.imdbscraper;
+package be.svend.goodviews.scraper.imdbscraper;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static be.svend.goodviews.factory.scraper.imdbscraper.LineValidator.HasSufficientVotesInDataLine;
+import static be.svend.goodviews.scraper.imdbscraper.LineValidator.HasSufficientVotesInDataLine;
 
 /**
  * Responsible for scraping duties based on tsv files of the ratingData

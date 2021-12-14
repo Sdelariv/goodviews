@@ -1,6 +1,6 @@
 package be.svend.goodviews.services;
 
-import be.svend.goodviews.factory.scraper.webscraper.WebScraper;
+import be.svend.goodviews.scraper.webscraper.WebScraper;
 import be.svend.goodviews.models.*;
 import be.svend.goodviews.repositories.FilmRepository;
 import be.svend.goodviews.repositories.GenreRepository;
