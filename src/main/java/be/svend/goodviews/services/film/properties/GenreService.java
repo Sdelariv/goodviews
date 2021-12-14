@@ -12,14 +12,19 @@ import java.util.Optional;
 public class GenreService {
     GenreRepository genreRepo;
 
+    // CONSTRUCTORS
+
     public GenreService(GenreRepository genreRepo) {
         this.genreRepo = genreRepo;
     }
 
+    // FIND METHODS
 
     public Optional<Genre> findByName(String name) {
         return genreRepo.findByName(name);
     }
+
+    // SAVE METHODS
 
     public List<Genre> saveGenres(List<Genre> genres) {
         List<Genre> savedGenres = new ArrayList<>();
@@ -43,6 +48,8 @@ public class GenreService {
             return foundGenre.get();
         }
     }
+
+    // DELETE METHODS
 
     public boolean deleteGenre(Genre genre) {
 
