@@ -8,7 +8,6 @@ import be.svend.goodviews.repositories.UserRepository;
 import be.svend.goodviews.services.rating.RatingService;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Comparator;
@@ -46,6 +45,7 @@ public class CommentService {
         Optional<Rating> ratingInDb = ratingRepo.findById(ratingId);
         if (ratingInDb.isEmpty()) return Collections.emptyList();
 
+        // Sorting by DateTime
         return ratingInDb.get().getCommentList().stream().sorted(Comparator.comparing(c -> c.getDateTime())).collect(Collectors.toList());
     }
 
@@ -55,15 +55,24 @@ public class CommentService {
 
     // CREATE METHODS
 
+    /**
+     * Creates a new Comment and adds it to the Rating based on its ratingId
+     * @param comment - The new comment to be added to the db and linked to the rating
+     * @param ratingId - the RatingId of the Rating object to which the comment needs to get added to its list
+     * @return
+     */
     public Optional<Comment> createNewComment(Comment comment, String ratingId) {
         System.out.println("Trying to create new comment");
 
+        // Finding the rating to add a comment to
         Optional<Rating> ratingToComment = ratingRepo.findById(ratingId);
         if (ratingToComment.isEmpty()) return Optional.empty();
 
-        Comment validatedComment = initialiseAndValidateComment(comment);
+        // Prepare and save comment
+        Comment validatedComment = addDateTimeAndNullifyId(comment);
         Optional<Comment> savedComment = saveComment(comment);
 
+        // Linking the comment to the relevant Rating
         ratingService.addCommentToRating(ratingToComment.get(),comment);
         return savedComment;
     }
@@ -71,13 +80,20 @@ public class CommentService {
     // UPDATE METHODS
 
     public Optional<Comment> updateComment(Comment comment) {
+        // Finding comment
         Optional<Comment> existingComment = findById(comment.getId());
         if (existingComment.isEmpty()) return Optional.empty();
 
+        // Updating comment
         Comment updatedComment = CommentMerger.updateCommentWithNewData(existingComment.get(),comment);
         return saveComment(updatedComment);
     }
 
+    /**
+     * Looks for all the comments that a user made, and deletes the user from that comment
+     * @param username
+     * @return List<Comment> a list of all the comments, with the user removed
+     */
     public List<Comment> deleteUserFromCommentsByUsername(String username) {
         List<Comment> commentsOfUser = findByUsername(username);
 
@@ -112,7 +128,7 @@ public class CommentService {
         return findById(savedComment.getId());
     }
 
-    private Comment initialiseAndValidateComment(Comment comment) {
+    private Comment addDateTimeAndNullifyId(Comment comment) {
         comment.setDateTime(LocalDateTime.now());
 
         if (comment.getId() != null) comment.setId(null);
