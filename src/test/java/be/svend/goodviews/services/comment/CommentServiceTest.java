@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class CommentServiceTest {
@@ -22,6 +24,7 @@ class CommentServiceTest {
     static Comment comment;
     static Comment commentToCreate;
     static Comment commentToDelete;
+    static Comment comment3;
 
     @BeforeAll
     static void generalInit() {
@@ -44,6 +47,11 @@ class CommentServiceTest {
         commentToDelete.setComment("Sory");
         commentToDelete.setUser(userService.findByUsername("sdelariv").get());
         commentService.createNewComment(commentToDelete,"sdelarivtt4468740");
+
+        comment3 = new Comment();
+        comment3.setUser(userService.findByUsername("sdelariv").get());
+        comment3.setComment("Comment from user that will be deleted");
+        commentService.createNewComment(comment3,"sdelarivtt4468740");
     }
 
     @Test
@@ -75,6 +83,8 @@ class CommentServiceTest {
 
     @Test
     void deleteUserFromCommentsByUsername() {
+        List<Comment> comments = commentService.deleteUserFromCommentsByUsername("sdelariv");
+        assertTrue(commentService.findByUsername("sdelariv").size() == 0);
     }
 
     @Test
