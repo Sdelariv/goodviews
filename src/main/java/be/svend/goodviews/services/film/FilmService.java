@@ -5,6 +5,7 @@ import be.svend.goodviews.models.*;
 import be.svend.goodviews.repositories.FilmRepository;
 import be.svend.goodviews.repositories.GenreRepository;
 import be.svend.goodviews.repositories.RatingRepository;
+import be.svend.goodviews.services.TagService;
 import be.svend.goodviews.services.crew.PersonService;
 import org.springframework.stereotype.Service;
 
@@ -21,17 +22,20 @@ public class FilmService {
     PersonService personService;
     RatingRepository ratingRepo;
     GenreRepository genreRepo;
+    TagService tagService;
 
     public FilmService(FilmRepository filmRepo,
                        FilmValidator filmValidator,
                        PersonService personService,
                        RatingRepository ratingRepo,
-                       GenreRepository genreRepo) {
+                       GenreRepository genreRepo,
+                       TagService tagService) {
         this.filmRepo = filmRepo;
         this.filmValidator = filmValidator;
         this.personService = personService;
         this.ratingRepo = ratingRepo;
         this.genreRepo = genreRepo;
+        this.tagService = tagService;
     }
 
     // FIND methods
@@ -263,6 +267,40 @@ public class FilmService {
         filmRepo.save(film.get());
         System.out.println("Average updated");
         return film;
+    }
+
+    public Optional<Film> addGenreBasedOnFilmId(String filmId, Genre genre) {
+        // Finding film
+        Optional<Film> film = findById(filmId);
+        if (film.isEmpty()) return Optional.empty();
+        Film foundFilm = film.get();
+
+        // Checking if genre already present
+        if (foundFilm.getGenres().contains(genre)) return film;
+
+        // Add and save genre
+        foundFilm.addGenre(genre);
+        return Optional.of(initialiseAndSaveFilm(foundFilm));
+    }
+
+    public Optional<Film> addTagBasedOnFilmIdAndTagString(String filmId, String tagString) {
+        // Finding film
+        Optional<Film> film = findById(filmId);
+        if (film.isEmpty()) return Optional.empty();
+        Film foundFilm = film.get();
+
+        // Checking if tag already exists (and whether the film already has it if so)
+        Tag tagToAdd;
+        Optional<Tag> tagInDb = tagService.findByName(tagString);
+        if (tagInDb.isPresent()) tagToAdd = tagInDb.get();
+        else tagToAdd = new Tag(tagString);
+
+        // Check if film has tag already
+        if (foundFilm.getTags().contains(tagToAdd)) return film;
+
+        // Add and save tag
+        foundFilm.addTag(tagToAdd);
+        return Optional.of(initialiseAndSaveFilm(foundFilm));
     }
 
     // DELETE methods

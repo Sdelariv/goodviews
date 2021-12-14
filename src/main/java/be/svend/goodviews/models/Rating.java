@@ -2,6 +2,7 @@ package be.svend.goodviews.models;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Entity
@@ -23,6 +24,9 @@ public class Rating {
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Film film;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<Comment> commentList;
 
     // GETTERS & SETTERS
 
@@ -92,6 +96,14 @@ public class Rating {
 
         this.id = this.getUser().getUsername() + this.getFilm().getId();
         return Optional.of(this.id);
+    }
+
+    public List<Comment> getCommentList() {
+        return commentList;
+    }
+
+    public void setCommentList(List<Comment> commentList) {
+        this.commentList = commentList;
     }
 
     // OTHER METHODS
