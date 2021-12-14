@@ -25,6 +25,7 @@ public class UserService {
     RatingService ratingService; // Need RatingService to migrate the ratings of a username change
     CommentService commentService; // Need CommentService to delete username from comments of a deleted user
 
+    // CONSTRUCTORS
 
     public UserService(UserRepository userRepo,
                        UserValidator userValidator,
@@ -121,20 +122,22 @@ public class UserService {
 
     // TODO: clean up this method
     public Optional<User> changeUsername(User user, String newUsername) {
-        Optional<User> existingUser = userValidator.isExistingUser(user);
-        if (existingUser.isEmpty()) return Optional.empty();
-
+        // Check if new username exists already
         if (findByUsername(newUsername).isPresent()) {
             System.out.println("Username already exists");
             return Optional.empty();
         }
 
-        // Creating new user object
+        // Find user to update
+        Optional<User> existingUser = userValidator.isExistingUser(user);
+        if (existingUser.isEmpty()) return Optional.empty();
+
+        // Creating and saving new user object
         User newUser = makeCopyOf(existingUser.get());
         newUser.setUsername(newUsername);
         if (saveUser(newUser).isEmpty()) return Optional.empty();
 
-        // Fetching old ratings, deleting them and saving new ones
+        // Fetching old ratings, fetching their ids (to delete later), and updating them to the new User
         List<Rating> ratings = ratingService.findByUsername(user.getUsername());
         List<String> ratingIdsToDelete = ratings.stream().map(r -> r.getId()).collect(Collectors.toList());
 
