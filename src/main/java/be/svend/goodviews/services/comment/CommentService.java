@@ -21,7 +21,10 @@ public class CommentService {
     CommentRepository commentRepo;
     RatingRepository ratingRepo;
     UserRepository userRepo;
-    RatingService ratingService;
+
+    RatingService ratingService; // Need ratingService to add or delete a comment from a Rating
+
+    // CONSTRUCTORS
 
     public CommentService(CommentRepository commentRepo,
                           RatingRepository ratingRepo,

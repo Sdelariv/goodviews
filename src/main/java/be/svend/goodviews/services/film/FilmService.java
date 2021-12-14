@@ -19,10 +19,11 @@ import static be.svend.goodviews.services.film.FilmValidator.isValidFilmIdFormat
 public class FilmService {
     FilmRepository filmRepo;
     FilmValidator filmValidator;
-    PersonService personService;
     RatingRepository ratingRepo;
     GenreRepository genreRepo;
     TagService tagService;
+
+    PersonService personService; // Using PersonService to find a films with a perticular director or writer, but could use Repo I think
 
     public FilmService(FilmRepository filmRepo,
                        FilmValidator filmValidator,
@@ -345,7 +346,6 @@ public class FilmService {
 
         return film;
     }
-
 
 
     public Integer calculateAverageRatingByFilmId(String filmId) {

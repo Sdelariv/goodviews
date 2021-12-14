@@ -1,5 +1,6 @@
 package be.svend.goodviews.services.users;
 
+import be.svend.goodviews.models.Comment;
 import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.models.TypeOfUser;
 import be.svend.goodviews.models.User;
@@ -20,8 +21,9 @@ import static be.svend.goodviews.services.users.UserMerger.mergeUserWithNewData;
 public class UserService {
     UserRepository userRepo;
     UserValidator userValidator;
-    RatingService ratingService;
-    CommentService commentService;
+
+    RatingService ratingService; // Need RatingService to migrate the ratings of a username change
+    CommentService commentService; // Need CommentService to delete username from comments of a deleted user
 
 
     public UserService(UserRepository userRepo,
@@ -142,8 +144,12 @@ public class UserService {
         }
 
         // Changing id in comments
-        // TODO: fix
+        List<Comment> comments = commentService.findByUsername(user.getUsername());
+        for (Comment comment: comments) {
+            comment.setUser(newUser);
+        }
 
+        // Deleting the old ratings & saving the new ones
         ratingService.deleteRatingsById(ratingIdsToDelete);
         deleteUser(existingUser.get());
 

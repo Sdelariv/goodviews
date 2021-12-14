@@ -15,7 +15,8 @@ import java.util.Optional;
 public class RatingService {
     RatingRepository ratingRepo;
     RatingValidator ratingValidator;
-    FilmService filmService;
+
+    FilmService filmService; // Need FilmService to calculate and update their averageRating property once a rating gets added, updated or deleted
 
     public RatingService(RatingRepository ratingRepo, RatingValidator ratingValidator, FilmService filmService) {
         this.ratingRepo = ratingRepo;
