@@ -115,6 +115,14 @@ public class Film {
         addGenre(genre);
     }
 
+    public void removeGenre(Genre genre) {
+        if (genres == null) return;
+
+        if (!genres.contains(genre)) return;
+
+        genres.remove(genre);
+    }
+
     public void setGenres(List<Genre> genres) {
         this.genres = genres;
     }
@@ -141,6 +149,14 @@ public class Film {
         Tag tag = new Tag(name);
 
         addTag(tag);
+    }
+
+    public void removeTag(Tag tag) {
+        if (tags == null) return;
+
+        if (!tags.contains(tag)) return;
+
+        tags.remove(tag);
     }
 
     public Integer getAverageRating() {
