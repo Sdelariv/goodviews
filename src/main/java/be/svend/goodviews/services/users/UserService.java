@@ -161,34 +161,26 @@ public class UserService {
         return Optional.of(newUser);
     }
 
-    public Optional<User> upgradeUserToAdmin(User user) {
+    public Optional<User> changeUserType(User user, TypeOfUser typeOfUser) {
         Optional<User> userInDb = findByUsername(user.getUsername());
 
         if (userInDb.isEmpty()) return Optional.empty();
 
-        userInDb.get().setTypeOfUser(TypeOfUser.ADMIN);
+        userInDb.get().setTypeOfUser(typeOfUser);
 
         return Optional.of(userRepo.save(userInDb.get()));
+    }
+
+    public Optional<User> upgradeUserToAdmin(User user) {
+        return changeUserType(user,TypeOfUser.ADMIN);
     }
 
     public Optional<User> upgradeUserToArchitect(User user) {
-        Optional<User> userInDb = findByUsername(user.getUsername());
-
-        if (userInDb.isEmpty()) return Optional.empty();
-
-        userInDb.get().setTypeOfUser(TypeOfUser.ARCHITECT);
-
-        return Optional.of(userRepo.save(userInDb.get()));
+        return changeUserType(user,TypeOfUser.ARCHITECT);
     }
 
     public Optional<User> downgradeUserToUser(User user) {
-        Optional<User> userInDb = findByUsername(user.getUsername());
-
-        if (userInDb.isEmpty()) return Optional.empty();
-
-        userInDb.get().setTypeOfUser(TypeOfUser.USER);
-
-        return Optional.of(userRepo.save(userInDb.get()));
+        return changeUserType(user,TypeOfUser.USER);
     }
 
     // DELETE METHODS
