@@ -2,7 +2,6 @@ package be.svend.goodviews.services.users;
 
 import be.svend.goodviews.models.Friendship;
 import be.svend.goodviews.models.User;
-import be.svend.goodviews.models.notification.FriendRequest;
 import be.svend.goodviews.repositories.FriendshipRepository;
 import be.svend.goodviews.repositories.UserRepository;
 import be.svend.goodviews.services.NotificationService;
@@ -126,16 +125,16 @@ public class FriendshipService {
 
     /**
      * Creates a new pending Friendship (unless the users don't exists, or are the same) and sends a notification to the receiver
-     * @param userA - the user requesting the Friendship (will be found based on username)
-     * @param username - the username of the User whose Friendship is requested
+     * @param requester - the user requesting the Friendship (will be found based on usernameOfRequested)
+     * @param usernameOfRequested - the username of the User whose Friendship is requested
      * @return true if it worked, false if it didn't
      */
-    public boolean requestFriendship (User userA, String username) {
-        Optional<User> friendA = userValidator.isExistingUser(userA);
-        Optional<User> friendB = userValidator.isExistingUserWithUsername(username);
+    public boolean requestFriendship (User requester, String usernameOfRequested) {
+        Optional<User> friendA = userValidator.isExistingUser(requester);
+        Optional<User> friendB = userValidator.isExistingUserWithUsername(usernameOfRequested);
         if (friendA.isEmpty() || friendB.isEmpty()) return false;
 
-        if (userA.getUsername().equals(username)) return false;
+        if (requester.getUsername().equals(usernameOfRequested)) return false;
 
         // Create request
         Optional<Friendship> createdFriendship = createRequestedFriendship(friendA.get(),friendB.get());
@@ -181,7 +180,8 @@ public class FriendshipService {
         if (acceptedFriendship.isEmpty()) return Optional.empty();
 
         // Notification
-        notificationService.createFriendAcceptance(acceptedFriendship.get().getFriendA(),acceptedFriendship.get().getFriendB());
+        notificationService.createFriendAcceptance(friendship);
+
 
         return acceptedFriendship;
     }
@@ -209,8 +209,7 @@ public class FriendshipService {
     public boolean denyFriendship(Friendship friendship) {
         System.out.println("Friendship denied");
 
-        Optional<FriendRequest> outdatedNotification = notificationService.findRequestByFriendship(friendship);
-        if (outdatedNotification.isPresent()) notificationService.deleteNotification(outdatedNotification.get());
+        notificationService.deleteFriendRequest(friendship);
 
         return deleteFriendship(friendship);
     }

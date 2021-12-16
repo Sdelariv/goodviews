@@ -2,7 +2,7 @@ package be.svend.goodviews.services;
 
 import be.svend.goodviews.models.Friendship;
 import be.svend.goodviews.models.User;
-import be.svend.goodviews.models.notification.FriendRequest;
+import be.svend.goodviews.models.notification.FriendRequestNotification;
 import be.svend.goodviews.models.notification.Notification;
 
 import be.svend.goodviews.repositories.NotificationRepository;
@@ -24,7 +24,7 @@ public class NotificationService {
 
     // FIND METHODS
 
-    public Optional<FriendRequest> findRequestByFriendship(Friendship friendship) {
+    public Optional<FriendRequestNotification> findFriendRequestNotificationByFriendship(Friendship friendship) {
         return notificationRepo.findByFriendRequest(friendship);
     }
 
@@ -32,20 +32,23 @@ public class NotificationService {
     // CREATE METHODS
 
     public void createFriendRequest(Friendship friendship, User userToNotify) {
-        FriendRequest friendRequest = new FriendRequest();
-        friendRequest.setTargetUser(userToNotify);
-        friendRequest.setFriendRequest(friendship);
-        notificationRepo.save(friendRequest);
+        FriendRequestNotification friendRequestNotification = new FriendRequestNotification();
+        friendRequestNotification.setTargetUser(userToNotify);
+        friendRequestNotification.setFriendRequest(friendship);
+        notificationRepo.save(friendRequestNotification);
 
         System.out.println("Friend request sent");
     }
 
-    public void createFriendAcceptance(User userWhoAccepted, User userToNotify) {
+    public void createFriendAcceptance(Friendship friendship) {
         Notification acceptedFriendNotification = new Notification();
-        acceptedFriendNotification.setTargetUser(userToNotify);
-        acceptedFriendNotification.setMessage(userWhoAccepted.getUsername() + "accepted your friendrequest");
+        acceptedFriendNotification.setTargetUser(friendship.getFriendA());
+        acceptedFriendNotification.setMessage(friendship.getFriendB().getUsername() + " has accepted your friendrequest");
+        notificationRepo.save(acceptedFriendNotification);
 
         System.out.println("Friend request accepted");
+
+        deleteFriendRequest(friendship);
     }
 
     // DELETE
@@ -65,10 +68,14 @@ public class NotificationService {
     }
 
     public void deleteNotificationsByFriendship(Friendship friendship) {
-        Optional<FriendRequest> request = findRequestByFriendship(friendship);
-        if (request.isPresent()) notificationRepo.delete(request.get());
+        deleteFriendRequest(friendship);
 
         // TODO: fill in other notifications of the friendship
+    }
+
+    public void deleteFriendRequest(Friendship friendship) {
+        Optional<FriendRequestNotification> request = findFriendRequestNotificationByFriendship(friendship);
+        if (request.isPresent()) notificationRepo.delete(request.get());
     }
 
     // TODO: Delete all finished notifications

@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 
 @Entity
-public class FriendRequest extends Notification {
+public class FriendRequestNotification extends Notification {
 
     @OneToOne
     private Friendship friendRequest;
@@ -20,6 +20,10 @@ public class FriendRequest extends Notification {
 
     public void setFriendRequest(Friendship friendRequest) {
         this.friendRequest = friendRequest;
+
+        if (friendRequest == null) return;
+        if (friendRequest.getFriendA() == null) return;
+        super.setMessage(friendRequest.getFriendA().getUsername() + " would like to be your friend.");
     }
 
     // OTHER METHODS

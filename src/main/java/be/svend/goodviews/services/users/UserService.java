@@ -231,7 +231,7 @@ public class UserService {
         }
 
         // Delete their notifications
-        List<Notification> allNotifications = notificationRepo.findByUser(existingUser.get());
+        List<Notification> allNotifications = notificationRepo.findByTargetUser(existingUser.get());
         for (Notification notification: allNotifications) {
             notificationRepo.delete(notification);
         }

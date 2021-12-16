@@ -3,11 +3,9 @@ package be.svend.goodviews;
 import be.svend.goodviews.models.Friendship;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.*;
+import be.svend.goodviews.services.NotificationService;
 import be.svend.goodviews.services.comment.CommentService;
-import be.svend.goodviews.services.crew.PersonService;
 import be.svend.goodviews.services.film.FilmService;
-import be.svend.goodviews.services.film.FilmValidator;
-import be.svend.goodviews.services.film.properties.TagService;
 import be.svend.goodviews.services.rating.RatingService;
 import be.svend.goodviews.services.rating.RatingValidator;
 import be.svend.goodviews.services.users.FriendshipService;
@@ -15,6 +13,8 @@ import be.svend.goodviews.services.users.UserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+
+import java.util.List;
 
 @SpringBootApplication
 public class GoodviewsApplication {
@@ -26,6 +26,7 @@ public class GoodviewsApplication {
         UserService userService = ctx.getBean(UserService.class);
         CommentService commentService = ctx.getBean(CommentService.class);
         FriendshipService friendshipService = ctx.getBean(FriendshipService.class);
+        NotificationService notificationService = ctx.getBean(NotificationService.class);
 
         User bibi = new User();
         bibi.setUsername("bibi");
@@ -44,6 +45,12 @@ public class GoodviewsApplication {
         waddles.setFirstName("Waddles");
         waddles.setLastName("The Pig");
         waddles.setPassword("hisPassword");
+
+        friendshipService.requestFriendship(bibi,"waddles");
+
+        List<Friendship> friendRequestsByBibi = friendshipService.findAllFriendRequestsByUser(bibi);
+
+        friendshipService.acceptFriendship(friendRequestsByBibi.get(0));
 
     }
 
