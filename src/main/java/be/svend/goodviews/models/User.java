@@ -6,7 +6,9 @@ import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static be.svend.goodviews.services.users.PasswordHasher.hashPassword;
 
@@ -107,6 +109,20 @@ public class User {
         this.friendList = friendList;
     }
 
+    public void addFriend(User user) {
+        if (this.friendList == null) friendList = new ArrayList<>();
+
+        if (this.friendList.contains(user)) return;
+
+        this.friendList.add(user);
+    }
+
+    public void removeFriend(User user) {
+        if (this.friendList.contains(user)) return;
+
+        this.friendList.remove(user);
+    }
+
     // OTHER
 
     @Override
@@ -120,4 +136,13 @@ public class User {
                 ", friendList=" + friendList +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return this.username.equals(user.getUsername());
+    }
+
 }
