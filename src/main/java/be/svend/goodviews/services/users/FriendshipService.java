@@ -74,6 +74,15 @@ public class FriendshipService {
         return friendRequestsOfUser;
     }
 
+    public List<Friendship> findAllFriendshipsAndRequestsByUser(User user) {
+        List<Friendship> friendships = new ArrayList<>();
+        friendships.addAll(findAllFriendsByUser(user));
+        friendships.addAll(findAllFriendRequestsByUser(user));
+        friendships.addAll(findAllFriendRequestsOfUser(user));
+
+        return friendships;
+    }
+
     // CREATE METHODS
 
     public boolean requestFriendship (User userA, String username) {
@@ -137,9 +146,16 @@ public class FriendshipService {
         return deleteFriendship(friendship);
     }
 
+    public Optional<Friendship> updateFriendship(Friendship friendship) {
+        Optional<Friendship> friendshipInDb = friendshipRepo.findById(friendship.getId());
+        if (friendshipInDb.isEmpty()) return Optional.empty();
+
+        return saveFriendship(friendship);
+    }
+
     // DELETE METHODS
 
-    private boolean deleteFriendship(Friendship friendship) {
+    public boolean deleteFriendship(Friendship friendship) {
         Optional<Friendship> friendshipInDb = friendshipRepo.findById(friendship.getId());
         if (friendshipInDb.isEmpty()) return false;
 
@@ -171,4 +187,5 @@ public class FriendshipService {
         }
         return true;
     }
+
 }

@@ -46,7 +46,7 @@ public class GoodviewsApplication {
         waddles.setPassword("hisPassword");
 
 
-        friendshipService.findAllFriendsByUser(bibi).forEach(System.out::println);
+        userService.changeUsername(bibi,"bibi_bear");
 
     }
 

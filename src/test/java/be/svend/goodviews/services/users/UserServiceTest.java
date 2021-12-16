@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserServiceTest {
     static UserService userService;
+    private static User user;
 
     @BeforeAll
     static void generalInit() {
@@ -22,6 +23,7 @@ class UserServiceTest {
         ConfigurableApplicationContext ctx = SpringApplication.run(GoodviewsApplication.class);
         userService = ctx.getBean(UserService.class);
         System.out.println("Success");
+
     }
 
 

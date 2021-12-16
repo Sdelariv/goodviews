@@ -1,9 +1,7 @@
 package be.svend.goodviews.services.users;
 
-import be.svend.goodviews.models.Comment;
-import be.svend.goodviews.models.Rating;
-import be.svend.goodviews.models.TypeOfUser;
-import be.svend.goodviews.models.User;
+import be.svend.goodviews.models.*;
+import be.svend.goodviews.repositories.FriendshipRepository;
 import be.svend.goodviews.repositories.UserRepository;
 import be.svend.goodviews.services.comment.CommentService;
 import be.svend.goodviews.services.rating.RatingService;
@@ -22,6 +20,7 @@ public class UserService {
     UserRepository userRepo;
     UserValidator userValidator;
 
+    FriendshipService friendshipService; // Used to delete the user or change the username from existing friendships
     RatingService ratingService; // Need RatingService to migrate the ratings of a username change
     CommentService commentService; // Need CommentService to delete username from comments of a deleted user
 
@@ -30,11 +29,13 @@ public class UserService {
     public UserService(UserRepository userRepo,
                        UserValidator userValidator,
                        RatingService ratingService,
-                       CommentService commentService) {
+                       CommentService commentService,
+                       FriendshipService friendshipService) {
         this.userRepo = userRepo;
         this.userValidator = userValidator;
         this.ratingService = ratingService;
         this.commentService = commentService;
+        this.friendshipService = friendshipService;
     }
 
     // FIND METHODS
@@ -120,7 +121,7 @@ public class UserService {
         return saveUser(existingUser.get());
     }
 
-    // TODO: clean up this method
+    // TODO: Clean up and fix
     public Optional<User> changeUsername(User user, String newUsername) {
         // Check if new username exists already
         if (findByUsername(newUsername).isPresent()) {
@@ -137,7 +138,17 @@ public class UserService {
         newUser.setUsername(newUsername);
         if (saveUser(newUser).isEmpty()) return Optional.empty();
 
+        // Changing friendships // TODO: make this work
+        List<Friendship> friendships = friendshipService.findAllFriendshipsAndRequestsByUser(existingUser.get());
+        for (Friendship friendship: friendships) {
+            if (friendship.getFriendA().equals(existingUser.get().getUsername())) friendship.setFriendA(newUser);
+            if (friendship.getFriendB().equals(existingUser.get().getUsername())) friendship.setFriendB(newUser);
+            friendshipService.updateFriendship(friendship);
+            System.out.println("Friendship updated");
+        }
+
         // Fetching old ratings, fetching their ids (to delete later), and updating them to the new User
+        // TODO: make this work
         List<Rating> ratings = ratingService.findByUsername(user.getUsername());
         List<String> ratingIdsToDelete = ratings.stream().map(r -> r.getId()).collect(Collectors.toList());
 
@@ -147,6 +158,7 @@ public class UserService {
         }
 
         // Changing id in comments
+        // TODO: make this work
         List<Comment> comments = commentService.findByUsername(user.getUsername());
         for (Comment comment: comments) {
             comment.setUser(newUser);
@@ -205,6 +217,12 @@ public class UserService {
         // Delete their ratings and their comments (or replace comments with deletedUser)
         commentService.deleteUserFromCommentsByUsername(user.getUsername());
 
+        // Delete their friendships
+        List<Friendship> friendships = friendshipService.findAllFriendshipsAndRequestsByUser(existingUser.get());
+        for (Friendship friendship: friendships) {
+            friendshipService.deleteFriendship(friendship);
+        }
+
         // Delete and check whether it worked
         userRepo.delete(existingUser.get());
         if (findByUsername(user.getUsername()).isEmpty()) {
@@ -237,6 +255,7 @@ public class UserService {
         newUser.setLastName(existingUser.getLastName());
         newUser.setUsername(existingUser.getUsername());
         newUser.setPasswordHash(existingUser.getPasswordHash());
+        newUser.setTypeOfUser(existingUser.getTypeOfUser());
 
         return newUser;
     }

@@ -59,6 +59,7 @@ class FriendshipServiceTest {
         nonExistingUser.setUsername("I don't exist");
 
         friendshipService.requestFriendship(sven,"bibi");
+        friendshipService.createFriendship(bibi,waddles);
     }
 
     @Test
