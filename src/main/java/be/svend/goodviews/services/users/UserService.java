@@ -1,7 +1,8 @@
 package be.svend.goodviews.services.users;
 
 import be.svend.goodviews.models.*;
-import be.svend.goodviews.repositories.FriendshipRepository;
+import be.svend.goodviews.models.notification.Notification;
+import be.svend.goodviews.repositories.NotificationRepository;
 import be.svend.goodviews.repositories.UserRepository;
 import be.svend.goodviews.services.comment.CommentService;
 import be.svend.goodviews.services.rating.RatingService;
@@ -19,6 +20,7 @@ import static be.svend.goodviews.services.users.UserMerger.mergeUserWithNewData;
 public class UserService {
     UserRepository userRepo;
     UserValidator userValidator;
+    NotificationRepository notificationRepo;
 
     FriendshipService friendshipService; // Used to delete the user or change the username from existing friendships
     RatingService ratingService; // Need RatingService to migrate the ratings of a username change
@@ -30,12 +32,14 @@ public class UserService {
                        UserValidator userValidator,
                        RatingService ratingService,
                        CommentService commentService,
-                       FriendshipService friendshipService) {
+                       FriendshipService friendshipService,
+                       NotificationRepository notificationRepo) {
         this.userRepo = userRepo;
         this.userValidator = userValidator;
         this.ratingService = ratingService;
         this.commentService = commentService;
         this.friendshipService = friendshipService;
+        this.notificationRepo = notificationRepo;
     }
 
     // FIND METHODS
@@ -164,6 +168,9 @@ public class UserService {
             comment.setUser(newUser);
         }
 
+        // Transport notifications
+        // TODO: make this work
+
         // Deleting the old ratings & saving the new ones
         ratingService.deleteRatingsById(ratingIdsToDelete);
         deleteUser(existingUser.get());
@@ -221,6 +228,12 @@ public class UserService {
         List<Friendship> friendships = friendshipService.findAllFriendshipsAndRequestsByUser(existingUser.get());
         for (Friendship friendship: friendships) {
             friendshipService.deleteFriendship(friendship);
+        }
+
+        // Delete their notifications
+        List<Notification> allNotifications = notificationRepo.findByUser(existingUser.get());
+        for (Notification notification: allNotifications) {
+            notificationRepo.delete(notification);
         }
 
         // Delete and check whether it worked

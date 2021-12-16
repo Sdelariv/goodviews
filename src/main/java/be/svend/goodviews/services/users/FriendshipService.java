@@ -2,8 +2,10 @@ package be.svend.goodviews.services.users;
 
 import be.svend.goodviews.models.Friendship;
 import be.svend.goodviews.models.User;
+import be.svend.goodviews.models.notification.FriendRequest;
 import be.svend.goodviews.repositories.FriendshipRepository;
 import be.svend.goodviews.repositories.UserRepository;
+import be.svend.goodviews.services.NotificationService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,14 +20,19 @@ public class FriendshipService {
     UserRepository userRepo;
     UserValidator userValidator;
 
+    NotificationService notificationService;
+
     // CONSTRUCTORS
 
     public FriendshipService(FriendshipRepository friendshipRepo,
                              UserRepository userRepo,
-                             UserValidator userValidator) {
+                             UserValidator userValidator,
+                             NotificationService notificationService) {
         this.friendshipRepo = friendshipRepo;
         this.userRepo = userRepo;
         this.userValidator = userValidator;
+        this.notificationService = notificationService;
+
     }
 
     // FIND METHODS
@@ -130,10 +137,12 @@ public class FriendshipService {
 
         if (userA.getUsername().equals(username)) return false;
 
-        if (createRequestedFriendship(friendA.get(),friendB.get()).isEmpty()) return false;
+        // Create request
+        Optional<Friendship> createdFriendship = createRequestedFriendship(friendA.get(),friendB.get());
+        if (createdFriendship.isEmpty()) return false;
 
         // Add notification
-        // TODO: Notify friendB of request
+        notificationService.createFriendRequest(createdFriendship.get(),friendB.get());
 
         return true;
     }
@@ -171,7 +180,8 @@ public class FriendshipService {
         Optional<Friendship> acceptedFriendship = acceptFriendshipWithoutNotification(friendship);
         if (acceptedFriendship.isEmpty()) return Optional.empty();
 
-        // TODO: notify friendA of acceptance
+        // Notification
+        notificationService.createFriendAcceptance(acceptedFriendship.get().getFriendA(),acceptedFriendship.get().getFriendB());
 
         return acceptedFriendship;
     }
@@ -198,6 +208,10 @@ public class FriendshipService {
      */
     public boolean denyFriendship(Friendship friendship) {
         System.out.println("Friendship denied");
+
+        Optional<FriendRequest> outdatedNotification = notificationService.findRequestByFriendship(friendship);
+        if (outdatedNotification.isPresent()) notificationService.deleteNotification(outdatedNotification.get());
+
         return deleteFriendship(friendship);
     }
 
@@ -223,6 +237,8 @@ public class FriendshipService {
     public boolean deleteFriendship(Friendship friendship) {
         Optional<Friendship> friendshipInDb = friendshipRepo.findById(friendship.getId());
         if (friendshipInDb.isEmpty()) return false;
+
+        notificationService.deleteNotificationsByFriendship(friendship);
 
         friendshipRepo.delete(friendshipInDb.get());
         System.out.println("Friendship deleted");
