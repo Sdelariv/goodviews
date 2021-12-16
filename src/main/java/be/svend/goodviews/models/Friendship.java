@@ -20,6 +20,8 @@ public class Friendship {
     @OneToOne
     private User friendB;
 
+    private boolean accepted;
+
 
     // GETTERS & SETTERS
 
@@ -67,5 +69,11 @@ public class Friendship {
         updateId();
     }
 
+    public boolean isAccepted() {
+        return accepted;
+    }
 
+    public void setAccepted(boolean accepted) {
+        this.accepted = accepted;
+    }
 }
