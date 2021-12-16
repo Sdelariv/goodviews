@@ -4,6 +4,7 @@ import be.svend.goodviews.models.TypeOfUser;
 import be.svend.goodviews.models.User;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 public class Notification {
@@ -23,6 +24,8 @@ public class Notification {
     private boolean seen;
 
     private boolean finished;
+
+    private LocalDateTime dateTime;
 
     // CONSTRUCTORS
 
@@ -81,17 +84,26 @@ public class Notification {
         this.finished = finished;
     }
 
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
+
     // OTHER METHODS
 
     @Override
     public String toString() {
         return "Notification{" +
                 "id=" + id +
-                ", user=" + targetUser +
+                ", targetUser=" + targetUser +
                 ", typeOfUser=" + typeOfUser +
                 ", message='" + message + '\'' +
                 ", seen=" + seen +
                 ", finished=" + finished +
+                ", dateTime=" + dateTime +
                 '}';
     }
 }
