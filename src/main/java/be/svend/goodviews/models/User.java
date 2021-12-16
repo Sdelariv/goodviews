@@ -1,10 +1,12 @@
 package be.svend.goodviews.models;
 
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+import javax.persistence.*;
+
+import java.util.List;
 
 import static be.svend.goodviews.services.users.PasswordHasher.hashPassword;
 
@@ -24,6 +26,10 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private TypeOfUser typeOfUser;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
+    private List<User> friendList;
 
     // CONSTRUCTORS
 
@@ -93,7 +99,15 @@ public class User {
         this.typeOfUser = typeOfUser;
     }
 
-// OTHER
+    public List<User> getFriendList() {
+        return friendList;
+    }
+
+    public void setFriendList(List<User> friendList) {
+        this.friendList = friendList;
+    }
+
+    // OTHER
 
     @Override
     public String toString() {
@@ -102,6 +116,8 @@ public class User {
                 ", profileUrl='" + profileUrl + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
+                ", typeOfUser=" + typeOfUser +
+                ", friendList=" + friendList +
                 '}';
     }
 }
