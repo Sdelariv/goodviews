@@ -10,5 +10,15 @@ public interface FriendshipRepository extends JpaRepository<Friendship, String> 
 
     boolean existsByFriendAAndFriendB(User first, User second);
 
-    List<Friendship> findByFriendAOrFriendB(User user);
+    List<Friendship> findAllByAcceptedTrue();
+
+    List<Friendship> findAllByAcceptedFalse();
+
+    List<Friendship> findAllByFriendAAndAcceptedTrue(User user);
+
+    List<Friendship> findAllByFriendBAndAcceptedTrue(User user);
+
+    List<Friendship> findAllByFriendAAndAcceptedFalse(User user);
+
+    List<Friendship> findAllByFriendBAndAcceptedFalse(User user);
 }

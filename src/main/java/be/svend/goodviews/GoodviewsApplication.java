@@ -1,5 +1,6 @@
 package be.svend.goodviews;
 
+import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.*;
 import be.svend.goodviews.services.comment.CommentService;
 import be.svend.goodviews.services.crew.PersonService;
@@ -8,6 +9,7 @@ import be.svend.goodviews.services.film.FilmValidator;
 import be.svend.goodviews.services.film.properties.TagService;
 import be.svend.goodviews.services.rating.RatingService;
 import be.svend.goodviews.services.rating.RatingValidator;
+import be.svend.goodviews.services.users.FriendshipService;
 import be.svend.goodviews.services.users.UserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,10 +24,35 @@ public class GoodviewsApplication {
         RatingService ratingService = new RatingService(ctx.getBean(RatingRepository.class),ctx.getBean(RatingValidator.class), ctx.getBean(FilmService.class));
         UserService userService = ctx.getBean(UserService.class);
         CommentService commentService = ctx.getBean(CommentService.class);
-        FilmService filmService = new FilmService(ctx.getBean(FilmRepository.class),ctx.getBean(FilmValidator.class),ctx.getBean(PersonService.class),ctx.getBean(RatingRepository.class),ctx.getBean(GenreRepository.class),ctx.getBean(TagService.class));
+        FriendshipService friendshipService = ctx.getBean(FriendshipService.class);
 
+        User bibi = new User();
+        bibi.setUsername("bibi");
+        bibi.setFirstName("Bibi");
+        bibi.setLastName("The Bear");
+        bibi.setPassword("herPassword");
 
-        commentService.findByRatingId("sdelarivtt4468740").forEach(System.out::println);
+        User sven = new User();
+        sven.setUsername("sdelariv");
+        sven.setFirstName("Sven");
+        sven.setLastName("Delarivière");
+        sven.setPassword("myPassword");
+
+        User waddles = new User();
+        waddles.setUsername("waddles");
+        waddles.setFirstName("Waddles");
+        waddles.setLastName("The Pig");
+        waddles.setPassword("hisPassword");
+
+        userService.createNewUser(bibi);
+        userService.createNewUser(sven);
+        userService.createNewUser(waddles);
+
+        friendshipService.createFriendship(bibi,sven);
+        friendshipService.createFriendship(bibi,waddles);
+        friendshipService.createFriendship(bibi,bibi);
+        friendshipService.createFriendship(sven,waddles);
+        friendshipService.createFriendship(sven,bibi);
 
 
     }
