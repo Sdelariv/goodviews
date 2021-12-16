@@ -1,5 +1,6 @@
 package be.svend.goodviews;
 
+import be.svend.goodviews.models.Friendship;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.*;
 import be.svend.goodviews.services.comment.CommentService;
@@ -44,16 +45,8 @@ public class GoodviewsApplication {
         waddles.setLastName("The Pig");
         waddles.setPassword("hisPassword");
 
-        userService.createNewUser(bibi);
-        userService.createNewUser(sven);
-        userService.createNewUser(waddles);
 
-        friendshipService.createFriendship(bibi,sven);
-        friendshipService.createFriendship(bibi,waddles);
-        friendshipService.createFriendship(bibi,bibi);
-        friendshipService.createFriendship(sven,waddles);
-        friendshipService.createFriendship(sven,bibi);
-
+        friendshipService.findAllFriendsByUser(bibi).forEach(System.out::println);
 
     }
 

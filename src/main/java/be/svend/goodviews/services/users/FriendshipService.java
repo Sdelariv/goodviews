@@ -16,13 +16,16 @@ import java.util.Optional;
 public class FriendshipService {
     FriendshipRepository friendshipRepo;
     UserRepository userRepo;
+    UserValidator userValidator;
 
     // CONSTRUCTORS
 
     public FriendshipService(FriendshipRepository friendshipRepo,
-                             UserRepository userRepo) {
+                             UserRepository userRepo,
+                             UserValidator userValidator) {
         this.friendshipRepo = friendshipRepo;
         this.userRepo = userRepo;
+        this.userValidator = userValidator;
     }
 
     // FIND METHODS
@@ -40,10 +43,7 @@ public class FriendshipService {
     }
 
     public List<Friendship> findAllFriendsByUser(User user) {
-        if (user == null) return Collections.emptyList();
-        if (user.getUsername() == null) return Collections.emptyList();
-
-        Optional<User> friendInDb = userRepo.findByUsername(user.getUsername());
+        Optional<User> friendInDb = userValidator.isExistingUser(user);
         if (friendInDb.isEmpty()) return Collections.emptyList();
 
         List<Friendship> friendsOfUser = new ArrayList<>();
@@ -54,10 +54,7 @@ public class FriendshipService {
     }
 
     public List<Friendship> findAllFriendRequestsByUser(User user) {
-        if (user == null) return Collections.emptyList();
-        if (user.getUsername() == null) return Collections.emptyList();
-
-        Optional<User> friendInDb = userRepo.findByUsername(user.getUsername());
+        Optional<User> friendInDb = userValidator.isExistingUser(user);
         if (friendInDb.isEmpty()) return Collections.emptyList();
 
         List<Friendship> friendRequestsByUser = new ArrayList<>();
@@ -67,11 +64,9 @@ public class FriendshipService {
     }
 
     public List<Friendship> findAllFriendRequestsOfUser(User user) {
-        if (user == null) return Collections.emptyList();
-        if (user.getUsername() == null) return Collections.emptyList();
-
-        Optional<User> friendInDb = userRepo.findByUsername(user.getUsername());
+        Optional<User> friendInDb = userValidator.isExistingUser(user);
         if (friendInDb.isEmpty()) return Collections.emptyList();
+
 
         List<Friendship> friendRequestsOfUser = new ArrayList<>();
         friendRequestsOfUser.addAll(friendshipRepo.findAllByFriendBAndAcceptedFalse(friendInDb.get()));
@@ -82,6 +77,8 @@ public class FriendshipService {
     // CREATE METHODS
 
     public boolean requestFriendship (User userA, String username) {
+        if (userA.getUsername().equals(username)) return false;
+
         Optional<User> requestedFriend = userRepo.findByUsername(username);
         if (requestedFriend.isEmpty()) return false;
 
@@ -89,16 +86,7 @@ public class FriendshipService {
         return true;
     }
 
-    public Optional<Friendship> acceptFriendship(Friendship friendship) {
-        Optional<Friendship> friendshipInDb = friendshipRepo.findById(friendship.getId());
-        if (friendshipInDb.isEmpty()) return Optional.empty();
-
-        friendshipInDb.get().setAccepted(true);
-        friendshipInDb.get().setDateCreated(LocalDate.now());
-        return saveFriendship(friendshipInDb.get());
-    }
-
-    public Optional<Friendship> createRequestedFriendship(User userA, User userB) {
+    private Optional<Friendship> createRequestedFriendship(User userA, User userB) {
         System.out.println("Creating friendship request between:");
         System.out.println(userA);
         System.out.println("and");
@@ -112,8 +100,7 @@ public class FriendshipService {
         if (friendB.isEmpty()) return Optional.empty();
 
         // Check if it already exists
-        if (friendshipRepo.existsByFriendAAndFriendB(friendA.get(),friendB.get())) return Optional.empty();
-        if (friendshipRepo.existsByFriendAAndFriendB(friendB.get(),friendA.get())) return Optional.empty();
+        if (!isValidNewFriendship(friendA.get(),friendB.get())) return Optional.empty();
 
         // Create
         Friendship friendship = new Friendship();
@@ -133,11 +120,55 @@ public class FriendshipService {
         return acceptFriendship(requestedFriendship.get());
     }
 
+    // UPDATE METHODS
+
+    public Optional<Friendship> acceptFriendship(Friendship friendship) {
+        System.out.println("Friendship accepted");
+        Optional<Friendship> friendshipInDb = friendshipRepo.findById(friendship.getId());
+        if (friendshipInDb.isEmpty()) return Optional.empty();
+
+        friendshipInDb.get().setAccepted(true);
+        friendshipInDb.get().setDateCreated(LocalDate.now());
+        return saveFriendship(friendshipInDb.get());
+    }
+
+    public boolean denyFriendship(Friendship friendship) {
+        System.out.println("Friendship denied");
+        return deleteFriendship(friendship);
+    }
+
+    // DELETE METHODS
+
+    private boolean deleteFriendship(Friendship friendship) {
+        Optional<Friendship> friendshipInDb = friendshipRepo.findById(friendship.getId());
+        if (friendshipInDb.isEmpty()) return false;
+
+        friendshipRepo.delete(friendshipInDb.get());
+        System.out.println("Friendship deleted");
+        return true;
+    }
+
     // INTERNAL METHODS
 
     private Optional<Friendship> saveFriendship(Friendship friendship) {
         System.out.println("Saving friendship: " + friendship);
         Friendship savedFriendship = friendshipRepo.save(friendship);
         return friendshipRepo.findById(friendship.getId());
+    }
+
+    private boolean isValidNewFriendship(User friendA, User friendB) {
+        if (friendA.equals(friendB)) {
+            System.out.println("Can't be friends with oneself");
+            return false;
+        }
+        if (friendshipRepo.existsByFriendAAndFriendB(friendA,friendB)) {
+            System.out.println("Friendship already exists");
+            return false;
+        }
+        if (friendshipRepo.existsByFriendAAndFriendB(friendB,friendA)) {
+            System.out.println("Friendship already exists");
+            return false;
+        }
+        return true;
     }
 }
