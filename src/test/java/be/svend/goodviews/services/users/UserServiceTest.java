@@ -24,6 +24,7 @@ class UserServiceTest {
         System.out.println("Success");
     }
 
+
     @Test
     void findByUsername() {
         Optional<User> foundUser = userService.findByUsername("sdelariv");

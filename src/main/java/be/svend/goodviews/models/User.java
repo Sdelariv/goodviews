@@ -111,6 +111,7 @@ public class User {
 
     public void addFriend(User user) {
         if (this.friendList == null) friendList = new ArrayList<>();
+        if (user.equals(this)) return;
 
         if (this.friendList.contains(user)) return;
 
@@ -118,7 +119,10 @@ public class User {
     }
 
     public void removeFriend(User user) {
-        if (this.friendList.contains(user)) return;
+        if (this.friendList == null) return;
+        if (user.equals(this)) return;
+
+        if (!this.friendList.contains(user)) return;
 
         this.friendList.remove(user);
     }
