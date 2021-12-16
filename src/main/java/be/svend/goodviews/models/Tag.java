@@ -1,6 +1,7 @@
 package be.svend.goodviews.models;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 /**
  * Keyword to describe the film (may overlap with genre in a few cases)
@@ -51,6 +52,14 @@ public class Tag {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Tag tag = (Tag) o;
+        return tag.getName().equals(this.getName());
     }
 
 
