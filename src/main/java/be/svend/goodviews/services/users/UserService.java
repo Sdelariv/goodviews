@@ -163,7 +163,6 @@ public class UserService {
 
     public Optional<User> changeUserType(User user, TypeOfUser typeOfUser) {
         Optional<User> userInDb = findByUsername(user.getUsername());
-
         if (userInDb.isEmpty()) return Optional.empty();
 
         userInDb.get().setTypeOfUser(typeOfUser);
@@ -182,6 +181,19 @@ public class UserService {
     public Optional<User> downgradeUserToUser(User user) {
         return changeUserType(user,TypeOfUser.USER);
     }
+
+    /*
+    public Optional<User> addFriend(User user, User friend) {
+        Optional<User> userInDb = findByUsername(user.getUsername());
+        if (userInDb.isEmpty()) return Optional.empty();
+        User userToAddFriend = userInDb.get();
+
+        if (!userToAddFriend.addFriend(friend)) return Optional.empty();
+
+        return saveUser(userToAddFriend);
+    }
+
+     */
 
     // DELETE METHODS
 

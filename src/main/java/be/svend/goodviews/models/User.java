@@ -29,9 +29,12 @@ public class User {
     @Enumerated(EnumType.STRING)
     private TypeOfUser typeOfUser;
 
+    // TODO: Decide whether you want a friendlist here
+    /*
     @ManyToMany(fetch = FetchType.EAGER)
     @Fetch(value = FetchMode.SUBSELECT)
     private List<User> friendList;
+*/
 
     // CONSTRUCTORS
 
@@ -101,6 +104,7 @@ public class User {
         this.typeOfUser = typeOfUser;
     }
 
+    /*
     public List<User> getFriendList() {
         return friendList;
     }
@@ -109,23 +113,27 @@ public class User {
         this.friendList = friendList;
     }
 
-    public void addFriend(User user) {
+    public boolean addFriend(User user) {
         if (this.friendList == null) friendList = new ArrayList<>();
-        if (user.equals(this)) return;
+        if (user.equals(this)) return false;
 
-        if (this.friendList.contains(user)) return;
+        if (this.friendList.contains(user)) return false;
 
         this.friendList.add(user);
+        return true;
     }
 
-    public void removeFriend(User user) {
-        if (this.friendList == null) return;
-        if (user.equals(this)) return;
+    public boolean removeFriend(User user) {
+        if (this.friendList == null) return false;
+        if (user.equals(this)) return false;
 
-        if (!this.friendList.contains(user)) return;
+        if (!this.friendList.contains(user)) return false;
 
         this.friendList.remove(user);
+        return true;
     }
+
+     */
 
     // OTHER
 
@@ -137,7 +145,7 @@ public class User {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", typeOfUser=" + typeOfUser +
-                ", friendList=" + friendList +
+               // ", friendList=" + friendList +
                 '}';
     }
 
