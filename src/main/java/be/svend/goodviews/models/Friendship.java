@@ -76,4 +76,17 @@ public class Friendship {
     public void setAccepted(boolean accepted) {
         this.accepted = accepted;
     }
+
+    // OTHER METHODS
+
+    @Override
+    public String toString() {
+        return "Friendship{" +
+                "id='" + id + '\'' +
+                ", dateCreated=" + dateCreated +
+                ", friendA=" + friendA +
+                ", friendB=" + friendB +
+                ", accepted=" + accepted +
+                '}';
+    }
 }
