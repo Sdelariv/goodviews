@@ -64,11 +64,34 @@ public class UserValidator {
         return true;
     }
 
+    /**
+     * Checks whether the user is null and found in the db, based on its username
+     * @param user
+     * @return Optional<User> - returns the user (optional) if found, empty (optional) if not
+     */
     public Optional<User> isExistingUser(User user) {
+        if (user == null) return Optional.empty();
+        if (user.getUsername() == null) return Optional.empty();
+
         Optional<User> existingUser = userRepo.findByUsername(user.getUsername());
         if (existingUser.isEmpty()) return Optional.empty();
 
         return existingUser;
     }
+
+    /**
+     * Checks whether the user is null and found in the db, based on its username
+     * @param username
+     * @return Optional<User> - returns the user (optional) if found, empty (optional) if not
+     */
+    public Optional<User> isExistingUserWithUsername(String username) {
+        if (username == null) return Optional.empty();
+
+        Optional<User> existingUser = userRepo.findByUsername(username);
+        if (existingUser.isEmpty()) return Optional.empty();
+
+        return existingUser;
+    }
+
 
 }

@@ -22,7 +22,7 @@ public class GoodviewsApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext ctx = SpringApplication.run(GoodviewsApplication.class, args);
 
-        RatingService ratingService = new RatingService(ctx.getBean(RatingRepository.class),ctx.getBean(RatingValidator.class), ctx.getBean(FilmService.class));
+        RatingService ratingService = new RatingService(ctx.getBean(RatingRepository.class), ctx.getBean(RatingValidator.class), ctx.getBean(FilmService.class));
         UserService userService = ctx.getBean(UserService.class);
         CommentService commentService = ctx.getBean(CommentService.class);
         FriendshipService friendshipService = ctx.getBean(FriendshipService.class);
@@ -44,9 +44,6 @@ public class GoodviewsApplication {
         waddles.setFirstName("Waddles");
         waddles.setLastName("The Pig");
         waddles.setPassword("hisPassword");
-
-
-        userService.changeUsername(bibi,"bibi_bear");
 
     }
 
