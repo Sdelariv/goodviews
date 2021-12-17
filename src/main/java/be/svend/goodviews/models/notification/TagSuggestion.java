@@ -6,12 +6,12 @@ import be.svend.goodviews.models.User;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
-import java.time.LocalDateTime;
+
 
 @Entity
 public class TagSuggestion extends Notification {
 
-    private String suggestedTag;
+    private String suggestedTagName;
 
     @OneToOne
     private Film film;
@@ -22,8 +22,8 @@ public class TagSuggestion extends Notification {
         this(null,null,null);
     }
 
-    public TagSuggestion(String suggestedTag, Film film, User suggester) {
-        this.suggestedTag = suggestedTag;
+    public TagSuggestion(String suggestedTagName, Film film, User suggester) {
+        this.suggestedTagName = suggestedTagName;
         this.film = film;
         super.setOriginUser(suggester);
         super.setTypeOfUser(TypeOfUser.ADMIN);
@@ -32,12 +32,12 @@ public class TagSuggestion extends Notification {
     // GETTERS & SETTERS
 
 
-    public String getSuggestedTag() {
-        return suggestedTag;
+    public String getSuggestedTagName() {
+        return suggestedTagName;
     }
 
-    public void setSuggestedTag(String suggestedTag) {
-        this.suggestedTag = suggestedTag;
+    public void setSuggestedTagName(String suggestedTag) {
+        this.suggestedTagName = suggestedTag;
         updateMessage();
     }
 
@@ -54,8 +54,14 @@ public class TagSuggestion extends Notification {
         if (super.getOriginUser() == null || super.getOriginUser().getUsername() == null) return;
         if (film == null || film.getId() == null) return;
 
-        super.setMessage(super.getOriginUser().getUsername() + " has suggested the tag \"" + this.suggestedTag + "\" for (" + film.getId() + ")");
+        super.setMessage(super.getOriginUser().getUsername() + " has suggested the tag \"" + this.suggestedTagName + "\" for (" + film.getId() + ")");
         if (film.getTitle() == null) super.setMessage(super.getMessage() + " " + film.getTitle());
+    }
+
+    @Override
+    public void setOriginUser(User user) {
+        super.setOriginUser(user);
+        updateMessage();
     }
 
     // OTHER METHODS
@@ -63,7 +69,7 @@ public class TagSuggestion extends Notification {
     @Override
     public String toString() {
         return "TagSuggestion{" +
-                "suggestedTag='" + suggestedTag + '\'' +
+                "suggestedTag='" + suggestedTagName + '\'' +
                 ", film=" + film +
                 "} " + super.toString();
     }

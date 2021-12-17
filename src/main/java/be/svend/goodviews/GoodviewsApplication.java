@@ -4,6 +4,7 @@ import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Friendship;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.models.notification.GenreSuggestion;
+import be.svend.goodviews.models.notification.TagSuggestion;
 import be.svend.goodviews.repositories.*;
 import be.svend.goodviews.services.notification.NotificationService;
 import be.svend.goodviews.services.comment.CommentService;
@@ -56,7 +57,8 @@ public class GoodviewsApplication {
        suggestionService.createTagSuggestion("Winter",film,bibi);
 
 
-       // suggestionService.findAllAdminNotifications().forEach(sug -> suggestionService.acceptGenre((GenreSuggestion) sug));
+
+       suggestionService.findAllAdminNotifications().forEach(sug -> suggestionService.acceptTag((TagSuggestion) sug));
 
 
 

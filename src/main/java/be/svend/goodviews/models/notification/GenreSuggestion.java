@@ -6,7 +6,7 @@ import be.svend.goodviews.models.User;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
-import java.time.LocalDateTime;
+
 
 @Entity
 public class GenreSuggestion extends Notification {

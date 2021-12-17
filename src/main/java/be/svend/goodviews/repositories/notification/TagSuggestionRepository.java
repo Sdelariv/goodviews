@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface TagSuggestionRepository extends JpaRepository<TagSuggestion, Long> {
 
-    Optional<TagSuggestion> findByFilmAndSuggestedTag(Film film, String suggestedTag);
+    Optional<TagSuggestion> findByFilmAndSuggestedTagName(Film film, String suggestedTag);
 }

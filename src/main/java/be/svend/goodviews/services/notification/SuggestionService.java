@@ -96,10 +96,11 @@ public class SuggestionService {
 
         // Create and check if exists
         TagSuggestion tagSuggestion = new TagSuggestion();
-        tagSuggestion.setSuggestedTag(suggestedTagName);
-        tagSuggestion.setFilm(film);
         tagSuggestion.setOriginUser(suggester);
-        if (tagSuggestionRepo.findByFilmAndSuggestedTag(film,suggestedTagName).isPresent()) {
+        tagSuggestion.setSuggestedTagName(suggestedTagName);
+        tagSuggestion.setFilm(film);
+
+        if (tagSuggestionRepo.findByFilmAndSuggestedTagName(film,suggestedTagName).isPresent()) {
             System.out.println("Tag suggestion already exists");
             return false;
         }
@@ -130,13 +131,13 @@ public class SuggestionService {
 
     // TODO: This method should be in the controller?
     public void acceptTag(TagSuggestion tagSuggestion) {
-        filmService.addTagBasedOnFilmIdAndTagString(tagSuggestion.getFilm().getId(),tagSuggestion.getSuggestedTag());
+        filmService.addTagBasedOnFilmIdAndTagString(tagSuggestion.getFilm().getId(),tagSuggestion.getSuggestedTagName());
 
         notificationService.deleteNotification(tagSuggestion);
 
         Notification accepted = new Notification();
         accepted.setTargetUser(tagSuggestion.getOriginUser());
-        accepted.setMessage("Your tag suggestion: " + tagSuggestion.getSuggestedTag() + " for " + tagSuggestion.getFilm().getTitle() + " has been accepted");
+        accepted.setMessage("Your tag suggestion: " + tagSuggestion.getSuggestedTagName() + " for " + tagSuggestion.getFilm().getTitle() + " has been accepted");
         notificationRepo.save(accepted);
 
         return;
