@@ -10,45 +10,36 @@ import javax.persistence.OneToOne;
 import java.time.LocalDateTime;
 
 @Entity
-public class GenreSuggestion extends Notification {
+public class TagSuggestion extends Notification {
 
-    private String suggestedGenreName;
+    private String suggestedTag;
 
     @OneToOne
     private Film film;
 
     // CONSTRUCTOR
 
-    public GenreSuggestion(){
+    public TagSuggestion() {
         this(null,null,null);
     }
 
-    public GenreSuggestion(String suggestedGenreName, Film film, User suggester) {
-        this.suggestedGenreName = suggestedGenreName;
+    public TagSuggestion(String suggestedTag, Film film, User suggester) {
+        this.suggestedTag = suggestedTag;
         this.film = film;
         super.setOriginUser(suggester);
         super.setTypeOfUser(TypeOfUser.ADMIN);
         super.setDateTime(LocalDateTime.now());
-
     }
 
     // GETTERS & SETTERS
 
-    public String getSuggestedGenreName() {
-        return suggestedGenreName;
+
+    public String getSuggestedTag() {
+        return suggestedTag;
     }
 
-    public void setSuggestedGenreName(String suggestedGenreName) {
-        this.suggestedGenreName = suggestedGenreName;
-        updateMessage();
-    }
-
-    public User getSuggester() {
-        return getOriginUser();
-    }
-
-    public void setSuggester(User suggester) {
-        super.setOriginUser(suggester);
+    public void setSuggestedTag(String suggestedTag) {
+        this.suggestedTag = suggestedTag;
         updateMessage();
     }
 
@@ -62,10 +53,10 @@ public class GenreSuggestion extends Notification {
     }
 
     public void updateMessage() {
-        if (getSuggester() == null || getSuggester().getUsername() == null) return;
+        if (super.getOriginUser() == null || super.getOriginUser().getUsername() == null) return;
         if (film == null || film.getId() == null) return;
 
-        super.setMessage(getSuggester().getUsername() + " has suggested the genre \"" + this.suggestedGenreName + "\" for (" + film.getId() + ")");
+        super.setMessage(super.getOriginUser().getUsername() + " has suggested the tag \"" + this.suggestedTag + "\" for (" + film.getId() + ")");
         if (film.getTitle() == null) super.setMessage(super.getMessage() + " " + film.getTitle());
     }
 
@@ -73,9 +64,8 @@ public class GenreSuggestion extends Notification {
 
     @Override
     public String toString() {
-        return "GenreSuggestionNotification{" +
-                "suggestedGenreName='" + suggestedGenreName + '\'' +
-                ", suggester=" + getSuggester() +
+        return "TagSuggestion{" +
+                "suggestedTag='" + suggestedTag + '\'' +
                 ", film=" + film +
                 "} " + super.toString();
     }
