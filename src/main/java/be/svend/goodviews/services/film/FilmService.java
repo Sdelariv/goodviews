@@ -365,4 +365,6 @@ public class FilmService {
 
         return runningTotal / ratings.size();
     }
+
+
 }

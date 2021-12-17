@@ -1,17 +1,15 @@
 package be.svend.goodviews.services.notification;
 
-import be.svend.goodviews.models.Film;
-import be.svend.goodviews.models.Genre;
-import be.svend.goodviews.models.TypeOfUser;
-import be.svend.goodviews.models.User;
+import be.svend.goodviews.models.*;
 import be.svend.goodviews.models.notification.GenreSuggestion;
 import be.svend.goodviews.models.notification.Notification;
+import be.svend.goodviews.models.notification.TagSuggestion;
 import be.svend.goodviews.repositories.GenreRepository;
 import be.svend.goodviews.repositories.notification.GenreSuggestionRepository;
 import be.svend.goodviews.repositories.notification.NotificationRepository;
+import be.svend.goodviews.repositories.notification.TagSuggestionRepository;
 import be.svend.goodviews.services.film.FilmService;
 import be.svend.goodviews.services.film.FilmValidator;
-import be.svend.goodviews.services.film.properties.GenreService;
 import be.svend.goodviews.services.users.UserValidator;
 import org.springframework.stereotype.Service;
 
@@ -22,11 +20,13 @@ public class SuggestionService {
     NotificationRepository notificationRepo;
     GenreRepository genreRepo;
     GenreSuggestionRepository genreSuggestionRepo;
+    TagSuggestionRepository tagSuggestionRepo;
 
     FilmValidator filmValidator;
     UserValidator userValidator;
 
     FilmService filmService; // For creating genres and updating films
+    NotificationService notificationService; // For deleting or saving the suggestions
 
     // CONSTRUCTOR
 
@@ -35,13 +35,17 @@ public class SuggestionService {
                              FilmValidator filmValidator,
                              UserValidator userValidator,
                              FilmService filmService,
-                             GenreSuggestionRepository genreSuggestionRepo) {
+                             GenreSuggestionRepository genreSuggestionRepo,
+                             TagSuggestionRepository tagSuggestionRepo,
+                             NotificationService notificationService) {
         this.notificationRepo = notificationRepo;
         this.genreRepo = genreRepo;
         this.filmValidator = filmValidator;
         this.userValidator = userValidator;
         this.filmService = filmService;
         this.genreSuggestionRepo = genreSuggestionRepo;
+        this.tagSuggestionRepo = tagSuggestionRepo;
+        this.notificationService = notificationService;
     }
 
     // FIND METHODS
@@ -56,6 +60,10 @@ public class SuggestionService {
 
     public List<GenreSuggestion> findAllGenreSuggestions() {
         return genreSuggestionRepo.findAll();
+    }
+
+    public List<TagSuggestion> findAllTagSuggestions() {
+        return tagSuggestionRepo.findAll();
     }
 
     // CREATE METHODS
@@ -81,12 +89,36 @@ public class SuggestionService {
         return true;
     }
 
+    public boolean createTagSuggestion(String suggestedTagName, Film film, User suggester) {
+        // Check if existing  TODO: Will have to move this to controller
+        if (userValidator.isExistingUser(suggester).isEmpty()) return false;
+        if (filmValidator.isExistingFilm(film).isEmpty()) return false;
+
+        // Create and check if exists
+        TagSuggestion tagSuggestion = new TagSuggestion();
+        tagSuggestion.setSuggestedTag(suggestedTagName);
+        tagSuggestion.setFilm(film);
+        tagSuggestion.setOriginUser(suggester);
+        if (tagSuggestionRepo.findByFilmAndSuggestedTag(film,suggestedTagName).isPresent()) {
+            System.out.println("Tag suggestion already exists");
+            return false;
+        }
+
+        // Save
+        notificationRepo.save(tagSuggestion);
+
+        System.out.println("Sent suggestion");
+        return true;
+    }
+
+    // UPDATE METHODS
+
     // TODO: This method should be in the controller?
     public void acceptGenre(GenreSuggestion genreSuggestion) {
         Genre genre = new Genre(genreSuggestion.getSuggestedGenreName());
         filmService.addGenreBasedOnFilmId(genreSuggestion.getFilm().getId(),genre);
 
-        deleteGenreSuggestion(genreSuggestion);
+        notificationService.deleteNotification(genreSuggestion);
 
         Notification accepted = new Notification();
         accepted.setTargetUser(genreSuggestion.getOriginUser());
@@ -96,19 +128,29 @@ public class SuggestionService {
         return;
     }
 
-    // TODO: Method should be in controller?
-    public boolean denyGenre(GenreSuggestion genreSuggestion) {
-        return deleteGenreSuggestion(genreSuggestion);
+    // TODO: This method should be in the controller?
+    public void acceptTag(TagSuggestion tagSuggestion) {
+        filmService.addTagBasedOnFilmIdAndTagString(tagSuggestion.getFilm().getId(),tagSuggestion.getSuggestedTag());
+
+        notificationService.deleteNotification(tagSuggestion);
+
+        Notification accepted = new Notification();
+        accepted.setTargetUser(tagSuggestion.getOriginUser());
+        accepted.setMessage("Your tag suggestion: " + tagSuggestion.getSuggestedTag() + " for " + tagSuggestion.getFilm().getTitle() + " has been accepted");
+        notificationRepo.save(accepted);
+
+        return;
     }
 
     // DELETE METHODS
 
-    public boolean deleteGenreSuggestion(GenreSuggestion genreSuggestion) {
-        if (genreSuggestion == null || genreSuggestion.getId() == null ) return false;
-        if (notificationRepo.findById(genreSuggestion.getId()).isEmpty()) return false;
-
-        notificationRepo.delete(genreSuggestion);
-        System.out.println("GenreSuggestion Notification deleted");
-        return true;
+    // TODO: Method should be in controller?
+    public boolean denyGenre(GenreSuggestion genreSuggestion) {
+        return notificationService.deleteNotification(genreSuggestion);
     }
+
+    public boolean denyTag(TagSuggestion tagSuggestion) {
+        return notificationService.deleteNotification(tagSuggestion);
+    }
+
 }
