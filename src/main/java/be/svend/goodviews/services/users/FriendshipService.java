@@ -4,6 +4,7 @@ import be.svend.goodviews.models.Friendship;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.FriendshipRepository;
 import be.svend.goodviews.repositories.UserRepository;
+import be.svend.goodviews.services.notification.FriendRequestService;
 import be.svend.goodviews.services.notification.NotificationService;
 import org.springframework.stereotype.Service;
 
@@ -19,18 +20,18 @@ public class FriendshipService {
     UserRepository userRepo;
     UserValidator userValidator;
 
-    NotificationService notificationService;
+    FriendRequestService friendRequestService;
 
     // CONSTRUCTORS
 
     public FriendshipService(FriendshipRepository friendshipRepo,
                              UserRepository userRepo,
                              UserValidator userValidator,
-                             NotificationService notificationService) {
+                             FriendRequestService friendRequestService) {
         this.friendshipRepo = friendshipRepo;
         this.userRepo = userRepo;
         this.userValidator = userValidator;
-        this.notificationService = notificationService;
+        this.friendRequestService = friendRequestService;
 
     }
 
@@ -141,7 +142,7 @@ public class FriendshipService {
         if (createdFriendship.isEmpty()) return false;
 
         // Add notification
-        notificationService.createFriendRequestNotification(createdFriendship.get(),friendB.get());
+        friendRequestService.sendFriendRequestNotification(createdFriendship.get(),friendB.get());
 
         return true;
     }
@@ -180,7 +181,7 @@ public class FriendshipService {
         if (acceptedFriendship.isEmpty()) return Optional.empty();
 
         // Notification
-        notificationService.acceptFriendRequest(friendship);
+        friendRequestService.acceptFriendRequest(friendship);
 
         return acceptedFriendship;
     }
@@ -208,7 +209,7 @@ public class FriendshipService {
     public boolean denyFriendship(Friendship friendship) {
         System.out.println("Friendship denied");
 
-        notificationService.deleteFriendRequest(friendship);
+        friendRequestService.deleteFriendRequest(friendship);
 
         return deleteFriendship(friendship);
     }
@@ -236,7 +237,7 @@ public class FriendshipService {
         Optional<Friendship> friendshipInDb = friendshipRepo.findById(friendship.getId());
         if (friendshipInDb.isEmpty()) return false;
 
-        notificationService.deleteNotificationsByFriendship(friendship);
+        friendRequestService.deleteNotificationsByFriendship(friendship);
 
         friendshipRepo.delete(friendshipInDb.get());
         System.out.println("Friendship deleted");

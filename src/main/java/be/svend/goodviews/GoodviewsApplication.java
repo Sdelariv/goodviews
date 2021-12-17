@@ -1,9 +1,7 @@
 package be.svend.goodviews;
 
 import be.svend.goodviews.models.Film;
-import be.svend.goodviews.models.Friendship;
 import be.svend.goodviews.models.User;
-import be.svend.goodviews.models.notification.GenreSuggestion;
 import be.svend.goodviews.models.notification.TagSuggestion;
 import be.svend.goodviews.repositories.*;
 import be.svend.goodviews.services.notification.NotificationService;
@@ -17,8 +15,6 @@ import be.svend.goodviews.services.users.UserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-
-import java.util.List;
 
 @SpringBootApplication
 public class GoodviewsApplication {
@@ -54,7 +50,7 @@ public class GoodviewsApplication {
         Film film = new Film();
         film.setId("tt0110367");
 
-       suggestionService.createTagSuggestion("Winter",film,bibi);
+       suggestionService.sendTagSuggestion("Winter",film,bibi);
 
 
 

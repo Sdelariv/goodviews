@@ -18,11 +18,14 @@ public class CommentNotification extends Notification {
     // CONSTRUCTOR
 
     public CommentNotification() {
-        this(null);
+        this(null, null);
     }
 
-    public CommentNotification(Comment comment) {
+    public CommentNotification(Comment comment, Rating rating) {
         this.comment = comment;
+        this.rating = rating;
+        super.setOriginUser(comment.getUser());
+        super.setTargetUser(rating.getUser());
     }
 
     // GETTERS & SETTERS

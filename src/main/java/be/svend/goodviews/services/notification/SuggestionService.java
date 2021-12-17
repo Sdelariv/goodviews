@@ -14,6 +14,7 @@ import be.svend.goodviews.services.users.UserValidator;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SuggestionService {
@@ -67,50 +68,36 @@ public class SuggestionService {
     }
 
     // CREATE METHODS
-    public boolean createGenreSuggestion(String suggestedGenreName, Film film, User suggester) {
+    public boolean sendGenreSuggestion(String suggestedGenreName, Film film, User suggester) {
         // Check if existing  TODO: Will have to move this to controller
         if (userValidator.isExistingUser(suggester).isEmpty()) return false;
         if (filmValidator.isExistingFilm(film).isEmpty()) return false;
 
-        // Create and check if exists
-        GenreSuggestion genreSuggestion = new GenreSuggestion();
-        genreSuggestion.setSuggestedGenreName(suggestedGenreName);
-        genreSuggestion.setFilm(film);
-        genreSuggestion.setSuggester(suggester);
-        if (genreSuggestionRepo.findByFilmAndSuggestedGenreName(film,suggestedGenreName).isPresent()) {
-            System.out.println("Genre suggestion already exists");
-            return false;
-        }
+       // See if it exists
+        Optional<GenreSuggestion> genreSuggestion = createGenreSuggestion(suggestedGenreName,film,suggester);
+        if (genreSuggestion.isEmpty()) return false;
 
-        // Save
-        notificationRepo.save(genreSuggestion);
-
+        // Send(Save)
+        notificationRepo.save(genreSuggestion.get());
         System.out.println("Sent suggestion");
         return true;
     }
 
-    public boolean createTagSuggestion(String suggestedTagName, Film film, User suggester) {
+    public boolean sendTagSuggestion(String suggestedTagName, Film film, User suggester) {
         // Check if existing  TODO: Will have to move this to controller
         if (userValidator.isExistingUser(suggester).isEmpty()) return false;
         if (filmValidator.isExistingFilm(film).isEmpty()) return false;
 
-        // Create and check if exists
-        TagSuggestion tagSuggestion = new TagSuggestion();
-        tagSuggestion.setOriginUser(suggester);
-        tagSuggestion.setSuggestedTagName(suggestedTagName);
-        tagSuggestion.setFilm(film);
+        // Check if suggestion exists
+        Optional<TagSuggestion> tagSuggestion = createTagSuggestion(suggestedTagName,film,suggester);
+        if (tagSuggestion.isEmpty()) return false;
 
-        if (tagSuggestionRepo.findByFilmAndSuggestedTagName(film,suggestedTagName).isPresent()) {
-            System.out.println("Tag suggestion already exists");
-            return false;
-        }
-
-        // Save
-        notificationRepo.save(tagSuggestion);
-
+        // Send(Save)
+        notificationRepo.save(tagSuggestion.get());
         System.out.println("Sent suggestion");
         return true;
     }
+
 
     // UPDATE METHODS
 
@@ -152,6 +139,33 @@ public class SuggestionService {
 
     public boolean denyTag(TagSuggestion tagSuggestion) {
         return notificationService.deleteNotification(tagSuggestion);
+    }
+
+    private Optional<GenreSuggestion> createGenreSuggestion(String suggestedGenreName, Film film, User suggester) {
+        GenreSuggestion genreSuggestion = new GenreSuggestion();
+        genreSuggestion.setSuggestedGenreName(suggestedGenreName);
+        genreSuggestion.setFilm(film);
+        genreSuggestion.setSuggester(suggester);
+
+        if (genreSuggestionRepo.findByFilmAndSuggestedGenreName(film,suggestedGenreName).isPresent()) {
+            System.out.println("Genre suggestion already exists");
+            return Optional.empty();
+        }
+        return Optional.of(genreSuggestion);
+    }
+
+    private Optional<TagSuggestion> createTagSuggestion(String suggestedTagName, Film film, User suggester) {
+        TagSuggestion tagSuggestion = new TagSuggestion();
+        tagSuggestion.setOriginUser(suggester);
+        tagSuggestion.setSuggestedTagName(suggestedTagName);
+        tagSuggestion.setFilm(film);
+
+        if (tagSuggestionRepo.findByFilmAndSuggestedTagName(film,suggestedTagName).isPresent()) {
+            System.out.println("Tag suggestion already exists");
+            return Optional.empty();
+        }
+
+        return Optional.of(tagSuggestion);
     }
 
 }
