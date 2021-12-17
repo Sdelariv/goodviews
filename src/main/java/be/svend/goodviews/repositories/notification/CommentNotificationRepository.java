@@ -9,4 +9,6 @@ import java.util.List;
 public interface CommentNotificationRepository extends JpaRepository<CommentNotification, Long> {
 
     List<CommentNotification> findByTargetUser(User targetUser);
+
+    List<CommentNotification> findByOriginUser(User commenter);
 }

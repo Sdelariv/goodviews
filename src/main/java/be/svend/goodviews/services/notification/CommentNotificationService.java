@@ -10,6 +10,7 @@ import be.svend.goodviews.repositories.notification.NotificationRepository;
 import be.svend.goodviews.services.comment.CommentValidator;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,6 +44,10 @@ public class CommentNotificationService {
         return commentNotificationRepo.findByTargetUser(targetUser);
     }
 
+    public List<CommentNotification> findByCommenter(User commenter) {
+        return commentNotificationRepo.findByOriginUser(commenter);
+    }
+
     // CREATE METHODS
 
     public boolean sendCommentNotification(Comment comment) {
@@ -58,6 +63,22 @@ public class CommentNotificationService {
         notificationRepo.save(commentNotification.get());
         System.out.println("Notified about comment");
         return true;
+    }
+
+    // UPDATE METHODS
+
+    public void deleteUserFromCommentNotifications(User user) {
+        List<CommentNotification> notificationsByUser = findByCommenter(user);
+        for (CommentNotification commentNotification:  notificationsByUser) {
+            commentNotification.setOriginUser(null);
+            notificationRepo.save(commentNotification);
+        }
+
+        List<CommentNotification> notificationsOfUser = findByTargetUser(user);
+
+        for (CommentNotification commentNotification: notificationsOfUser ) {
+            deleteCommentNotification(commentNotification);
+        }
     }
 
     // INTERNAL METHODS
@@ -83,4 +104,6 @@ public class CommentNotificationService {
     public void deleteCommentNotification(CommentNotification commentNotification) {
         notificationService.deleteNotification(commentNotification);
     }
+
+
 }
