@@ -27,7 +27,6 @@ public class GenreSuggestion extends Notification {
         this.film = film;
         super.setOriginUser(suggester);
         super.setTypeOfUser(TypeOfUser.ADMIN);
-        super.setDateTime(LocalDateTime.now());
 
     }
 

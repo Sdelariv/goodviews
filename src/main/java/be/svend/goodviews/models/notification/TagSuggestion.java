@@ -27,7 +27,6 @@ public class TagSuggestion extends Notification {
         this.film = film;
         super.setOriginUser(suggester);
         super.setTypeOfUser(TypeOfUser.ADMIN);
-        super.setDateTime(LocalDateTime.now());
     }
 
     // GETTERS & SETTERS
