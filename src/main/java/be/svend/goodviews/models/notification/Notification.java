@@ -16,6 +16,9 @@ public class Notification {
     @ManyToOne
     private User targetUser;
 
+    @ManyToOne
+    private User originUser;
+
     @Enumerated
     private TypeOfUser typeOfUser;
 
@@ -23,15 +26,12 @@ public class Notification {
 
     private boolean seen;
 
-    private boolean finished;
-
     private LocalDateTime dateTime;
 
     // CONSTRUCTORS
 
     public Notification() {
         this.seen = false;
-        this.finished = false;
     }
 
     // GETTERS & SETTERS
@@ -76,14 +76,6 @@ public class Notification {
         this.seen = seen;
     }
 
-    public boolean isFinished() {
-        return finished;
-    }
-
-    public void setFinished(boolean finished) {
-        this.finished = finished;
-    }
-
     public LocalDateTime getDateTime() {
         return dateTime;
     }
@@ -92,17 +84,26 @@ public class Notification {
         this.dateTime = dateTime;
     }
 
+    public User getOriginUser() {
+        return originUser;
+    }
+
+    public void setOriginUser(User originUser) {
+        this.originUser = originUser;
+    }
+
     // OTHER METHODS
+
 
     @Override
     public String toString() {
         return "Notification{" +
                 "id=" + id +
                 ", targetUser=" + targetUser +
+                ", originUser=" + originUser +
                 ", typeOfUser=" + typeOfUser +
                 ", message='" + message + '\'' +
                 ", seen=" + seen +
-                ", finished=" + finished +
                 ", dateTime=" + dateTime +
                 '}';
     }

@@ -13,9 +13,6 @@ public class GenreSuggestion extends Notification {
     private String suggestedGenreName;
 
     @OneToOne
-    private User suggester;
-
-    @OneToOne
     private Film film;
 
     // CONSTRUCTOR
@@ -26,7 +23,7 @@ public class GenreSuggestion extends Notification {
 
     public GenreSuggestion(String suggestedGenreName, Film film, User suggester) {
         this.film = film;
-        this.suggester = suggester;
+        super.setOriginUser(suggester);
         this.suggestedGenreName = suggestedGenreName;
         super.setTypeOfUser(TypeOfUser.ADMIN);
     }
@@ -43,11 +40,11 @@ public class GenreSuggestion extends Notification {
     }
 
     public User getSuggester() {
-        return suggester;
+        return getOriginUser();
     }
 
     public void setSuggester(User suggester) {
-        this.suggester = suggester;
+        super.setOriginUser(suggester);
         updateMessage();
     }
 
@@ -61,10 +58,10 @@ public class GenreSuggestion extends Notification {
     }
 
     public void updateMessage() {
-        if (suggester == null || suggester.getUsername() == null) return;
+        if (getSuggester() == null || getSuggester().getUsername() == null) return;
         if (film == null || film.getTitle() == null || film.getId() == null) return;
 
-        super.setMessage(suggester.getUsername() + " has suggested the genre \"" + this.suggestedGenreName + "\" for " + film.getTitle() + " (" + film.getId() + ")");
+        super.setMessage(getSuggester().getUsername() + " has suggested the genre \"" + this.suggestedGenreName + "\" for " + film.getTitle() + " (" + film.getId() + ")");
     }
 
     // OTHER METHODS
@@ -74,7 +71,7 @@ public class GenreSuggestion extends Notification {
     public String toString() {
         return "GenreSuggestionNotification{" +
                 "suggestedGenreName='" + suggestedGenreName + '\'' +
-                ", suggester=" + suggester +
+                ", suggester=" + getSuggester() +
                 ", film=" + film +
                 "} " + super.toString();
     }

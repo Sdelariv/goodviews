@@ -21,4 +21,8 @@ public interface NotificationRepository extends JpaRepository<Notification,Long>
 
     List<GenreSuggestion> findAllGenreSuggestionNotifications();
 
+    List<Notification> findByOriginUser(User user);
+
+    List<Notification> findByOriginUserAndTargetUser(User origin, User target);
+
 }

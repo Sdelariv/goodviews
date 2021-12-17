@@ -8,6 +8,8 @@ import be.svend.goodviews.models.notification.Notification;
 import be.svend.goodviews.repositories.NotificationRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -64,15 +66,26 @@ public class NotificationService {
         return true;
     }
 
-    public void deleteNotificationsInvolvingUser(User user) {
+    public void deleteNotifications(List<Notification> notifications) {
+        for (Notification notification: notifications) {
+            deleteNotification(notification);
+        }
+    }
 
-        // TODO: fill in
+    public void deleteNotificationsInvolvingUser(User user) {
+        List<Notification> allNotifications = new ArrayList<>();
+        allNotifications.addAll(notificationRepo.findByTargetUser(user));
+        allNotifications.addAll(notificationRepo.findByOriginUser(user));
+
+        deleteNotifications(allNotifications);
     }
 
     public void deleteNotificationsByFriendship(Friendship friendship) {
-        deleteFriendRequest(friendship);
+        List<Notification> allNotifications = new ArrayList<>();
+        allNotifications.addAll(notificationRepo.findByOriginUserAndTargetUser(friendship.getFriendA(), friendship.getFriendB()));
+        allNotifications.addAll(notificationRepo.findByOriginUserAndTargetUser(friendship.getFriendB(), friendship.getFriendA()));
 
-        // TODO: fill in other notifications of the friendship
+        deleteNotifications(allNotifications);
     }
 
     public void deleteFriendRequest(Friendship friendship) {
@@ -80,5 +93,4 @@ public class NotificationService {
         if (request.isPresent()) notificationRepo.delete(request.get());
     }
 
-    // TODO: Delete all finished notifications
 }
