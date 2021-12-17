@@ -296,7 +296,10 @@ public class FilmService {
         else tagToAdd = new Tag(tagString);
 
         // Check if film has tag already
-        if (foundFilm.getTags().contains(tagToAdd)) return film;
+        if (foundFilm.getTags().contains(tagToAdd)) {
+            System.out.println("Film already has tag");
+            return film;
+        }
 
         // Add and save tag
         foundFilm.addTag(tagToAdd);

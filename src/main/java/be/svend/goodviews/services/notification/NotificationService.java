@@ -33,6 +33,10 @@ public class NotificationService {
         return notificationRepo.findByTargetUser(targetUser);
     }
 
+    public List<Notification> findByOriginUser(User originUser) {
+        return notificationRepo.findByOriginUser(originUser);
+    }
+
 
     // CREATE METHODS
 
@@ -68,5 +72,8 @@ public class NotificationService {
     }
 
 
-
+    public void removeOriginUserFromNotification(Notification notification) {
+        notification.setOriginUser(null);
+        notificationRepo.save(notification);
+    }
 }

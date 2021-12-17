@@ -5,6 +5,7 @@ import be.svend.goodviews.models.notification.Notification;
 import be.svend.goodviews.repositories.notification.NotificationRepository;
 import be.svend.goodviews.repositories.UserRepository;
 import be.svend.goodviews.services.comment.CommentService;
+import be.svend.goodviews.services.notification.NotificationService;
 import be.svend.goodviews.services.rating.RatingService;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +21,8 @@ import static be.svend.goodviews.services.users.UserMerger.mergeUserWithNewData;
 public class UserService {
     UserRepository userRepo;
     UserValidator userValidator;
-    NotificationRepository notificationRepo;
 
+    NotificationService notificationService; // Used to change the notifications when deleting user
     FriendshipService friendshipService; // Used to delete the user or change the username from existing friendships
     RatingService ratingService; // Need RatingService to migrate the ratings of a username change
     CommentService commentService; // Need CommentService to delete username from comments of a deleted user
@@ -33,13 +34,13 @@ public class UserService {
                        RatingService ratingService,
                        CommentService commentService,
                        FriendshipService friendshipService,
-                       NotificationRepository notificationRepo) {
+                       NotificationService notificationService) {
         this.userRepo = userRepo;
         this.userValidator = userValidator;
         this.ratingService = ratingService;
         this.commentService = commentService;
         this.friendshipService = friendshipService;
-        this.notificationRepo = notificationRepo;
+        this.notificationService = notificationService;
     }
 
     // FIND METHODS
@@ -231,9 +232,13 @@ public class UserService {
         }
 
         // Delete their notifications
-        List<Notification> allNotifications = notificationRepo.findByTargetUser(existingUser.get());
-        for (Notification notification: allNotifications) {
-            notificationRepo.delete(notification);
+        List<Notification> allNotificationsOf = notificationService.findByTargetUser(existingUser.get());
+        for (Notification notification: allNotificationsOf) {
+            notificationService.deleteNotification(notification);
+        }
+        List<Notification> allNotificationsBy = notificationService.findByOriginUser(existingUser.get());
+        for (Notification notification: allNotificationsBy) {
+            notificationService.removeOriginUserFromNotification(notification);
         }
 
         // Delete and check whether it worked

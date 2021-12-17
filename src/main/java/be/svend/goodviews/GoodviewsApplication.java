@@ -53,7 +53,6 @@ public class GoodviewsApplication {
        suggestionService.sendTagSuggestion("Winter",film,bibi);
 
 
-
        suggestionService.findAllAdminNotifications().forEach(sug -> suggestionService.acceptTag((TagSuggestion) sug));
 
 

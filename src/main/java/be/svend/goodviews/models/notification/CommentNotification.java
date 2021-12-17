@@ -24,8 +24,8 @@ public class CommentNotification extends Notification {
     public CommentNotification(Comment comment, Rating rating) {
         this.comment = comment;
         this.rating = rating;
-        super.setOriginUser(comment.getUser());
-        super.setTargetUser(rating.getUser());
+        if (comment != null && comment.getUser() != null) super.setOriginUser(comment.getUser());
+        if (rating != null && rating.getUser() != null) super.setTargetUser(rating.getUser());
     }
 
     // GETTERS & SETTERS

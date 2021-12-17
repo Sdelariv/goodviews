@@ -72,8 +72,15 @@ public class SuggestionService {
         // Check if existing  TODO: Will have to move this to controller
         if (userValidator.isExistingUser(suggester).isEmpty()) return false;
         if (filmValidator.isExistingFilm(film).isEmpty()) return false;
+        else film = filmValidator.isExistingFilm(film).get();
 
-       // See if it exists
+        // See if film already has that genre
+        if (film.getGenres().contains(new Genre(suggestedGenreName))) {
+            System.out.println("Film already has that genre");
+            return false;
+        }
+
+       // See if suggestion already exists
         Optional<GenreSuggestion> genreSuggestion = createGenreSuggestion(suggestedGenreName,film,suggester);
         if (genreSuggestion.isEmpty()) return false;
 
@@ -87,6 +94,13 @@ public class SuggestionService {
         // Check if existing  TODO: Will have to move this to controller
         if (userValidator.isExistingUser(suggester).isEmpty()) return false;
         if (filmValidator.isExistingFilm(film).isEmpty()) return false;
+        else film = filmValidator.isExistingFilm(film).get();
+
+        // Check if film already has tag
+        if (film.getTags().contains(new Tag(suggestedTagName))) {
+            System.out.println("Film already has that tag");
+            return false;
+        }
 
         // Check if suggestion exists
         Optional<TagSuggestion> tagSuggestion = createTagSuggestion(suggestedTagName,film,suggester);
@@ -156,9 +170,9 @@ public class SuggestionService {
 
     private Optional<TagSuggestion> createTagSuggestion(String suggestedTagName, Film film, User suggester) {
         TagSuggestion tagSuggestion = new TagSuggestion();
-        tagSuggestion.setOriginUser(suggester);
         tagSuggestion.setSuggestedTagName(suggestedTagName);
         tagSuggestion.setFilm(film);
+        tagSuggestion.setOriginUser(suggester);
 
         if (tagSuggestionRepo.findByFilmAndSuggestedTagName(film,suggestedTagName).isPresent()) {
             System.out.println("Tag suggestion already exists");
