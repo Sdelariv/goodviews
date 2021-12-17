@@ -1,4 +1,4 @@
-package be.svend.goodviews.services;
+package be.svend.goodviews.services.notification;
 
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Genre;

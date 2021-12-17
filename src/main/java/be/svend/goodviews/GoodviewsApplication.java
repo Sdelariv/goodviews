@@ -3,7 +3,7 @@ package be.svend.goodviews;
 import be.svend.goodviews.models.Friendship;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.*;
-import be.svend.goodviews.services.NotificationService;
+import be.svend.goodviews.services.notification.NotificationService;
 import be.svend.goodviews.services.comment.CommentService;
 import be.svend.goodviews.services.film.FilmService;
 import be.svend.goodviews.services.rating.RatingService;

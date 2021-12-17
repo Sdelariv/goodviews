@@ -1,4 +1,4 @@
-package be.svend.goodviews.services;
+package be.svend.goodviews.services.notification;
 
 import be.svend.goodviews.models.Friendship;
 import be.svend.goodviews.models.User;
@@ -31,7 +31,7 @@ public class NotificationService {
 
     // CREATE METHODS
 
-    public void createFriendRequest(Friendship friendship, User userToNotify) {
+    public void createFriendRequestNotification(Friendship friendship, User userToNotify) {
         FriendRequestNotification friendRequestNotification = new FriendRequestNotification();
         friendRequestNotification.setTargetUser(userToNotify);
         friendRequestNotification.setFriendRequest(friendship);
@@ -40,7 +40,9 @@ public class NotificationService {
         System.out.println("Friend request sent");
     }
 
-    public void createFriendAcceptance(Friendship friendship) {
+    // UPDATE METHODS
+
+    public void acceptFriendRequest(Friendship friendship) {
         Notification acceptedFriendNotification = new Notification();
         acceptedFriendNotification.setTargetUser(friendship.getFriendA());
         acceptedFriendNotification.setMessage(friendship.getFriendB().getUsername() + " has accepted your friendrequest");

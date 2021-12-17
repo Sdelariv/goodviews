@@ -4,7 +4,7 @@ import be.svend.goodviews.models.Friendship;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.FriendshipRepository;
 import be.svend.goodviews.repositories.UserRepository;
-import be.svend.goodviews.services.NotificationService;
+import be.svend.goodviews.services.notification.NotificationService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -141,7 +141,7 @@ public class FriendshipService {
         if (createdFriendship.isEmpty()) return false;
 
         // Add notification
-        notificationService.createFriendRequest(createdFriendship.get(),friendB.get());
+        notificationService.createFriendRequestNotification(createdFriendship.get(),friendB.get());
 
         return true;
     }
@@ -180,8 +180,7 @@ public class FriendshipService {
         if (acceptedFriendship.isEmpty()) return Optional.empty();
 
         // Notification
-        notificationService.createFriendAcceptance(friendship);
-
+        notificationService.acceptFriendRequest(friendship);
 
         return acceptedFriendship;
     }
