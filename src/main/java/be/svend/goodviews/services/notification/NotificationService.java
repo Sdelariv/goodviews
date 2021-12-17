@@ -5,9 +5,10 @@ import be.svend.goodviews.models.User;
 import be.svend.goodviews.models.notification.FriendRequestNotification;
 import be.svend.goodviews.models.notification.Notification;
 
-import be.svend.goodviews.repositories.NotificationRepository;
+import be.svend.goodviews.repositories.notification.NotificationRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +48,7 @@ public class NotificationService {
     public void acceptFriendRequest(Friendship friendship) {
         Notification acceptedFriendNotification = new Notification();
         acceptedFriendNotification.setTargetUser(friendship.getFriendA());
+        acceptedFriendNotification.setOriginUser(friendship.getFriendB());
         acceptedFriendNotification.setMessage(friendship.getFriendB().getUsername() + " has accepted your friendrequest");
         notificationRepo.save(acceptedFriendNotification);
 

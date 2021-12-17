@@ -1,11 +1,14 @@
 package be.svend.goodviews;
 
+import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Friendship;
 import be.svend.goodviews.models.User;
+import be.svend.goodviews.models.notification.GenreSuggestion;
 import be.svend.goodviews.repositories.*;
 import be.svend.goodviews.services.notification.NotificationService;
 import be.svend.goodviews.services.comment.CommentService;
 import be.svend.goodviews.services.film.FilmService;
+import be.svend.goodviews.services.notification.SuggestionService;
 import be.svend.goodviews.services.rating.RatingService;
 import be.svend.goodviews.services.rating.RatingValidator;
 import be.svend.goodviews.services.users.FriendshipService;
@@ -27,6 +30,7 @@ public class GoodviewsApplication {
         CommentService commentService = ctx.getBean(CommentService.class);
         FriendshipService friendshipService = ctx.getBean(FriendshipService.class);
         NotificationService notificationService = ctx.getBean(NotificationService.class);
+        SuggestionService suggestionService = ctx.getBean(SuggestionService.class);
 
         User bibi = new User();
         bibi.setUsername("bibi");
@@ -46,11 +50,17 @@ public class GoodviewsApplication {
         waddles.setLastName("The Pig");
         waddles.setPassword("hisPassword");
 
-        friendshipService.requestFriendship(bibi,"waddles");
+        Film film = new Film();
+        film.setId("tt0110367");
 
-        List<Friendship> friendRequestsByBibi = friendshipService.findAllFriendRequestsByUser(bibi);
+       suggestionService.createGenreSuggestion("Ladyfilm",film,bibi);
 
-        friendshipService.acceptFriendship(friendRequestsByBibi.get(0));
+
+
+               suggestionService.findAllAdminNotifications().forEach(sug -> suggestionService.acceptGenre((GenreSuggestion) sug));
+
+
+
 
     }
 

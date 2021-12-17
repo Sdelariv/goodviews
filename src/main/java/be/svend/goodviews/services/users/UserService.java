@@ -2,7 +2,7 @@ package be.svend.goodviews.services.users;
 
 import be.svend.goodviews.models.*;
 import be.svend.goodviews.models.notification.Notification;
-import be.svend.goodviews.repositories.NotificationRepository;
+import be.svend.goodviews.repositories.notification.NotificationRepository;
 import be.svend.goodviews.repositories.UserRepository;
 import be.svend.goodviews.services.comment.CommentService;
 import be.svend.goodviews.services.rating.RatingService;

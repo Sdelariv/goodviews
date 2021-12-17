@@ -2,10 +2,14 @@ package be.svend.goodviews.services.notification;
 
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Genre;
+import be.svend.goodviews.models.TypeOfUser;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.models.notification.GenreSuggestion;
+import be.svend.goodviews.models.notification.Notification;
 import be.svend.goodviews.repositories.GenreRepository;
-import be.svend.goodviews.repositories.NotificationRepository;
+import be.svend.goodviews.repositories.notification.GenreSuggestionRepository;
+import be.svend.goodviews.repositories.notification.NotificationRepository;
+import be.svend.goodviews.services.film.FilmService;
 import be.svend.goodviews.services.film.FilmValidator;
 import be.svend.goodviews.services.film.properties.GenreService;
 import be.svend.goodviews.services.users.UserValidator;
@@ -17,10 +21,12 @@ import java.util.List;
 public class SuggestionService {
     NotificationRepository notificationRepo;
     GenreRepository genreRepo;
+    GenreSuggestionRepository genreSuggestionRepo;
+
     FilmValidator filmValidator;
     UserValidator userValidator;
 
-    GenreService genreService; // For creating accepted genres
+    FilmService filmService; // For creating genres and updating films
 
     // CONSTRUCTOR
 
@@ -28,50 +34,69 @@ public class SuggestionService {
                              GenreRepository genreRepo,
                              FilmValidator filmValidator,
                              UserValidator userValidator,
-                             GenreService genreService) {
+                             FilmService filmService,
+                             GenreSuggestionRepository genreSuggestionRepo) {
         this.notificationRepo = notificationRepo;
         this.genreRepo = genreRepo;
         this.filmValidator = filmValidator;
         this.userValidator = userValidator;
-        this.genreService = genreService;
+        this.filmService = filmService;
+        this.genreSuggestionRepo = genreSuggestionRepo;
     }
 
     // FIND METHODS
+
+    public List<Notification> findAllAdminNotifications() {
+        return notificationRepo.findAllByTypeOfUser(TypeOfUser.ADMIN);
+    }
+
+    public List<Notification> findAllArchitectNotifications() {
+        return notificationRepo.findAllByTypeOfUser(TypeOfUser.ARCHITECT);
+    }
+
     public List<GenreSuggestion> findAllGenreSuggestions() {
-        return notificationRepo.findAllGenreSuggestionNotifications();
+        return genreSuggestionRepo.findAll();
     }
 
     // CREATE METHODS
     public boolean createGenreSuggestion(String suggestedGenreName, Film film, User suggester) {
         // Check if existing  TODO: Will have to move this to controller
-        if (genreRepo.findByName(suggestedGenreName).isPresent()) {
-            System.out.println("Genre already exists");
-            return false;
-        }
         if (userValidator.isExistingUser(suggester).isEmpty()) return false;
         if (filmValidator.isExistingFilm(film).isEmpty()) return false;
 
-        // Create
+        // Create and check if exists
         GenreSuggestion genreSuggestion = new GenreSuggestion();
         genreSuggestion.setSuggestedGenreName(suggestedGenreName);
         genreSuggestion.setFilm(film);
         genreSuggestion.setSuggester(suggester);
+        if (genreSuggestionRepo.findByFilmAndSuggestedGenreName(film,suggestedGenreName).isPresent()) {
+            System.out.println("Genre suggestion already exists");
+            return false;
+        }
+
+        // Save
         notificationRepo.save(genreSuggestion);
 
         System.out.println("Sent suggestion");
         return true;
     }
 
-    // TODO: This method should be in the controller
-    public Genre acceptGenre(GenreSuggestion genreSuggestion) {
+    // TODO: This method should be in the controller?
+    public void acceptGenre(GenreSuggestion genreSuggestion) {
         Genre genre = new Genre(genreSuggestion.getSuggestedGenreName());
-        Genre savedGenre = genreService.saveGenre(genre);
+        filmService.addGenreBasedOnFilmId(genreSuggestion.getFilm().getId(),genre);
 
         deleteGenreSuggestion(genreSuggestion);
-        return savedGenre;
+
+        Notification accepted = new Notification();
+        accepted.setTargetUser(genreSuggestion.getOriginUser());
+        accepted.setMessage("Your genresuggestions: " + genreSuggestion.getSuggestedGenreName() + " for " + genreSuggestion.getFilm().getTitle() + " has been accepted");
+        notificationRepo.save(accepted);
+
+        return;
     }
 
-    // TODO: Method should be in controller
+    // TODO: Method should be in controller?
     public boolean denyGenre(GenreSuggestion genreSuggestion) {
         return deleteGenreSuggestion(genreSuggestion);
     }

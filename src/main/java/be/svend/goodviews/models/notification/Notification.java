@@ -32,6 +32,7 @@ public class Notification {
 
     public Notification() {
         this.seen = false;
+        this.dateTime = LocalDateTime.now();
     }
 
     // GETTERS & SETTERS

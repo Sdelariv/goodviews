@@ -59,9 +59,10 @@ public class GenreSuggestion extends Notification {
 
     public void updateMessage() {
         if (getSuggester() == null || getSuggester().getUsername() == null) return;
-        if (film == null || film.getTitle() == null || film.getId() == null) return;
+        if (film == null || film.getId() == null) return;
 
-        super.setMessage(getSuggester().getUsername() + " has suggested the genre \"" + this.suggestedGenreName + "\" for " + film.getTitle() + " (" + film.getId() + ")");
+        super.setMessage(getSuggester().getUsername() + " has suggested the genre \"" + this.suggestedGenreName + "\" for (" + film.getId() + ")");
+        if (film.getTitle() == null) super.setMessage(super.getMessage() + " " + film.getTitle());
     }
 
     // OTHER METHODS

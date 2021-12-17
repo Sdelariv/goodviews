@@ -243,6 +243,18 @@ public class FriendshipService {
         return true;
     }
 
+    public boolean deleteFriendship(User user1, User user2) {
+        Optional<Friendship> foundFriendship;
+
+        foundFriendship = friendshipRepo.findByFriendAAndFriendB(user1, user2);
+        if (foundFriendship.isPresent()) return deleteFriendship(foundFriendship.get());
+
+        foundFriendship = friendshipRepo.findByFriendAAndFriendB(user2, user1);
+        if (foundFriendship.isPresent()) return deleteFriendship(foundFriendship.get());
+
+        return false;
+    }
+
     // INTERNAL METHODS
 
     /**
