@@ -53,11 +53,10 @@ public class GoodviewsApplication {
         Film film = new Film();
         film.setId("tt0110367");
 
-       suggestionService.createGenreSuggestion("Ladyfilm",film,bibi);
+       suggestionService.createTagSuggestion("Winter",film,bibi);
 
 
-
-               suggestionService.findAllAdminNotifications().forEach(sug -> suggestionService.acceptGenre((GenreSuggestion) sug));
+       // suggestionService.findAllAdminNotifications().forEach(sug -> suggestionService.acceptGenre((GenreSuggestion) sug));
 
 
 
