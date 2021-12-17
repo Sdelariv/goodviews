@@ -26,8 +26,8 @@ public class RatingService {
 
     // FIND METHODS
 
-    public Optional<Rating> findById(String filmId) {
-        Optional<Rating> foundRating = ratingRepo.findById(filmId);
+    public Optional<Rating> findById(String id) {
+        Optional<Rating> foundRating = ratingRepo.findById(id);
 
         if (foundRating.isPresent()) System.out.println("Found rating: " + foundRating);
 

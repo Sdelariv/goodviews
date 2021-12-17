@@ -5,6 +5,7 @@ import be.svend.goodviews.models.Rating;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
+import java.util.Objects;
 
 @Entity
 public class CommentNotification extends Notification {
@@ -36,6 +37,7 @@ public class CommentNotification extends Notification {
 
     public void setComment(Comment comment) {
         this.comment = comment;
+        updateMessage();
     }
 
     public Rating getRating() {
@@ -44,6 +46,14 @@ public class CommentNotification extends Notification {
 
     public void setRating(Rating rating) {
         this.rating = rating;
+        updateMessage();
+    }
+
+    public void updateMessage() {
+        if (comment == null || comment.getUser() == null || comment.getUser().getUsername() == null) return;
+        if (rating == null || rating.getFilm() == null || rating.getFilm().getTitle() == null) return;
+
+        super.setMessage(comment.getUser().getUsername() + " commented on your rating of " + rating.getFilm().getTitle());
     }
 
     // OTHER METHODS
@@ -55,4 +65,13 @@ public class CommentNotification extends Notification {
                 ", rating=" + rating +
                 "} " + super.toString();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CommentNotification that = (CommentNotification) o;
+        return Objects.equals(comment, that.comment) && Objects.equals(rating, that.rating);
+    }
+
 }

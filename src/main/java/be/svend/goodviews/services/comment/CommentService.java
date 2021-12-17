@@ -5,6 +5,7 @@ import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.repositories.CommentRepository;
 import be.svend.goodviews.repositories.RatingRepository;
 import be.svend.goodviews.repositories.UserRepository;
+import be.svend.goodviews.services.notification.CommentNotificationService;
 import be.svend.goodviews.services.rating.RatingService;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,7 @@ public class CommentService {
     RatingRepository ratingRepo;
     UserRepository userRepo;
 
+    CommentNotificationService commentNotificationService; // To send notifications
     RatingService ratingService; // Need ratingService to add or delete a comment from a Rating
 
     // CONSTRUCTORS
@@ -28,11 +30,13 @@ public class CommentService {
     public CommentService(CommentRepository commentRepo,
                           RatingRepository ratingRepo,
                           UserRepository userRepo,
-                          RatingService ratingService) {
+                          RatingService ratingService,
+                          CommentNotificationService commentNotificationService) {
         this.commentRepo = commentRepo;
         this.ratingRepo = ratingRepo;
         this.userRepo = userRepo;
         this.ratingService = ratingService;
+        this.commentNotificationService = commentNotificationService;
     }
 
     // FIND METHODS
@@ -66,14 +70,20 @@ public class CommentService {
 
         // Finding the rating to add a comment to
         Optional<Rating> ratingToComment = ratingRepo.findById(ratingId);
-        if (ratingToComment.isEmpty()) return Optional.empty();
+        if (ratingToComment.isEmpty()) {
+            System.out.println("Invalid rating");
+            return Optional.empty();
+        }
 
         // Prepare and save comment
         Comment validatedComment = addDateTimeAndNullifyId(comment);
-        Optional<Comment> savedComment = saveComment(comment);
+        Optional<Comment> savedComment = saveComment(validatedComment);
 
         // Linking the comment to the relevant Rating
-        ratingService.addCommentToRating(ratingToComment.get(),comment);
+        ratingService.addCommentToRating(ratingToComment.get(),savedComment.get());
+
+        // Sending notifications
+        commentNotificationService.sendCommentNotification(savedComment.get());
         return savedComment;
     }
 

@@ -1,6 +1,8 @@
 package be.svend.goodviews;
 
+import be.svend.goodviews.models.Comment;
 import be.svend.goodviews.models.Film;
+import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.models.notification.TagSuggestion;
 import be.svend.goodviews.repositories.*;
@@ -28,6 +30,7 @@ public class GoodviewsApplication {
         FriendshipService friendshipService = ctx.getBean(FriendshipService.class);
         NotificationService notificationService = ctx.getBean(NotificationService.class);
         SuggestionService suggestionService = ctx.getBean(SuggestionService.class);
+        RatingRepository ratingRepo = ctx.getBean(RatingRepository.class);
 
         User bibi = new User();
         bibi.setUsername("bibi");
@@ -50,11 +53,11 @@ public class GoodviewsApplication {
         Film film = new Film();
         film.setId("tt0110367");
 
-       suggestionService.sendTagSuggestion("Winter",film,bibi);
+        Comment comment = new Comment();
+        comment.setComment("RGR!");
+        comment.setUser(waddles);
 
-
-       suggestionService.findAllAdminNotifications().forEach(sug -> suggestionService.acceptTag((TagSuggestion) sug));
-
+       commentService.createNewComment(comment,"sdelarivtt4468740");
 
 
 
