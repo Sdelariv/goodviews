@@ -8,11 +8,13 @@ import be.svend.goodviews.models.notification.Notification;
 import be.svend.goodviews.repositories.notification.NotificationRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service for general notification-methods
+ */
 @Service
 public class NotificationService {
     NotificationRepository notificationRepo;
