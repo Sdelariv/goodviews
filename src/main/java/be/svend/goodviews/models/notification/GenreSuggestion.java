@@ -8,7 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 
 @Entity
-public class GenreSuggestionNotification extends Notification {
+public class GenreSuggestion extends Notification {
 
     private String suggestedGenreName;
 
@@ -20,11 +20,11 @@ public class GenreSuggestionNotification extends Notification {
 
     // CONSTRUCTOR
 
-    public GenreSuggestionNotification(){
+    public GenreSuggestion(){
         super.setTypeOfUser(TypeOfUser.ADMIN);
     }
 
-    public GenreSuggestionNotification(String suggestedGenreName, Film film, User suggester) {
+    public GenreSuggestion(String suggestedGenreName, Film film, User suggester) {
         this.film = film;
         this.suggester = suggester;
         this.suggestedGenreName = suggestedGenreName;

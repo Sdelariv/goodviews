@@ -4,6 +4,7 @@ import be.svend.goodviews.models.Friendship;
 import be.svend.goodviews.models.TypeOfUser;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.models.notification.FriendRequestNotification;
+import be.svend.goodviews.models.notification.GenreSuggestion;
 import be.svend.goodviews.models.notification.Notification;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -17,5 +18,7 @@ public interface NotificationRepository extends JpaRepository<Notification,Long>
     Optional<FriendRequestNotification> findByFriendRequest(Friendship friendship);
 
     List<Notification> findByTargetUser(User user);
+
+    List<GenreSuggestion> findAllGenreSuggestionNotifications();
 
 }

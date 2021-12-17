@@ -1,10 +1,13 @@
 package be.svend.goodviews.services.film;
 
 import be.svend.goodviews.models.Film;
+import be.svend.goodviews.repositories.FilmRepository;
 import be.svend.goodviews.services.film.properties.GenreService;
 import be.svend.goodviews.services.crew.PersonService;
 import be.svend.goodviews.services.film.properties.TagService;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 
 @Component
@@ -12,12 +15,17 @@ public class FilmValidator {
     PersonService personService;
     GenreService genreService;
     TagService tagService;
+    FilmRepository filmRepo;
 
 
-    public FilmValidator(PersonService directorService, GenreService genreService, TagService tagService) {
+    public FilmValidator(PersonService directorService,
+                         GenreService genreService,
+                         TagService tagService,
+                         FilmRepository filmRepo) {
         this.personService = directorService;
         this.genreService = genreService;
         this.tagService = tagService;
+        this.filmRepo = filmRepo;
     }
 
     /**
@@ -47,5 +55,11 @@ public class FilmValidator {
         return id.startsWith("tt");
     }
 
+    public Optional<Film> isExistingFilm(Film film) {
+        if (film == null) return Optional.empty();
+        if (film.getId() == null) return Optional.empty();
+
+        return filmRepo.findById(film.getId());
+    }
 
 }
