@@ -4,6 +4,7 @@ import be.svend.goodviews.models.Comment;
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.models.User;
+import be.svend.goodviews.models.notification.FilmSuggestion;
 import be.svend.goodviews.models.notification.TagSuggestion;
 import be.svend.goodviews.repositories.*;
 import be.svend.goodviews.services.notification.NotificationService;
@@ -53,12 +54,10 @@ public class GoodviewsApplication {
         Film film = new Film();
         film.setId("tt0110367");
 
-        Comment comment = new Comment();
-        comment.setComment("RGR!");
-        comment.setUser(waddles);
+        suggestionService.sendFilmSuggestion("tt16283668",sven);
 
-       commentService.createNewComment(comment,"sdelarivtt4468740");
-
+        FilmSuggestion suggestion = suggestionService.findAllFilmSuggestions().get(0);
+        suggestionService.acceptFilm(suggestion);
 
 
     }

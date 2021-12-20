@@ -52,6 +52,8 @@ public class FilmValidator {
     }
 
     public static boolean isValidFilmIdFormat(String id) {
+        if (id.contains(";")) return false;
+
         return id.startsWith("tt");
     }
 
@@ -60,6 +62,12 @@ public class FilmValidator {
         if (film.getId() == null) return Optional.empty();
 
         return filmRepo.findById(film.getId());
+    }
+
+    public Optional<Film> isExistingFilmId(String filmId) {
+        if (filmId == null) return Optional.empty();
+
+        return filmRepo.findById(filmId);
     }
 
 }

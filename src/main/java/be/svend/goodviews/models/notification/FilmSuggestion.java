@@ -12,6 +12,8 @@ public class FilmSuggestion extends Notification{
 
     private String suggestedFilmId;
 
+    private String filmTitle;
+
     // CONSTRUCTORS
 
     public FilmSuggestion() {
@@ -45,14 +47,22 @@ public class FilmSuggestion extends Notification{
         updateMessage();
     }
 
+    public void setFilmTitle(String title) {
+        this.filmTitle = title;
+        updateMessage();
+    }
 
-    // OTHER
+    public String getFilmTitle() {
+        return filmTitle;
+    }
+
+// OTHER
 
     public void updateMessage() {
         if (getSuggester() == null || getSuggester().getUsername() == null) return;
-        if (suggestedFilmId == null ) return;
+        if (suggestedFilmId == null || filmTitle == null) return;
 
-        super.setMessage(getSuggester().getUsername() + " has suggested to add \"" + suggestedFilmId + " to the film database");
+        super.setMessage(getSuggester().getUsername() + " has suggested to add to \"" + filmTitle + "\" (" + suggestedFilmId + ") to the film database");
     }
 
 

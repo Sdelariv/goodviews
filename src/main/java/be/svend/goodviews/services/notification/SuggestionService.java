@@ -1,10 +1,12 @@
 package be.svend.goodviews.services.notification;
 
 import be.svend.goodviews.models.*;
+import be.svend.goodviews.models.notification.FilmSuggestion;
 import be.svend.goodviews.models.notification.GenreSuggestion;
 import be.svend.goodviews.models.notification.Notification;
 import be.svend.goodviews.models.notification.TagSuggestion;
 import be.svend.goodviews.repositories.GenreRepository;
+import be.svend.goodviews.repositories.notification.FilmSuggestionRepository;
 import be.svend.goodviews.repositories.notification.GenreSuggestionRepository;
 import be.svend.goodviews.repositories.notification.NotificationRepository;
 import be.svend.goodviews.repositories.notification.TagSuggestionRepository;
@@ -22,6 +24,7 @@ public class SuggestionService {
     GenreRepository genreRepo;
     GenreSuggestionRepository genreSuggestionRepo;
     TagSuggestionRepository tagSuggestionRepo;
+    FilmSuggestionRepository filmSuggestionRepo;
 
     FilmValidator filmValidator;
     UserValidator userValidator;
@@ -38,7 +41,8 @@ public class SuggestionService {
                              FilmService filmService,
                              GenreSuggestionRepository genreSuggestionRepo,
                              TagSuggestionRepository tagSuggestionRepo,
-                             NotificationService notificationService) {
+                             NotificationService notificationService,
+                             FilmSuggestionRepository filmSuggestionRepo) {
         this.notificationRepo = notificationRepo;
         this.genreRepo = genreRepo;
         this.filmValidator = filmValidator;
@@ -47,6 +51,7 @@ public class SuggestionService {
         this.genreSuggestionRepo = genreSuggestionRepo;
         this.tagSuggestionRepo = tagSuggestionRepo;
         this.notificationService = notificationService;
+        this.filmSuggestionRepo = filmSuggestionRepo;
     }
 
     // FIND METHODS
@@ -67,6 +72,8 @@ public class SuggestionService {
         return tagSuggestionRepo.findAll();
     }
 
+    public List<FilmSuggestion> findAllFilmSuggestions() { return filmSuggestionRepo.findAll(); }
+
     // CREATE METHODS
     public boolean sendGenreSuggestion(String suggestedGenreName, Film film, User suggester) {
         // Check if existing  TODO: Will have to move this to controller
@@ -86,7 +93,7 @@ public class SuggestionService {
 
         // Send(Save)
         notificationRepo.save(genreSuggestion.get());
-        System.out.println("Sent suggestion");
+        System.out.println("Genre suggestion sent");
         return true;
     }
 
@@ -108,7 +115,39 @@ public class SuggestionService {
 
         // Send(Save)
         notificationRepo.save(tagSuggestion.get());
-        System.out.println("Sent suggestion");
+        System.out.println("Tag suggestion sent");
+        return true;
+    }
+
+    public boolean sendFilmSuggestion(String suggestedFilmId, User suggester) {
+        // Check if existing
+        if (userValidator.isExistingUser(suggester).isEmpty()) {
+            System.out.println("Invalid user");
+            return false;
+        }
+
+        // Check if film is already in Db
+        suggestedFilmId = suggestedFilmId.trim();
+        if (filmValidator.isExistingFilmId(suggestedFilmId).isPresent()) {
+            System.out.println("Film already exists in db");
+            return false;
+        }
+
+        // Check if film exists on IMDB
+        if (!filmValidator.isValidFilmIdFormat(suggestedFilmId)) return false;
+        Optional<Film> filmFromIMDB = filmService.fetchFilmByImdbId(suggestedFilmId);
+        if (filmFromIMDB.isEmpty()) {
+            System.out.println("Invalid imdb id.");
+            return false;
+        }
+
+        // Create notification
+        Optional<FilmSuggestion> filmSuggestion = createFilmSuggestion(suggestedFilmId,suggester, filmFromIMDB.get().getTitle());
+        if (filmSuggestion.isEmpty()) return false;
+
+        // Send(Save)
+        notificationRepo.save(filmSuggestion.get());
+        System.out.println("Film suggestion sent");
         return true;
     }
 
@@ -120,28 +159,36 @@ public class SuggestionService {
         Genre genre = new Genre(genreSuggestion.getSuggestedGenreName());
         filmService.addGenreBasedOnFilmId(genreSuggestion.getFilm().getId(),genre);
 
-        notificationService.deleteNotification(genreSuggestion);
-
         Notification accepted = new Notification();
         accepted.setTargetUser(genreSuggestion.getOriginUser());
         accepted.setMessage("Your genresuggestions: " + genreSuggestion.getSuggestedGenreName() + " for " + genreSuggestion.getFilm().getTitle() + " has been accepted");
         notificationRepo.save(accepted);
 
-        return;
+        notificationService.deleteNotification(genreSuggestion);
     }
 
     // TODO: This method should be in the controller?
     public void acceptTag(TagSuggestion tagSuggestion) {
         filmService.addTagBasedOnFilmIdAndTagString(tagSuggestion.getFilm().getId(),tagSuggestion.getSuggestedTagName());
 
-        notificationService.deleteNotification(tagSuggestion);
-
         Notification accepted = new Notification();
         accepted.setTargetUser(tagSuggestion.getOriginUser());
         accepted.setMessage("Your tag suggestion: " + tagSuggestion.getSuggestedTagName() + " for " + tagSuggestion.getFilm().getTitle() + " has been accepted");
         notificationRepo.save(accepted);
 
-        return;
+        notificationService.deleteNotification(tagSuggestion);
+    }
+
+    // TODO: This method should be in the controller?
+    public void acceptFilm(FilmSuggestion filmSuggestion) {
+        filmService.createFilmByImdbId(filmSuggestion.getSuggestedFilmId());
+
+        Notification accepted = new Notification();
+        accepted.setTargetUser(filmSuggestion.getOriginUser());
+        accepted.setMessage("Your film suggestion of " + filmSuggestion.getFilmTitle() + " has been accepted");
+        notificationRepo.save(accepted);
+
+        notificationService.deleteNotification(filmSuggestion);
     }
 
     // DELETE METHODS
@@ -154,6 +201,12 @@ public class SuggestionService {
     public boolean denyTag(TagSuggestion tagSuggestion) {
         return notificationService.deleteNotification(tagSuggestion);
     }
+
+    public boolean denyFilm(FilmSuggestion filmSuggestion) {
+        return notificationService.deleteNotification(filmSuggestion);
+    }
+
+    // INTERNAL METHODS
 
     private Optional<GenreSuggestion> createGenreSuggestion(String suggestedGenreName, Film film, User suggester) {
         GenreSuggestion genreSuggestion = new GenreSuggestion();
@@ -180,6 +233,20 @@ public class SuggestionService {
         }
 
         return Optional.of(tagSuggestion);
+    }
+
+    private Optional<FilmSuggestion> createFilmSuggestion(String suggestedFilmId, User suggester, String title) {
+        FilmSuggestion filmSuggestion = new FilmSuggestion();
+        filmSuggestion.setSuggester(suggester);
+        filmSuggestion.setSuggestedFilmId(suggestedFilmId);
+        filmSuggestion.setFilmTitle(title);
+
+        if (filmSuggestionRepo.findBySuggestedFilmId(suggestedFilmId).isPresent()) {
+            System.out.println("Film suggestion already exists");
+            return Optional.empty();
+        }
+
+        return Optional.of(filmSuggestion);
     }
 
 }

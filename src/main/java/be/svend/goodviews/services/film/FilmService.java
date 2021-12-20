@@ -140,6 +140,16 @@ public class FilmService {
 
 
     public Optional<Film> createFilmByImdbId(String imdbId) {
+       Optional<Film> createdFilm = fetchFilmByImdbId(imdbId);
+
+        // Save if present
+        if (createdFilm.isEmpty()) return Optional.empty();
+        initialiseAndSaveFilm(createdFilm.get());
+
+        return createdFilm;
+    }
+
+    public Optional<Film> fetchFilmByImdbId(String imdbId) {
         // Check whether existing
         if (imdbId == null) return Optional.empty();
         if (findById(imdbId).isPresent()) {
@@ -148,13 +158,7 @@ public class FilmService {
         }
 
         // Get data
-        Optional<Film> createdFilm = WebScraper.createFilmWithWebData(imdbId);
-
-        // Save if present
-        if (createdFilm.isEmpty()) return Optional.empty();
-        initialiseAndSaveFilm(createdFilm.get());
-
-        return createdFilm;
+        return WebScraper.createFilmWithWebData(imdbId);
     }
 
     // UPDATE METHODS
