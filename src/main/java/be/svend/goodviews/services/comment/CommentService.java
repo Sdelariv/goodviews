@@ -102,6 +102,7 @@ public class CommentService {
 
         // Updating comment
         Comment updatedComment = CommentMerger.updateCommentWithNewData(existingComment.get(),comment);
+        logUpdateService.createUpdateCommentUpdate(existingComment.get());
         return saveComment(updatedComment);
     }
 

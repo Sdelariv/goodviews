@@ -22,12 +22,14 @@ public class LogUpdate {
 
     private String updateString;
 
+    private boolean isClassified;
+
     // CONSTRUCTOR
 
     public LogUpdate() {
         this.dateTime = LocalDateTime.now();
+        this.setClassified(false);
     }
-
 
     // GETTERS & SETTERS
 
@@ -63,15 +65,24 @@ public class LogUpdate {
         this.updateString = updateString;
     }
 
+    public boolean isClassified() {
+        return isClassified;
+    }
+
+    public void setClassified(boolean classified) {
+        isClassified = classified;
+    }
+
     // OTHER
 
     @Override
     public String toString() {
-        return "Update{" +
+        return "LogUpdate{" +
                 "id=" + id +
                 ", user=" + user +
                 ", dateTime=" + dateTime +
                 ", updateString='" + updateString + '\'' +
+                ", isPublic=" + isClassified +
                 '}';
     }
 }

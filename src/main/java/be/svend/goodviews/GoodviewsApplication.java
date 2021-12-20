@@ -19,6 +19,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.util.Optional;
+
 @SpringBootApplication
 public class GoodviewsApplication {
 
@@ -59,8 +61,16 @@ public class GoodviewsApplication {
         rating.setUser(bibi);
         rating.setFilm(film);
 
+        Comment comment = new Comment();
+        comment.setComment("Rgr");
+        comment.setUser(waddles);
 
-        ratingService.createNewRating(rating);
+
+        Optional<Comment> commentInDb = commentService.findById(177L);
+        System.out.println(commentInDb.get());
+
+        commentInDb.get().setComment("Rgr!!");
+        commentService.updateComment(commentInDb.get());
 
 
     }

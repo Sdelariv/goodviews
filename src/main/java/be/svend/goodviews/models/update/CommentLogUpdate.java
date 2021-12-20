@@ -24,10 +24,10 @@ public class CommentLogUpdate extends LogUpdate {
     public CommentLogUpdate(Rating rating, Comment comment) {
         if (comment == null) return;
         this.comment = comment;
+        if (comment.getUser() == null) return;
+        super.setUser(comment.getUser());
         if (rating == null) return;
         this.rating = rating;
-        if (rating.getUser() == null) return;
-        super.setUser(rating.getUser());
         updateUpdateString();
     }
 
