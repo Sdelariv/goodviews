@@ -7,6 +7,7 @@ import be.svend.goodviews.repositories.GenreRepository;
 import be.svend.goodviews.repositories.RatingRepository;
 import be.svend.goodviews.services.film.properties.TagService;
 import be.svend.goodviews.services.crew.PersonService;
+import be.svend.goodviews.services.rating.RatingService;
 import be.svend.goodviews.services.update.LogUpdateService;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,7 @@ public class FilmService {
 
     PersonService personService; // Using PersonService to find a films with a particular director or writer, but could use Repo I think
     LogUpdateService logUpdateService; // Used to log
+    // RatingService ratingService; // Used to delete rating when deleting film // TODO: Add this once RatingService doesn't need to refer to FilmService
 
     // CONSTRUCTOR
 
@@ -35,7 +37,8 @@ public class FilmService {
                        RatingRepository ratingRepo,
                        GenreRepository genreRepo,
                        TagService tagService,
-                       LogUpdateService logUpdateService) {
+                       LogUpdateService logUpdateService,
+                       RatingService ratingService) {
         this.filmRepo = filmRepo;
         this.filmValidator = filmValidator;
         this.personService = personService;
@@ -43,6 +46,7 @@ public class FilmService {
         this.genreRepo = genreRepo;
         this.tagService = tagService;
         this.logUpdateService = logUpdateService;
+        // this.ratingService = ratingService; // TODO: Add this once RatingService doesn't need to refer to FilmService
     }
 
     // FIND METHODS
@@ -335,9 +339,13 @@ public class FilmService {
             System.out.println("Can't delete a film with id not in database");
             return;
         } else {
-            System.out.println("Deleting " + film.getTitle());
-            logUpdateService.createGeneralLog("Deleted " + film.getTitle());
+           // ratingService.deleteByFilmId(film.getId()); // TODO: Add this once RatingService doesn't need to refer to FilmService
+
+            String title = film.getTitle();
+
             filmRepo.deleteById(film.getId());
+            System.out.println("Deleted " + title);
+            logUpdateService.createGeneralLog("Deleted " + title);
         }
     }
 

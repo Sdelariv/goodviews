@@ -1,6 +1,7 @@
 package be.svend.goodviews.services.rating;
 
 import be.svend.goodviews.models.Comment;
+import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.repositories.RatingRepository;
 import be.svend.goodviews.services.film.FilmService;
@@ -74,7 +75,7 @@ public class RatingService {
         else System.out.println("Couldn't create this new rating " + rating);
 
         // Other updates
-        filmService.calculateAndUpdateAverageRatingByFilmId(rating.getFilm().getId());
+        filmService.calculateAndUpdateAverageRatingByFilmId(rating.getFilm().getId()); // TODO: Move to Controller
         logUpdateService.createRatingUpdate(createdRating.get());
 
         return createdRating;
@@ -133,7 +134,7 @@ public class RatingService {
         ratingToUpdate.setRatingValue(ratingValue);
         ratingToUpdate.setDateOfRating(LocalDate.now());
 
-        filmService.calculateAndUpdateAverageRatingByFilmId(filmId);
+        filmService.calculateAndUpdateAverageRatingByFilmId(filmId); // TODO: Move to Controller
 
         return updateRating(ratingToUpdate);
     }
@@ -190,7 +191,7 @@ public class RatingService {
         ratingRepo.delete(foundRating.get());
         System.out.println("Succesfully deleted the rating");
 
-        filmService.calculateAndUpdateAverageRatingByFilmId(filmId);
+        filmService.calculateAndUpdateAverageRatingByFilmId(filmId); // TODO: Move to Controller
         return true;
     }
 
@@ -212,6 +213,16 @@ public class RatingService {
         for (Rating rating: ratings) {
             deleteRatingById(rating.getId());
         }
+    }
+
+    public boolean deleteByFilmId(String filmId) {
+        List<Rating> ratingsOfFilm = ratingRepo.findByFilm_Id(filmId);
+
+        for (Rating rating : ratingsOfFilm) {
+            deleteRating(rating);
+        }
+
+        return true;
     }
 
 

@@ -33,6 +33,7 @@ public class GoodviewsApplication {
         SuggestionService suggestionService = ctx.getBean(SuggestionService.class);
         RatingRepository ratingRepo = ctx.getBean(RatingRepository.class);
         LogUpdateService logUpdateService = ctx.getBean(LogUpdateService.class);
+        FilmService filmService = ctx.getBean(FilmService.class);
 
         User bibi = new User();
         bibi.setUsername("bibi");
@@ -55,10 +56,6 @@ public class GoodviewsApplication {
         Film film = new Film();
         film.setId("tt0110367");
 
-        Rating rating = new Rating();
-        rating.setRatingValue(90);
-        rating.setUser(bibi);
-        rating.setFilm(film);
 
 
 
@@ -67,21 +64,23 @@ public class GoodviewsApplication {
         newUser.setFirstName("Fake");
         newUser.setLastName("McFakington");
         newUser.setPassword("fakePassword");
-        userService.createNewUser(newUser);
+
+        // Film henry = filmService.createFilmByImdbId("tt16283668").get();
+        Film henry = filmService.findById("tt16283668").get();
+
+        Rating rating = new Rating();
+        rating.setRatingValue(90);
+        rating.setUser(bibi);
+        rating.setFilm(henry);
+        ratingService.createNewRating(rating);
 
         Comment comment = new Comment();
-        comment.setComment("Comment from userToDelete");
-        comment.setUser(newUser);
+        comment.setComment("Thank you Bibi!");
+        comment.setUser(sven);
+
+        filmService.deleteFilm(henry);
 
 
-        friendshipService.requestFriendship(sven,"userToDelete");
-        Friendship request = friendshipService.findAllFriendRequestsOfUser(newUser).get(0);
-        friendshipService.acceptFriendship(request);
-
-        commentService.createNewComment(comment,"bibitt0110367");
-
-
-           userService.deleteUser(newUser);
     }
 
 }
