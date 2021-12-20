@@ -36,6 +36,7 @@ public class LogUpdate {
 
     public LogUpdate(String updateString) {
         this.updateString = updateString;
+        this.dateTime = LocalDateTime.now();
     }
 
     // GETTERS & SETTERS

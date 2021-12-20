@@ -186,7 +186,6 @@ public class FriendshipService {
 
         // Notification + Log
         friendRequestService.acceptFriendRequest(friendship);
-        logUpdateService.createFriendshipUpdate(acceptedFriendship.get());
 
         return acceptedFriendship;
     }

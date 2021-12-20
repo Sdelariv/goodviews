@@ -93,7 +93,10 @@ public class UserService {
         // TODO: hash the password?
 
         Optional<User> createdUser = saveUser(user);
-        if (createdUser.isPresent()) System.out.println("Created " + createdUser.get().getUsername());
+        if (createdUser.isPresent()) {
+            logUpdateService.createGeneralLog("Created user: " + createdUser.get().getUsername());
+            System.out.println("Created " + createdUser.get().getUsername());
+        }
         else System.out.println("Couldn't create new user");
 
         return createdUser;
@@ -252,7 +255,7 @@ public class UserService {
         userRepo.delete(existingUser.get());
         if (findByUsername(user.getUsername()).isEmpty()) {
             System.out.println(user.getUsername() + " succesfully deleted");
-            logUpdateService.createGeneralLog("New user created: " + user.getUsername());
+            logUpdateService.createGeneralLog("User deleted: " + user.getUsername());
             return true;
         }
         System.out.println("Something went wrong while deleting");

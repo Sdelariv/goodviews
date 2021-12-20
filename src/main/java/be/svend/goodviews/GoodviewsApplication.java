@@ -60,10 +60,7 @@ public class GoodviewsApplication {
         rating.setUser(bibi);
         rating.setFilm(film);
 
-        Comment comment = new Comment();
-        comment.setId(177L);
-        comment.setComment("Rgr!!!!");
-        comment.setUser(waddles);
+
 
         User newUser = new User();
         newUser.setUsername("userToDelete");
@@ -72,6 +69,9 @@ public class GoodviewsApplication {
         newUser.setPassword("fakePassword");
         userService.createNewUser(newUser);
 
+        Comment comment = new Comment();
+        comment.setComment("Comment from userToDelete");
+        comment.setUser(newUser);
 
 
         friendshipService.requestFriendship(sven,"userToDelete");

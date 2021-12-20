@@ -101,7 +101,7 @@ public class LogUpdateService {
         System.out.println("Deleting user from their logs");
         for (LogUpdate logUpdate: logUpdatesWithUser) {
             if (logUpdate.getUser().equals(user)) logUpdate.setUser(null);
-            if (logUpdate.getOtherUser().equals(user)) logUpdate.setOtherUser(null);
+            if (logUpdate.getOtherUser() != null && logUpdate.getOtherUser().equals(user)) logUpdate.setOtherUser(null);
             if (logUpdate instanceof FriendshipLogUpdate) ((FriendshipLogUpdate) logUpdate).setFriendship(null);
             logUpdateRepo.save(logUpdate);
         }
