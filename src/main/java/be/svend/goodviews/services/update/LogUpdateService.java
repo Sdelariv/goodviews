@@ -56,6 +56,7 @@ public class LogUpdateService {
 
     public void createUpdateCommentUpdate(Comment comment) {
         CommentLogUpdate commentLogUpdate = new CommentLogUpdate();
+        commentLogUpdate.setUser(comment.getUser());
         commentLogUpdate.setComment(comment);
         commentLogUpdate.setUpdateString(comment.getUser().getUsername() + " has updated their comment with id " + comment.getId());
         commentLogUpdate.setClassified(true);

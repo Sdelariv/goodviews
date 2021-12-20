@@ -13,6 +13,7 @@ import be.svend.goodviews.services.film.FilmService;
 import be.svend.goodviews.services.notification.SuggestionService;
 import be.svend.goodviews.services.rating.RatingService;
 import be.svend.goodviews.services.rating.RatingValidator;
+import be.svend.goodviews.services.update.LogUpdateService;
 import be.svend.goodviews.services.users.FriendshipService;
 import be.svend.goodviews.services.users.UserService;
 import org.springframework.boot.SpringApplication;
@@ -34,6 +35,7 @@ public class GoodviewsApplication {
         NotificationService notificationService = ctx.getBean(NotificationService.class);
         SuggestionService suggestionService = ctx.getBean(SuggestionService.class);
         RatingRepository ratingRepo = ctx.getBean(RatingRepository.class);
+        LogUpdateService logUpdateService = ctx.getBean(LogUpdateService.class);
 
         User bibi = new User();
         bibi.setUsername("bibi");
@@ -62,15 +64,12 @@ public class GoodviewsApplication {
         rating.setFilm(film);
 
         Comment comment = new Comment();
-        comment.setComment("Rgr");
+        comment.setId(177L);
+        comment.setComment("Rgr!!!!");
         comment.setUser(waddles);
 
 
-        Optional<Comment> commentInDb = commentService.findById(177L);
-        System.out.println(commentInDb.get());
-
-        commentInDb.get().setComment("Rgr!!");
-        commentService.updateComment(commentInDb.get());
+        logUpdateService.findByUserExcludingClassified(waddles).forEach(lu -> System.out.println(lu.getUpdateString()));
 
 
     }
