@@ -7,6 +7,7 @@ import be.svend.goodviews.repositories.RatingRepository;
 import be.svend.goodviews.repositories.UserRepository;
 import be.svend.goodviews.services.notification.CommentNotificationService;
 import be.svend.goodviews.services.rating.RatingService;
+import be.svend.goodviews.services.update.LogUpdateService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,8 @@ public class CommentService {
     RatingRepository ratingRepo;
     UserRepository userRepo;
 
+    LogUpdateService logUpdateService; // To update the log
+
     CommentNotificationService commentNotificationService; // To send notifications
     RatingService ratingService; // Need ratingService to add or delete a comment from a Rating
 
@@ -31,12 +34,14 @@ public class CommentService {
                           RatingRepository ratingRepo,
                           UserRepository userRepo,
                           RatingService ratingService,
-                          CommentNotificationService commentNotificationService) {
+                          CommentNotificationService commentNotificationService,
+                          LogUpdateService logUpdateService) {
         this.commentRepo = commentRepo;
         this.ratingRepo = ratingRepo;
         this.userRepo = userRepo;
         this.ratingService = ratingService;
         this.commentNotificationService = commentNotificationService;
+        this.logUpdateService = logUpdateService;
     }
 
     // FIND METHODS
@@ -82,8 +87,9 @@ public class CommentService {
         // Linking the comment to the relevant Rating
         ratingService.addCommentToRating(ratingToComment.get(),savedComment.get());
 
-        // Sending notifications
+        // Sending notifications + updating Log
         commentNotificationService.sendCommentNotification(savedComment.get());
+        logUpdateService.createCommentUpdate(ratingToComment.get(),savedComment.get());
         return savedComment;
     }
 
