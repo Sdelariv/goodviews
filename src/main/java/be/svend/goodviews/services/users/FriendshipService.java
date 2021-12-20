@@ -144,8 +144,9 @@ public class FriendshipService {
         Optional<Friendship> createdFriendship = createRequestedFriendship(friendA.get(),friendB.get());
         if (createdFriendship.isEmpty()) return false;
 
-        // Add notification
+        // Add notification + Log
         friendRequestService.sendFriendRequestNotification(createdFriendship.get(),friendB.get());
+        logUpdateService.createGeneralLog(friendA.get(),friendA.get().getUsername() + " has requested friendship with " + friendB.get().getUsername());
 
         return true;
     }
@@ -202,6 +203,9 @@ public class FriendshipService {
 
         friendshipInDb.get().setAccepted(true);
         friendshipInDb.get().setDateCreated(LocalDate.now());
+
+        // Log
+        logUpdateService.createFriendshipUpdate(friendshipInDb.get());
 
         return saveFriendship(friendshipInDb.get());
     }

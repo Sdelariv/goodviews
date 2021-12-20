@@ -7,6 +7,7 @@ import be.svend.goodviews.repositories.GenreRepository;
 import be.svend.goodviews.repositories.RatingRepository;
 import be.svend.goodviews.services.film.properties.TagService;
 import be.svend.goodviews.services.crew.PersonService;
+import be.svend.goodviews.services.update.LogUpdateService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -24,6 +25,7 @@ public class FilmService {
     TagService tagService;
 
     PersonService personService; // Using PersonService to find a films with a perticular director or writer, but could use Repo I think
+    LogUpdateService logUpdateService; // Used to log
 
     // CONSTRUCTOR
 
@@ -32,13 +34,15 @@ public class FilmService {
                        PersonService personService,
                        RatingRepository ratingRepo,
                        GenreRepository genreRepo,
-                       TagService tagService) {
+                       TagService tagService,
+                       LogUpdateService logUpdateService) {
         this.filmRepo = filmRepo;
         this.filmValidator = filmValidator;
         this.personService = personService;
         this.ratingRepo = ratingRepo;
         this.genreRepo = genreRepo;
         this.tagService = tagService;
+        this.logUpdateService = logUpdateService;
     }
 
     // FIND METHODS
@@ -145,6 +149,9 @@ public class FilmService {
         // Save if present
         if (createdFilm.isEmpty()) return Optional.empty();
         initialiseAndSaveFilm(createdFilm.get());
+
+        // Log
+        logUpdateService.createGeneralLog("Created film: " + createdFilm.get().getTitle());
 
         return createdFilm;
     }
@@ -282,8 +289,9 @@ public class FilmService {
         // Checking if genre already present
         if (foundFilm.getGenres().contains(genre)) return film;
 
-        // Add and save genre
+        // Add and save genre + log
         foundFilm.addGenre(genre);
+        logUpdateService.createGeneralLog(genre.getName() + " has been added to " + foundFilm.getTitle());
         return Optional.of(initialiseAndSaveFilm(foundFilm));
     }
 
@@ -305,8 +313,9 @@ public class FilmService {
             return film;
         }
 
-        // Add and save tag
+        // Add and save tag + log
         foundFilm.addTag(tagToAdd);
+        logUpdateService.createGeneralLog(tagToAdd.getName() + " has been added to " + foundFilm.getTitle());
         return Optional.of(initialiseAndSaveFilm(foundFilm));
     }
 
@@ -327,6 +336,7 @@ public class FilmService {
             return;
         } else {
             System.out.println("Deleting " + film.getTitle());
+            logUpdateService.createGeneralLog("Deleted " + film.getTitle());
             filmRepo.deleteById(film.getId());
         }
     }

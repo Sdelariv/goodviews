@@ -52,6 +52,18 @@ public class LogUpdateService {
 
     //  CREATE METHODS
 
+    public void createGeneralLog(String logUpdateString) {
+        LogUpdate logUpdate = new LogUpdate(logUpdateString);
+        logUpdate.setClassified(true);
+        save(logUpdate);
+    }
+    public void createGeneralLog(User user, String logUpdateString) {
+        LogUpdate logUpdate = new LogUpdate(logUpdateString);
+        logUpdate.setUser(user);
+        logUpdate.setClassified(true);
+        save(logUpdate);
+    }
+
     public void createRatingUpdate(Rating rating) {
         RatingLogUpdate ratingUpdate = new RatingLogUpdate(rating);
         save(ratingUpdate);

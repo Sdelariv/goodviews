@@ -34,6 +34,10 @@ public class LogUpdate {
         this.setClassified(false);
     }
 
+    public LogUpdate(String updateString) {
+        this.updateString = updateString;
+    }
+
     // GETTERS & SETTERS
 
     public Long getId() {

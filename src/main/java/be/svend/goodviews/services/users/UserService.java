@@ -252,6 +252,7 @@ public class UserService {
         userRepo.delete(existingUser.get());
         if (findByUsername(user.getUsername()).isEmpty()) {
             System.out.println(user.getUsername() + " succesfully deleted");
+            logUpdateService.createGeneralLog("New user created: " + user.getUsername());
             return true;
         }
         System.out.println("Something went wrong while deleting");
