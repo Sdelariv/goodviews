@@ -114,6 +114,7 @@ public class CommentNotificationService {
         return Optional.of(commentNotification);
     }
 
+    // TODO: Clean up this method
     private List<CommentNotification> createReplyNotifications(Comment comment) {
         // Find rating-thread
         Optional<Rating> ratingWithComment = ratingRepo.findRatingByCommentListContaining(comment);
