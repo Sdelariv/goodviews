@@ -24,7 +24,7 @@ public class FilmService {
     GenreRepository genreRepo;
     TagService tagService;
 
-    PersonService personService; // Using PersonService to find a films with a perticular director or writer, but could use Repo I think
+    PersonService personService; // Using PersonService to find a films with a particular director or writer, but could use Repo I think
     LogUpdateService logUpdateService; // Used to log
 
     // CONSTRUCTOR

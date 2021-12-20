@@ -246,6 +246,7 @@ public class FriendshipService {
         if (friendshipInDb.isEmpty()) return false;
 
         friendRequestService.deleteNotificationsByFriendship(friendship);
+        logUpdateService.deleteFriendshipFromLogByFriendship(friendship);
 
         friendshipRepo.delete(friendshipInDb.get());
         System.out.println("Friendship deleted");

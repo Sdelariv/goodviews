@@ -134,6 +134,7 @@ public class CommentService {
 
         // Deleting comment
         System.out.println("Deleting comment: " + comment.getComment());
+        logUpdateService.createGeneralLog(comment.getUser() + "'s comment was deleted");
         commentRepo.delete(comment);
         return true;
     }

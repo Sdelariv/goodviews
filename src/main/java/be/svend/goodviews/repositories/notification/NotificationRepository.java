@@ -4,10 +4,8 @@ import be.svend.goodviews.models.Friendship;
 import be.svend.goodviews.models.TypeOfUser;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.models.notification.FriendRequestNotification;
-import be.svend.goodviews.models.notification.GenreSuggestion;
 import be.svend.goodviews.models.notification.Notification;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;

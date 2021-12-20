@@ -4,6 +4,7 @@ import be.svend.goodviews.models.Comment;
 import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.repositories.RatingRepository;
 import be.svend.goodviews.services.film.FilmService;
+import be.svend.goodviews.services.notification.NotificationService;
 import be.svend.goodviews.services.update.LogUpdateService;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +18,8 @@ public class RatingService {
     RatingRepository ratingRepo;
     RatingValidator ratingValidator;
 
-    LogUpdateService logUpdateService;
-
+    NotificationService notificationService; // For deleting rating from notifications
+    LogUpdateService logUpdateService; // For logupdates
     FilmService filmService; // Need FilmService to calculate and update their averageRating property once a rating gets added, updated or deleted
 
     public RatingService(RatingRepository ratingRepo, RatingValidator ratingValidator, FilmService filmService, LogUpdateService logUpdateService) {
@@ -178,6 +179,10 @@ public class RatingService {
         // Find the rating
         Optional<Rating> foundRating = findById(ratingId);
         if (foundRating.isEmpty()) System.out.println("Failed");
+
+        // Delete rating from log + notifications
+        logUpdateService.deleteRatingFromLogByRating(foundRating.get());
+        notificationService.deleteNotificationsByRating(foundRating.get());
 
         // Delete the rating
         String filmId = foundRating.get().getFilm().getId();

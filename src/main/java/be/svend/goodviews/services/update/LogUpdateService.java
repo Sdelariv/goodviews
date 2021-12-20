@@ -1,14 +1,13 @@
 package be.svend.goodviews.services.update;
 
-import be.svend.goodviews.models.Comment;
-import be.svend.goodviews.models.Friendship;
-import be.svend.goodviews.models.Rating;
-import be.svend.goodviews.models.User;
+import be.svend.goodviews.models.*;
 import be.svend.goodviews.models.update.CommentLogUpdate;
 import be.svend.goodviews.models.update.FriendshipLogUpdate;
 import be.svend.goodviews.models.update.LogUpdate;
 import be.svend.goodviews.models.update.RatingLogUpdate;
+import be.svend.goodviews.repositories.update.FriendshipLogUpdateRepository;
 import be.svend.goodviews.repositories.update.LogUpdateRepository;
+import be.svend.goodviews.repositories.update.RatingLogUpdateRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,9 +18,15 @@ import java.util.stream.Collectors;
 @Service
 public class LogUpdateService {
     LogUpdateRepository logUpdateRepo;
+    RatingLogUpdateRepository ratingLogUpdateRepo;
+    FriendshipLogUpdateRepository friendshipLogUpdateRepo;
 
-    public LogUpdateService(LogUpdateRepository logUpdateRepo) {
+    public LogUpdateService(LogUpdateRepository logUpdateRepo,
+                            RatingLogUpdateRepository ratingLogUpdateRepo,
+                            FriendshipLogUpdateRepository friendshipLogUpdateRepo) {
         this.logUpdateRepo = logUpdateRepo;
+        this.ratingLogUpdateRepo = ratingLogUpdateRepo;
+        this.friendshipLogUpdateRepo = friendshipLogUpdateRepo;
     }
 
     // FIND METHODS
@@ -102,6 +107,30 @@ public class LogUpdateService {
         }
 
         return logUpdatesWithUser;
+    }
+
+    public List<RatingLogUpdate> deleteRatingFromLogByRating(Rating rating) {
+        List<RatingLogUpdate> logUpdatesWithRating = ratingLogUpdateRepo.findByRating(rating);
+
+        System.out.println("Deleting ratings from the logs");
+        for (RatingLogUpdate logUpdate: logUpdatesWithRating) {
+            logUpdate.setRating(null);
+            save(logUpdate);
+        }
+
+        return logUpdatesWithRating;
+    }
+
+    public List<FriendshipLogUpdate> deleteFriendshipFromLogByFriendship(Friendship friendship) {
+        List<FriendshipLogUpdate> logUpdatesWithFriendship = friendshipLogUpdateRepo.findByFriendship(friendship);
+
+        System.out.println("Deleting friendships from the logs");
+        for (FriendshipLogUpdate logUpdate: logUpdatesWithFriendship) {
+            logUpdate.setFriendship(null);
+            save(logUpdate);
+        }
+
+        return logUpdatesWithFriendship;
     }
 
     // INTERNAL

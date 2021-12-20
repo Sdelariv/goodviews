@@ -60,6 +60,7 @@ public class FriendRequestService {
         if (request.isPresent()) notificationRepo.delete(request.get());
     }
 
+    // TODO: Move to NotificationService?
     public void deleteNotificationsByFriendship(Friendship friendship) {
         List<Notification> allNotifications = new ArrayList<>();
         allNotifications.addAll(notificationRepo.findByOriginUserAndTargetUser(friendship.getFriendA(), friendship.getFriendB()));

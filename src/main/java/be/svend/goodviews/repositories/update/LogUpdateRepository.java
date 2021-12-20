@@ -1,6 +1,7 @@
 package be.svend.goodviews.repositories.update;
 
 import be.svend.goodviews.models.User;
+
 import be.svend.goodviews.models.update.LogUpdate;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,4 +16,5 @@ public interface LogUpdateRepository extends JpaRepository<LogUpdate, Long> {
     List<LogUpdate> findByUserAndIsClassifiedFalse(User user);
 
     List<LogUpdate> findByOtherUserAndIsClassifiedFalse(User user);
+
 }

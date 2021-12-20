@@ -2,10 +2,13 @@ package be.svend.goodviews.services.notification;
 
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Friendship;
+import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.models.User;
+import be.svend.goodviews.models.notification.CommentNotification;
 import be.svend.goodviews.models.notification.FriendRequestNotification;
 import be.svend.goodviews.models.notification.Notification;
 
+import be.svend.goodviews.repositories.notification.CommentNotificationRepository;
 import be.svend.goodviews.repositories.notification.NotificationRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +22,14 @@ import java.util.Optional;
 @Service
 public class NotificationService {
     NotificationRepository notificationRepo;
+    CommentNotificationRepository commentNotificationRepo;
 
     // CONSTRUCTORS
 
-    public NotificationService(NotificationRepository notificationRepo) {
+    public NotificationService(NotificationRepository notificationRepo,
+                               CommentNotificationRepository commentNotificationRepo) {
         this.notificationRepo = notificationRepo;
+        this.commentNotificationRepo = commentNotificationRepo;
 
     }
 
@@ -68,6 +74,12 @@ public class NotificationService {
         allNotifications.addAll(notificationRepo.findByTargetUser(user));
         allNotifications.addAll(notificationRepo.findByOriginUser(user));
 
+        deleteNotifications(allNotifications);
+    }
+
+    public void deleteNotificationsByRating(Rating rating) {
+        List<Notification> allNotifications = new ArrayList<>();
+        allNotifications.addAll(commentNotificationRepo.findByRating(rating));
         deleteNotifications(allNotifications);
     }
 
