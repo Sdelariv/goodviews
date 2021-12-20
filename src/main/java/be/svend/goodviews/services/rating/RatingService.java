@@ -4,6 +4,7 @@ import be.svend.goodviews.models.Comment;
 import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.repositories.RatingRepository;
 import be.svend.goodviews.services.film.FilmService;
+import be.svend.goodviews.services.update.UpdateService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -16,12 +17,15 @@ public class RatingService {
     RatingRepository ratingRepo;
     RatingValidator ratingValidator;
 
+    UpdateService updateService;
+
     FilmService filmService; // Need FilmService to calculate and update their averageRating property once a rating gets added, updated or deleted
 
-    public RatingService(RatingRepository ratingRepo, RatingValidator ratingValidator, FilmService filmService) {
+    public RatingService(RatingRepository ratingRepo, RatingValidator ratingValidator, FilmService filmService, UpdateService updateService) {
         this.ratingRepo = ratingRepo;
         this.ratingValidator = ratingValidator;
         this.filmService = filmService;
+        this.updateService = updateService;
     }
 
     // FIND METHODS
@@ -68,7 +72,9 @@ public class RatingService {
         if (createdRating.isPresent()) System.out.println("Created " + createdRating.get());
         else System.out.println("Couldn't create this new rating " + rating);
 
+        // Other updates
         filmService.calculateAndUpdateAverageRatingByFilmId(rating.getFilm().getId());
+        updateService.createRatingUpdate(createdRating.get());
 
         return createdRating;
     }

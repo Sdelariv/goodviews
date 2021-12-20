@@ -9,7 +9,7 @@ import javax.persistence.OneToOne;
 import java.time.LocalDateTime;
 
 @Entity
-public class Update {
+public class LogUpdate {
 
     @Id
     @GeneratedValue
@@ -24,7 +24,7 @@ public class Update {
 
     // CONSTRUCTOR
 
-    public Update() {
+    public LogUpdate() {
         this.dateTime = LocalDateTime.now();
     }
 

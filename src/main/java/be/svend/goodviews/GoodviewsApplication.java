@@ -25,7 +25,7 @@ public class GoodviewsApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext ctx = SpringApplication.run(GoodviewsApplication.class, args);
 
-        RatingService ratingService = new RatingService(ctx.getBean(RatingRepository.class), ctx.getBean(RatingValidator.class), ctx.getBean(FilmService.class));
+        RatingService ratingService = ctx.getBean(RatingService.class);
         UserService userService = ctx.getBean(UserService.class);
         CommentService commentService = ctx.getBean(CommentService.class);
         FriendshipService friendshipService = ctx.getBean(FriendshipService.class);
@@ -54,10 +54,13 @@ public class GoodviewsApplication {
         Film film = new Film();
         film.setId("tt0110367");
 
-        suggestionService.sendFilmSuggestion("tt16283668",sven);
+        Rating rating = new Rating();
+        rating.setRatingValue(90);
+        rating.setUser(bibi);
+        rating.setFilm(film);
 
-        FilmSuggestion suggestion = suggestionService.findAllFilmSuggestions().get(0);
-        suggestionService.acceptFilm(suggestion);
+
+        ratingService.createNewRating(rating);
 
 
     }

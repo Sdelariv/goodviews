@@ -1,19 +1,26 @@
 package be.svend.goodviews.models.update;
 
 import be.svend.goodviews.models.Rating;
-import be.svend.goodviews.models.User;
 
+import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 
-public class RatingUpdate extends Update {
+@Entity
+public class RatingLogUpdate extends LogUpdate {
 
     @OneToOne
     Rating rating;
 
-    public RatingUpdate(Rating rating, User user) {
+    public RatingLogUpdate(Rating rating) {
+        if (rating == null) return;
         this.rating = rating;
-        super.setUser(user);
+        if (rating.getUser() == null) return;
+        super.setUser(rating.getUser());
         updateUpdateString();
+    }
+
+    public RatingLogUpdate() {
+        this(null);
     }
 
     // GETTERS & SETTERS
@@ -27,11 +34,6 @@ public class RatingUpdate extends Update {
         updateUpdateString();
     }
 
-    @Override
-    public void setUser(User user) {
-        super.setUser(user);
-        updateUpdateString();
-    }
 
     public void updateUpdateString() {
         if (super.getUser() == null || super.getUser() .getUsername() == null) return;
