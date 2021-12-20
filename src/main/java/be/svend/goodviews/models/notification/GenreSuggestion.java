@@ -64,7 +64,7 @@ public class GenreSuggestion extends Notification {
         if (film == null || film.getId() == null) return;
 
         super.setMessage(getSuggester().getUsername() + " has suggested the genre \"" + this.suggestedGenreName + "\" for (" + film.getId() + ")");
-        if (film.getTitle() == null) super.setMessage(super.getMessage() + " " + film.getTitle());
+        if (film.getTitle() != null) super.setMessage(super.getMessage() + " " + film.getTitle());
     }
 
     // OTHER METHODS
