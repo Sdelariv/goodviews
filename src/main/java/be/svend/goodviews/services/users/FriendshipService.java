@@ -6,6 +6,7 @@ import be.svend.goodviews.repositories.FriendshipRepository;
 import be.svend.goodviews.repositories.UserRepository;
 import be.svend.goodviews.services.notification.FriendRequestService;
 import be.svend.goodviews.services.notification.NotificationService;
+import be.svend.goodviews.services.update.LogUpdateService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -20,19 +21,21 @@ public class FriendshipService {
     UserRepository userRepo;
     UserValidator userValidator;
 
-    FriendRequestService friendRequestService;
+    FriendRequestService friendRequestService; // For accepting requests
+    LogUpdateService logUpdateService;
 
     // CONSTRUCTORS
 
     public FriendshipService(FriendshipRepository friendshipRepo,
                              UserRepository userRepo,
                              UserValidator userValidator,
-                             FriendRequestService friendRequestService) {
+                             FriendRequestService friendRequestService,
+                             LogUpdateService logUpdateService) {
         this.friendshipRepo = friendshipRepo;
         this.userRepo = userRepo;
         this.userValidator = userValidator;
         this.friendRequestService = friendRequestService;
-
+        this.logUpdateService = logUpdateService;
     }
 
     // FIND METHODS
@@ -180,8 +183,9 @@ public class FriendshipService {
         Optional<Friendship> acceptedFriendship = acceptFriendshipWithoutNotification(friendship);
         if (acceptedFriendship.isEmpty()) return Optional.empty();
 
-        // Notification
+        // Notification + Log
         friendRequestService.acceptFriendRequest(friendship);
+        logUpdateService.createFriendshipUpdate(acceptedFriendship.get());
 
         return acceptedFriendship;
     }

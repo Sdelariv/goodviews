@@ -19,8 +19,9 @@ public class FriendRequestService {
 
     // CONSTRUCTOR
 
-    public FriendRequestService(NotificationRepository notificationRepo) {
+    public FriendRequestService(NotificationRepository notificationRepo, NotificationService notificationService) {
         this.notificationRepo = notificationRepo;
+        this.notificationService = notificationService;
     }
 
     // FIND METHODS

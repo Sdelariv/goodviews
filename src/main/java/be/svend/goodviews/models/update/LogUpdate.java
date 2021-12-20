@@ -18,6 +18,9 @@ public class LogUpdate {
     @OneToOne
     private User user;
 
+    @OneToOne
+    private User otherUser;
+
     private LocalDateTime dateTime;
 
     private String updateString;
@@ -73,6 +76,14 @@ public class LogUpdate {
         isClassified = classified;
     }
 
+    public User getOtherUser() {
+        return otherUser;
+    }
+
+    public void setOtherUser(User otherUser) {
+        this.otherUser = otherUser;
+    }
+
     // OTHER
 
     @Override
@@ -80,9 +91,10 @@ public class LogUpdate {
         return "LogUpdate{" +
                 "id=" + id +
                 ", user=" + user +
+                ", otherUser=" + otherUser +
                 ", dateTime=" + dateTime +
                 ", updateString='" + updateString + '\'' +
-                ", isPublic=" + isClassified +
+                ", isClassified=" + isClassified +
                 '}';
     }
 }

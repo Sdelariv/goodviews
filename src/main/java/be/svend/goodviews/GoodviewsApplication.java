@@ -1,9 +1,6 @@
 package be.svend.goodviews;
 
-import be.svend.goodviews.models.Comment;
-import be.svend.goodviews.models.Film;
-import be.svend.goodviews.models.Rating;
-import be.svend.goodviews.models.User;
+import be.svend.goodviews.models.*;
 import be.svend.goodviews.models.notification.FilmSuggestion;
 import be.svend.goodviews.models.notification.TagSuggestion;
 import be.svend.goodviews.repositories.*;
@@ -68,10 +65,23 @@ public class GoodviewsApplication {
         comment.setComment("Rgr!!!!");
         comment.setUser(waddles);
 
+        User newUser = new User();
+        newUser.setUsername("userToDelete");
+        newUser.setFirstName("Fake");
+        newUser.setLastName("McFakington");
+        newUser.setPassword("fakePassword");
+        userService.createNewUser(newUser);
 
-        logUpdateService.findByUserExcludingClassified(waddles).forEach(lu -> System.out.println(lu.getUpdateString()));
 
 
+        friendshipService.requestFriendship(sven,"userToDelete");
+        Friendship request = friendshipService.findAllFriendRequestsOfUser(newUser).get(0);
+        friendshipService.acceptFriendship(request);
+
+        commentService.createNewComment(comment,"bibitt0110367");
+
+
+           userService.deleteUser(newUser);
     }
 
 }

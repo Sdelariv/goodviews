@@ -7,6 +7,7 @@ import be.svend.goodviews.repositories.UserRepository;
 import be.svend.goodviews.services.comment.CommentService;
 import be.svend.goodviews.services.notification.NotificationService;
 import be.svend.goodviews.services.rating.RatingService;
+import be.svend.goodviews.services.update.LogUpdateService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ public class UserService {
     UserRepository userRepo;
     UserValidator userValidator;
 
+    LogUpdateService logUpdateService; // Used to delete the log when deleting user
     NotificationService notificationService; // Used to change the notifications when deleting user
     FriendshipService friendshipService; // Used to delete the user or change the username from existing friendships
     RatingService ratingService; // Need RatingService to migrate the ratings of a username change
@@ -34,13 +36,15 @@ public class UserService {
                        RatingService ratingService,
                        CommentService commentService,
                        FriendshipService friendshipService,
-                       NotificationService notificationService) {
+                       NotificationService notificationService,
+                       LogUpdateService logUpdateService) {
         this.userRepo = userRepo;
         this.userValidator = userValidator;
         this.ratingService = ratingService;
         this.commentService = commentService;
         this.friendshipService = friendshipService;
         this.notificationService = notificationService;
+        this.logUpdateService = logUpdateService;
     }
 
     // FIND METHODS
@@ -222,7 +226,10 @@ public class UserService {
         Optional<User> existingUser = userValidator.isExistingUser(user);
         if (existingUser.isEmpty()) return false;
 
-        // Delete their ratings and their comments (or replace comments with deletedUser)
+        // Delete their logs
+        logUpdateService.deleteUserFromLogByUser(existingUser.get());
+
+        // Delete their ratings and their comments
         commentService.deleteUserFromCommentsByUsername(user.getUsername());
 
         // Delete their friendships

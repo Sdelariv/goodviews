@@ -1,9 +1,11 @@
 package be.svend.goodviews.services.update;
 
 import be.svend.goodviews.models.Comment;
+import be.svend.goodviews.models.Friendship;
 import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.models.update.CommentLogUpdate;
+import be.svend.goodviews.models.update.FriendshipLogUpdate;
 import be.svend.goodviews.models.update.LogUpdate;
 import be.svend.goodviews.models.update.RatingLogUpdate;
 import be.svend.goodviews.repositories.update.LogUpdateRepository;
@@ -25,11 +27,17 @@ public class LogUpdateService {
     // FIND METHODS
 
     public List<LogUpdate> findByUserIncludingClassified(User user) {
-        return logUpdateRepo.findByUser(user);
+        List<LogUpdate> logsByUser = new ArrayList<>();
+        logsByUser.addAll(logUpdateRepo.findByUser(user));
+        logsByUser.addAll(logUpdateRepo.findByOtherUser(user));
+        return logsByUser;
     }
 
     public List<LogUpdate> findByUserExcludingClassified(User user) {
-        return logUpdateRepo.findByUserAndIsClassifiedFalse(user);
+        List<LogUpdate> logsByUser = new ArrayList<>();
+        logsByUser.addAll(logUpdateRepo.findByUserAndIsClassifiedFalse(user));
+        logsByUser.addAll(logUpdateRepo.findByOtherUserAndIsClassifiedFalse(user));
+        return logsByUser;
     }
 
     public List<LogUpdate> findByUsersExcludingClassified(List<User> users) {
@@ -63,7 +71,30 @@ public class LogUpdateService {
         save(commentLogUpdate);
     }
 
-    public void save(LogUpdate logUpdate) {
+    public void createFriendshipUpdate(Friendship friendship) {
+        FriendshipLogUpdate friendshipLogUpdate = new FriendshipLogUpdate(friendship);
+        save(friendshipLogUpdate);
+    }
+
+    // DELETE METHODS
+
+    public List<LogUpdate> deleteUserFromLogByUser(User user) {
+        List<LogUpdate> logUpdatesWithUser = findByUserIncludingClassified(user);
+
+        System.out.println("Deleting user from their logs");
+        for (LogUpdate logUpdate: logUpdatesWithUser) {
+            if (logUpdate.getUser().equals(user)) logUpdate.setUser(null);
+            if (logUpdate.getOtherUser().equals(user)) logUpdate.setOtherUser(null);
+            if (logUpdate instanceof FriendshipLogUpdate) ((FriendshipLogUpdate) logUpdate).setFriendship(null);
+            logUpdateRepo.save(logUpdate);
+        }
+
+        return logUpdatesWithUser;
+    }
+
+    // INTERNAL
+
+    private void save(LogUpdate logUpdate) {
         logUpdateRepo.save(logUpdate);
         System.out.println("Log updated");
     }
