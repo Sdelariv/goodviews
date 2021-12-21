@@ -194,6 +194,34 @@ public class UserService {
         return Optional.of(userRepo.save(userInDb.get()));
     }
 
+    public Optional<User> updatePassword(User user, String password) {
+        userValidator.isValidPassword(password); // TODO: Move to controller
+
+        user.setPassword(password);
+        return saveUser(user);
+    }
+
+    public Optional<User> updateFirstName(User user, String firstName) {
+        // TODO: Have a general string checker
+
+        user.setFirstName(firstName);
+        return saveUser(user);
+    }
+
+    public Optional<User> updateLastName(User user, String lastName) {
+        // TODO: Have a general string checker
+
+        user.setLastName(lastName);
+        return saveUser(user);
+    }
+
+    public Optional<User> updatePosterUrl(User user, String profileUrl) {
+        // TODO: Have a general string checker
+
+        user.setProfileUrl(profileUrl);
+        return saveUser(user);
+    }
+
     public Optional<User> upgradeUserToAdmin(User user) {
         return changeUserType(user,TypeOfUser.ADMIN);
     }
@@ -205,19 +233,6 @@ public class UserService {
     public Optional<User> downgradeUserToUser(User user) {
         return changeUserType(user,TypeOfUser.USER);
     }
-
-    /*
-    public Optional<User> addFriend(User user, User friend) {
-        Optional<User> userInDb = findByUsername(user.getUsername());
-        if (userInDb.isEmpty()) return Optional.empty();
-        User userToAddFriend = userInDb.get();
-
-        if (!userToAddFriend.addFriend(friend)) return Optional.empty();
-
-        return saveUser(userToAddFriend);
-    }
-
-     */
 
     // DELETE METHODS
 
