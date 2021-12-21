@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static be.svend.goodviews.services.film.FilmValidator.isValidFilmIdFormat;
 
@@ -110,7 +111,7 @@ public class FilmController {
         filmsInvolvingPerson.addAll(filmService.findFilmsByWriterId(foundPerson.get().getId()));
 
         if (filmsInvolvingPerson.isEmpty()) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(filmsInvolvingPerson);
+        return ResponseEntity.ok(filmsInvolvingPerson.stream().distinct().collect(Collectors.toList()));
     }
 
     @GetMapping("/findAll")
