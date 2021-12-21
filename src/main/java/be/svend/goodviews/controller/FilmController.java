@@ -90,4 +90,12 @@ public class FilmController {
         return ResponseEntity.ok(foundFilms);
     }
 
+    // CREATE METHODS
+
+    // UPDATE METHODS
+
+    // DELETE METHODS
+
+    // TODO: Delete ratings with ratingService, then films with filmService
+
 }
