@@ -168,7 +168,7 @@ public class Film {
     }
 
     public List<Person> getDirector() {
-        return director;
+        return director.stream().distinct().collect(Collectors.toList());
     }
 
     public void setDirector(Person director) {
@@ -180,15 +180,15 @@ public class Film {
     }
 
     public void setDirector(List<Person> directors) {
-        this.director = directors;
+        this.director = directors.stream().distinct().collect(Collectors.toList());
     }
 
     public List<Person> getWriter() {
-        return writer;
+        return writer.stream().distinct().collect(Collectors.toList());
     }
 
     public void setWriter(List<Person> writer) {
-        this.writer = writer;
+        this.writer = writer.stream().distinct().collect(Collectors.toList());
     }
 
     public Integer getRunTime() {
