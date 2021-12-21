@@ -5,12 +5,10 @@ import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.services.rating.RatingService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/rating")
@@ -45,6 +43,19 @@ public class RatingController {
         if (userRatings.isEmpty()) return ResponseEntity.notFound().build();
 
         return ResponseEntity.ok(userRatings);
+    }
+
+    @CrossOrigin // TODO: Take away if no longer localhost
+    @GetMapping("/{id}")
+    public ResponseEntity findRatingById(@PathVariable String id) {
+        System.out.println("FIND RATINGS BY ID FOR " + id);
+
+        // TODO: Validate string?
+
+        Optional<Rating> rating = ratingService.findById(id);
+        if (rating.isEmpty()) return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok(rating.get());
     }
 
 }

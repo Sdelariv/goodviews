@@ -40,7 +40,7 @@ public class RatingService {
     public Optional<Rating> findById(String id) {
         Optional<Rating> foundRating = ratingRepo.findById(id);
 
-        if (foundRating.isPresent()) System.out.println("Found rating: " + foundRating);
+        if (foundRating.isPresent()) System.out.println("Found rating: " + foundRating.get());
 
         return foundRating;
     }
