@@ -1,10 +1,19 @@
 package be.svend.goodviews.services.crew;
 
 import be.svend.goodviews.models.Person;
+import be.svend.goodviews.repositories.PersonRepository;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component
 public class PersonValidator {
+
+    PersonRepository personRepo;
+
+    public PersonValidator(PersonRepository personRepo) {
+        this.personRepo = personRepo;
+    }
 
 
     /**
@@ -27,5 +36,13 @@ public class PersonValidator {
      */
     public boolean isValidIdFormat(String id) {
         return id.startsWith("nm");
+    }
+
+    public Optional<Person> isExistingPerson(Person person) {
+        if (person == null) return Optional.empty();
+
+        if (person.getId() == null) return Optional.empty();
+
+        return personRepo.findById(person.getId());
     }
 }

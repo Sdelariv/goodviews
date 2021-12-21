@@ -2,7 +2,9 @@ package be.svend.goodviews.controller;
 
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Genre;
+import be.svend.goodviews.models.Person;
 import be.svend.goodviews.models.Tag;
+import be.svend.goodviews.services.crew.PersonValidator;
 import be.svend.goodviews.services.film.FilmService;
 import be.svend.goodviews.services.film.FilmValidator;
 import be.svend.goodviews.services.film.properties.GenreService;
@@ -10,6 +12,7 @@ import be.svend.goodviews.services.film.properties.TagService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,13 +24,18 @@ public class FilmController {
     FilmService filmService;
     FilmValidator filmValidator;
 
+    PersonValidator personValidator;
+
     TagService tagService;
     GenreService genreService;
 
     public FilmController(FilmService filmService, FilmValidator filmValidator,
+                          PersonValidator personValidator,
                           TagService tagService, GenreService genreService) {
         this.filmService = filmService;
         this.filmValidator = filmValidator;
+
+        this.personValidator = personValidator;
 
         this.tagService = tagService;
         this.genreService = genreService;
@@ -86,6 +94,31 @@ public class FilmController {
 
         List<Film> foundFilms = filmService.findByGenre(foundGenre.get());
         if (foundFilms.isEmpty()) return ResponseEntity.status(404).body("No films with that genre");
+
+        return ResponseEntity.ok(foundFilms);
+    }
+
+    @GetMapping("/findByPerson")
+    public ResponseEntity findByPerson(@RequestBody Person person) {
+        System.out.println("FIND BY PERSON CALLED with: " + person);
+
+        Optional<Person> foundPerson = personValidator.isExistingPerson(person);
+        if (foundPerson.isEmpty()) return ResponseEntity.notFound().build();
+
+        List<Film> filmsInvolvingPerson = new ArrayList<>();
+        filmsInvolvingPerson.addAll(filmService.findFilmsByDirectorId(foundPerson.get().getId()));
+        filmsInvolvingPerson.addAll(filmService.findFilmsByWriterId(foundPerson.get().getId()));
+
+        if (filmsInvolvingPerson.isEmpty()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(filmsInvolvingPerson);
+    }
+
+    @GetMapping("/findAll")
+    public ResponseEntity findAll() {
+        System.out.println("FIND ALL CALLED");
+
+        List<Film> foundFilms = filmService.findAllFilms();
+        if (foundFilms.isEmpty()) return ResponseEntity.status(500).body("Something went wrong fetching the films");
 
         return ResponseEntity.ok(foundFilms);
     }
