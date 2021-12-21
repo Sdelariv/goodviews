@@ -82,13 +82,10 @@ public class UserService {
         return userRepo.findByTypeOfUser(TypeOfUser.ARCHITECT);
     }
 
+
     // CREATE METHODS
 
     public Optional<User> createNewUser(User user) {
-        System.out.println("Trying to create a new user");
-
-        if (!userValidator.isValidNewUser(user)) return Optional.empty();
-
         if (user.getTypeOfUser() == null) user.setTypeOfUser(TypeOfUser.USER);
         // TODO: hash the password?
 
@@ -224,8 +221,11 @@ public class UserService {
 
     // DELETE METHODS
 
+    public boolean deleteUserByUsername(String username) {
+        return deleteUser(new User(username));
+    }
+
     public boolean deleteUser(User user) {
-        // See if user exists
         Optional<User> existingUser = userValidator.isExistingUser(user);
         if (existingUser.isEmpty()) return false;
 

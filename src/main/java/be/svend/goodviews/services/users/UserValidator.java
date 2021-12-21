@@ -59,7 +59,7 @@ public class UserValidator {
 
         if (user.getPasswordHash() == null) return false;
 
-        if (hasInvalidCharacter(user.getUsername())) return false;
+        if (hasInvalidCharacter(user.getPasswordHash())) return false;
 
         return true;
     }
