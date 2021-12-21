@@ -12,6 +12,7 @@ import be.svend.goodviews.services.update.LogUpdateService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 import static be.svend.goodviews.services.film.FilmValidator.filmHasValidIdFormat;
@@ -80,6 +81,13 @@ public class FilmService {
         return filmRepo.findAllByTagsIn(tags);
     }
 
+    public List<Film> findFilmsByPersonInvolved(Person person) {
+        List<Film> filmsInvolvingPerson = new ArrayList<>();
+        filmsInvolvingPerson.addAll(filmRepo.findFilmsByDirectorContaining(person));
+        filmsInvolvingPerson.addAll(filmRepo.findFilmsByWriterContaining(person));
+
+        return filmsInvolvingPerson.stream().distinct().collect(Collectors.toList());
+    }
 
     public List<Film> findFilmsByDirectorId(String directorId) {
         if (directorId == null) return Collections.emptyList();
@@ -390,6 +398,7 @@ public class FilmService {
 
         return runningTotal / ratings.size();
     }
+
 
 
 }

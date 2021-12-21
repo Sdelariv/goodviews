@@ -4,6 +4,8 @@ import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Genre;
 import be.svend.goodviews.models.Person;
 import be.svend.goodviews.models.Tag;
+import be.svend.goodviews.repositories.PersonRepository;
+import be.svend.goodviews.services.crew.PersonService;
 import be.svend.goodviews.services.crew.PersonValidator;
 import be.svend.goodviews.services.film.FilmService;
 import be.svend.goodviews.services.film.FilmValidator;
@@ -26,17 +28,19 @@ public class FilmController {
     FilmValidator filmValidator;
 
     PersonValidator personValidator;
+    PersonService personService;
 
     TagService tagService;
     GenreService genreService;
 
     public FilmController(FilmService filmService, FilmValidator filmValidator,
-                          PersonValidator personValidator,
+                          PersonValidator personValidator, PersonService personService,
                           TagService tagService, GenreService genreService) {
         this.filmService = filmService;
         this.filmValidator = filmValidator;
 
         this.personValidator = personValidator;
+        this.personService = personService;
 
         this.tagService = tagService;
         this.genreService = genreService;
@@ -106,13 +110,30 @@ public class FilmController {
         Optional<Person> foundPerson = personValidator.isExistingPerson(person);
         if (foundPerson.isEmpty()) return ResponseEntity.notFound().build();
 
-        List<Film> filmsInvolvingPerson = new ArrayList<>();
-        filmsInvolvingPerson.addAll(filmService.findFilmsByDirectorId(foundPerson.get().getId()));
-        filmsInvolvingPerson.addAll(filmService.findFilmsByWriterId(foundPerson.get().getId()));
+        List<Film> filmsInvolvingPerson = filmService.findFilmsByPersonInvolved(person);
 
         if (filmsInvolvingPerson.isEmpty()) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(filmsInvolvingPerson.stream().distinct().collect(Collectors.toList()));
     }
+
+  @GetMapping("/findByPersonName")
+  public ResponseEntity findByPersonName(@RequestParam String name) {
+      System.out.println("FIND BY PERSON-NAME CALLED with: " + name);
+
+      // TODO: Validate string?
+
+      List<Person> foundPersons = personService.FindPersonsByName(name);
+      if (foundPersons.isEmpty()) return ResponseEntity.notFound().build();
+
+      List<Film> filmsInvolvingPerson = new ArrayList<>();
+      for (Person person: foundPersons) {
+          filmsInvolvingPerson.addAll(filmService.findFilmsByPersonInvolved(person));
+      }
+
+      if (filmsInvolvingPerson.isEmpty()) return  ResponseEntity.notFound().build();
+
+      return ResponseEntity.ok(filmsInvolvingPerson);
+  }
 
     @GetMapping("/findAll")
     public ResponseEntity findAll() {

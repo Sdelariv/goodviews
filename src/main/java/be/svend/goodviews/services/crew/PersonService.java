@@ -29,6 +29,7 @@ public class PersonService {
     }
 
     public List<Person> FindPersonsByName(String name) {
+        // TODO: make sure it can contain the name
         return personRepo.findByName(name);
     }
 
