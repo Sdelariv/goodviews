@@ -4,11 +4,9 @@ import be.svend.goodviews.models.Film;
 import be.svend.goodviews.services.film.FilmService;
 import be.svend.goodviews.services.film.FilmValidator;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import static be.svend.goodviews.services.film.FilmValidator.isValidFilmIdFormat;
@@ -36,6 +34,20 @@ public class FilmController {
 
         if (foundFilm.isEmpty()) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(foundFilm.get());
+    }
+
+    @GetMapping("/findByTitle")
+    public ResponseEntity findByTitle(@RequestParam String title) {
+        System.out.println("FIND BY TITLE CALLED with: " + title);
+
+        // TODO: Validate string?
+
+        List<Film> foundFilms = filmService.findByTitle(title);
+
+        if (foundFilms.isEmpty()) return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok(foundFilms);
+
     }
 
 }

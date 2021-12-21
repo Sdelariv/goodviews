@@ -109,6 +109,7 @@ public class FilmService {
         List<Film> foundFilms = filmRepo.findFilmsByTitle(name);
         foundFilms.addAll(filmRepo.findByTranslatedTitle(name));
 
+        // TODO: Look for films that contain the name (instead of are equal to)
         return foundFilms;
     }
 
