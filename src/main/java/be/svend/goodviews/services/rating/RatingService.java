@@ -23,11 +23,16 @@ public class RatingService {
     LogUpdateService logUpdateService; // For logupdates
     FilmService filmService; // Need FilmService to calculate and update their averageRating property once a rating gets added, updated or deleted
 
-    public RatingService(RatingRepository ratingRepo, RatingValidator ratingValidator, FilmService filmService, LogUpdateService logUpdateService) {
+    public RatingService(RatingRepository ratingRepo,
+                         RatingValidator ratingValidator,
+                         FilmService filmService,
+                         NotificationService notificationService,
+                         LogUpdateService logUpdateService) {
         this.ratingRepo = ratingRepo;
         this.ratingValidator = ratingValidator;
         this.filmService = filmService;
         this.logUpdateService = logUpdateService;
+        this.notificationService = notificationService;
     }
 
     // FIND METHODS
@@ -185,13 +190,18 @@ public class RatingService {
         logUpdateService.deleteRatingFromLogByRating(foundRating.get());
         notificationService.deleteNotificationsByRating(foundRating.get());
 
-        // Delete the rating
+        // Prep info for log and updating rating average
         String filmId = foundRating.get().getFilm().getId();
+        String filmTitle = foundRating.get().getFilm().getTitle();
+        String username = foundRating.get().getUser().getUsername();
 
+        // Delete the rating
         ratingRepo.delete(foundRating.get());
         System.out.println("Succesfully deleted the rating");
 
-        filmService.calculateAndUpdateAverageRatingByFilmId(filmId); // TODO: Move to Controller
+        // Post info // TODO: Move to Controller
+        logUpdateService.createGeneralLog("Deleted " + username + "'s rating of " + filmTitle);
+        filmService.calculateAndUpdateAverageRatingByFilmId(filmId);
         return true;
     }
 

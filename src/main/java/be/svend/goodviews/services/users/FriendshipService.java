@@ -249,6 +249,7 @@ public class FriendshipService {
 
         friendshipRepo.delete(friendshipInDb.get());
         System.out.println("Friendship deleted");
+        logUpdateService.createGeneralLog("Friendship deleted between " + friendship.getFriendA().getUsername() + " and " + friendship.getFriendB().getUsername());
         return true;
     }
 

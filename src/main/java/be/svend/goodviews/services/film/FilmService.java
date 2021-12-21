@@ -37,8 +37,7 @@ public class FilmService {
                        RatingRepository ratingRepo,
                        GenreRepository genreRepo,
                        TagService tagService,
-                       LogUpdateService logUpdateService,
-                       RatingService ratingService) {
+                       LogUpdateService logUpdateService) {
         this.filmRepo = filmRepo;
         this.filmValidator = filmValidator;
         this.personService = personService;

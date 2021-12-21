@@ -5,6 +5,7 @@ import be.svend.goodviews.models.update.CommentLogUpdate;
 import be.svend.goodviews.models.update.FriendshipLogUpdate;
 import be.svend.goodviews.models.update.LogUpdate;
 import be.svend.goodviews.models.update.RatingLogUpdate;
+import be.svend.goodviews.repositories.update.CommentLogUpdateRepository;
 import be.svend.goodviews.repositories.update.FriendshipLogUpdateRepository;
 import be.svend.goodviews.repositories.update.LogUpdateRepository;
 import be.svend.goodviews.repositories.update.RatingLogUpdateRepository;
@@ -20,13 +21,16 @@ public class LogUpdateService {
     LogUpdateRepository logUpdateRepo;
     RatingLogUpdateRepository ratingLogUpdateRepo;
     FriendshipLogUpdateRepository friendshipLogUpdateRepo;
+    CommentLogUpdateRepository commentLogUpdateRepo;
 
     public LogUpdateService(LogUpdateRepository logUpdateRepo,
                             RatingLogUpdateRepository ratingLogUpdateRepo,
-                            FriendshipLogUpdateRepository friendshipLogUpdateRepo) {
+                            FriendshipLogUpdateRepository friendshipLogUpdateRepo,
+                            CommentLogUpdateRepository commentLogUpdateRepo) {
         this.logUpdateRepo = logUpdateRepo;
         this.ratingLogUpdateRepo = ratingLogUpdateRepo;
         this.friendshipLogUpdateRepo = friendshipLogUpdateRepo;
+        this.commentLogUpdateRepo = commentLogUpdateRepo;
     }
 
     // FIND METHODS
@@ -109,16 +113,20 @@ public class LogUpdateService {
         return logUpdatesWithUser;
     }
 
-    public List<RatingLogUpdate> deleteRatingFromLogByRating(Rating rating) {
-        List<RatingLogUpdate> logUpdatesWithRating = ratingLogUpdateRepo.findByRating(rating);
+    public void deleteRatingFromLogByRating(Rating rating) {
+        List<RatingLogUpdate> ratingLogUpdatesWithRating = ratingLogUpdateRepo.findByRating(rating);
+        List<CommentLogUpdate> commentLogUpdatesWithRating = commentLogUpdateRepo.findByRating(rating);
 
         System.out.println("Deleting ratings from the logs");
-        for (RatingLogUpdate logUpdate: logUpdatesWithRating) {
+        for (RatingLogUpdate logUpdate: ratingLogUpdatesWithRating) {
+            logUpdate.setRating(null);
+            save(logUpdate);
+        }
+        for (CommentLogUpdate logUpdate: commentLogUpdatesWithRating) {
             logUpdate.setRating(null);
             save(logUpdate);
         }
 
-        return logUpdatesWithRating;
     }
 
     public List<FriendshipLogUpdate> deleteFriendshipFromLogByFriendship(Friendship friendship) {
