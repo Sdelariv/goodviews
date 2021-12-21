@@ -37,6 +37,8 @@ public class UserValidator {
 
         if (user.getUsername() == null) return false;
 
+        if (user.getUsername().equals("findAll")) return false;
+
         if (userRepo.findByUsername(user.getUsername()).isPresent()) return false;
 
         return true;

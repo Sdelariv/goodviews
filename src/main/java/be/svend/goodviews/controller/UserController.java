@@ -6,6 +6,7 @@ import be.svend.goodviews.services.users.UserValidator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -33,8 +34,16 @@ public class UserController {
         Optional<User> foundUser = userService.findByUsername(username);
 
         if (foundUser.isEmpty()) return ResponseEntity.notFound().build();
-
         return ResponseEntity.ok(foundUser.get());
+    }
+
+    @GetMapping("/findAll")
+    public ResponseEntity findAllUsers() {
+        System.out.println("FIND ALL USERS CALLED");
+
+        List<User> foundUsers = userService.findAllUsers();
+
+        return ResponseEntity.ok(foundUsers);
     }
 
     // CREATE METHODS
@@ -58,7 +67,7 @@ public class UserController {
 
     // UPDATE METHODS
 
-
+    // TODO: Decide whether to have a general one or update each individiual element
 
     // DELETE METHODS
 
