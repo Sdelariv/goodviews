@@ -1,8 +1,12 @@
 package be.svend.goodviews.controller;
 
 import be.svend.goodviews.models.Film;
+import be.svend.goodviews.models.Genre;
+import be.svend.goodviews.models.Tag;
 import be.svend.goodviews.services.film.FilmService;
 import be.svend.goodviews.services.film.FilmValidator;
+import be.svend.goodviews.services.film.properties.GenreService;
+import be.svend.goodviews.services.film.properties.TagService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,9 +21,16 @@ public class FilmController {
     FilmService filmService;
     FilmValidator filmValidator;
 
-    public FilmController(FilmService filmService, FilmValidator filmValidator) {
+    TagService tagService;
+    GenreService genreService;
+
+    public FilmController(FilmService filmService, FilmValidator filmValidator,
+                          TagService tagService, GenreService genreService) {
         this.filmService = filmService;
         this.filmValidator = filmValidator;
+
+        this.tagService = tagService;
+        this.genreService = genreService;
     }
 
     // FIND METHODS
@@ -47,7 +58,36 @@ public class FilmController {
         if (foundFilms.isEmpty()) return ResponseEntity.notFound().build();
 
         return ResponseEntity.ok(foundFilms);
+    }
 
+    @GetMapping("/findByTag")
+    public ResponseEntity findByTagName(@RequestParam String tagName) {
+        System.out.println("FIND BY TAG NAME CALLED with: " + tagName);
+
+        // TODO: validate string?
+
+        Optional<Tag> foundTag = tagService.findByName(tagName);
+        if (foundTag.isEmpty()) return ResponseEntity.status(404).body("No such tag in the database");
+
+        List<Film> foundFilms = filmService.findByTag(foundTag.get());
+        if (foundFilms.isEmpty()) return ResponseEntity.status(404).body("No films with that tag");
+
+        return ResponseEntity.ok(foundFilms);
+    }
+
+    @GetMapping("/findByGenre")
+    public ResponseEntity findByGenreName(@RequestParam String genreName) {
+        System.out.println("FIND BY GENRE NAME CALLED with: " + genreName);
+
+        // TODO: validate string?
+
+        Optional<Genre> foundGenre = genreService.findByName(genreName);
+        if (foundGenre.isEmpty()) return ResponseEntity.status(404).body("No such genre in the database");
+
+        List<Film> foundFilms = filmService.findByGenre(foundGenre.get());
+        if (foundFilms.isEmpty()) return ResponseEntity.status(404).body("No films with that genre");
+
+        return ResponseEntity.ok(foundFilms);
     }
 
 }
