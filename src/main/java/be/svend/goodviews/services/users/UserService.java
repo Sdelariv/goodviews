@@ -182,16 +182,8 @@ public class UserService {
         commentService.deleteUserFromCommentsByUsername(user.getUsername());
         // Delete their friendships
         friendshipService.deleteFriendshipsByUser(existingUser.get());
-
         // Delete their notifications
-        List<Notification> allNotificationsOf = notificationService.findByTargetUser(existingUser.get());
-        for (Notification notification: allNotificationsOf) {
-            notificationService.deleteNotification(notification);
-        }
-        List<Notification> allNotificationsBy = notificationService.findByOriginUser(existingUser.get());
-        for (Notification notification: allNotificationsBy) {
-            notificationService.removeOriginUserFromNotification(notification);
-        }
+        notificationService.deleteNotificationsInvolvingUser(existingUser.get());
 
         // Delete and check whether it worked
         userRepo.delete(existingUser.get());

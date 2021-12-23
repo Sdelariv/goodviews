@@ -70,12 +70,16 @@ public class NotificationService {
     }
 
     public void deleteNotificationsInvolvingUser(User user) {
-        List<Notification> allNotifications = new ArrayList<>();
-        allNotifications.addAll(notificationRepo.findByTargetUser(user));
-        allNotifications.addAll(notificationRepo.findByOriginUser(user));
-
-        deleteNotifications(allNotifications);
+        List<Notification> allNotificationsOf = findByTargetUser(user);
+        for (Notification notification: allNotificationsOf) {
+            deleteNotification(notification);
+        }
+        List<Notification> allNotificationsBy = findByOriginUser(user);
+        for (Notification notification: allNotificationsBy) {
+            removeOriginUserFromNotification(notification);
+        }
     }
+
 
     public void deleteNotificationsByRating(Rating rating) {
         List<Notification> allNotifications = new ArrayList<>();
