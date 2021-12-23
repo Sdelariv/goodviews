@@ -51,14 +51,25 @@ public class FilmService {
 
     // FIND METHODS
 
+    /**
+     * Looks for the film in the database (presumes a null-check has already been done)
+     * @param id
+     * @return Optional<Film> returns film (optional) if found, empty (optional) if not.
+     */
     public Optional<Film> findById(String id) {
-        if (id == null) return Optional.empty();
-
         Optional<Film> foundFilm = filmRepo.findById(id);
 
         if (foundFilm.isEmpty()) return Optional.empty();
-
         return foundFilm;
+    }
+
+    public List<Film> findByTitle(String name) {
+
+        List<Film> foundFilms = filmRepo.findFilmsByTitle(name);
+        foundFilms.addAll(filmRepo.findByTranslatedTitle(name));
+
+        // TODO: Look for films that contain the name (instead of are equal to)
+        return foundFilms;
     }
 
     public List<Film> findByGenre(Genre genre) {
@@ -112,15 +123,6 @@ public class FilmService {
     }
 
 
-    public List<Film> findByTitle(String name) {
-
-        List<Film> foundFilms = filmRepo.findFilmsByTitle(name);
-        foundFilms.addAll(filmRepo.findByTranslatedTitle(name));
-
-        // TODO: Look for films that contain the name (instead of are equal to)
-        return foundFilms;
-    }
-
     public List<Film> findAllFilms() {
         return filmRepo.findAll();
     }
@@ -171,7 +173,7 @@ public class FilmService {
     public Optional<Film> fetchFilmByImdbId(String imdbId) {
         // Check whether existing
         if (imdbId == null) return Optional.empty();
-        if (findById(imdbId).isPresent()) {
+        if (filmValidator.isExistingFilmId(imdbId).isPresent()) {
             System.out.println("Can't create a film with an id that is already in the db");
             return Optional.empty();
         }
@@ -224,8 +226,8 @@ public class FilmService {
             return Optional.empty();
         }
 
-        Optional<Film> existingFilm = findById(filmId);
-        if (findById(filmId).isEmpty()) {
+        Optional<Film> existingFilm = filmValidator.isExistingFilmId(filmId);
+        if (existingFilm.isEmpty()) {
             System.out.println("Can't update af ilm that's not in the db");
             return Optional.empty();
         }
@@ -263,8 +265,8 @@ public class FilmService {
             return Optional.empty();
         }
 
-        Optional<Film> existingFilm = findById(filmId);
-        if (findById(filmId).isEmpty()) {
+        Optional<Film> existingFilm = filmValidator.isExistingFilmId(filmId);
+        if (existingFilm.isEmpty()) {
             System.out.println("Can't update a film that is nto in the db");
             return Optional.empty();
         }
@@ -281,7 +283,7 @@ public class FilmService {
     }
 
     public Optional<Film> calculateAndUpdateAverageRatingByFilmId(String filmId) {
-        Optional<Film> film = findById(filmId);
+        Optional<Film> film = filmValidator.isExistingFilmId(filmId);
         if (film.isEmpty()) return Optional.empty();
 
         Integer calculatedAverage = calculateAverageRatingByFilmId(filmId);
@@ -294,7 +296,7 @@ public class FilmService {
 
     public Optional<Film> addGenreBasedOnFilmId(String filmId, Genre genre) {
         // Finding film
-        Optional<Film> film = findById(filmId);
+        Optional<Film> film = filmValidator.isExistingFilmId(filmId);
         if (film.isEmpty()) return Optional.empty();
         Film foundFilm = film.get();
 
@@ -309,7 +311,7 @@ public class FilmService {
 
     public Optional<Film> addTagBasedOnFilmIdAndTagString(String filmId, String tagString) {
         // Finding film
-        Optional<Film> film = findById(filmId);
+        Optional<Film> film = filmValidator.isExistingFilmId(filmId);
         if (film.isEmpty()) return Optional.empty();
         Film foundFilm = film.get();
 
@@ -362,7 +364,7 @@ public class FilmService {
     // INTERNAL
 
     private Optional<Film> findFilmByFilm(Film film) {
-        return findById(film.getId());
+        return filmValidator.isExistingFilm(film);
     }
 
 

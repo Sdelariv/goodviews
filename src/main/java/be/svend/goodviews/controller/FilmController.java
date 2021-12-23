@@ -147,6 +147,18 @@ public class FilmController {
 
     // CREATE METHODS
 
+    @PostMapping("/createFromImdbId") // TODO: Needs to be changed to an object with the id?
+    public ResponseEntity createFilmFromImdbId(@RequestParam String imdbId) {
+        System.out.println("CREATE FILM FROM IMDB ID CALLED with: " + imdbId);
+
+        if (filmValidator.isExistingFilmId(imdbId).isPresent()) return ResponseEntity.badRequest().body("Film already in database");
+
+        Optional<Film> createdFilm = filmService.createFilmByImdbId(imdbId);
+        if (createdFilm.isEmpty()) return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok(createdFilm.get());
+    }
+
     // UPDATE METHODS
 
     // DELETE METHODS
