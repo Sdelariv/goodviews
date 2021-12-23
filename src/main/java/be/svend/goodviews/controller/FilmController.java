@@ -4,13 +4,13 @@ import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Genre;
 import be.svend.goodviews.models.Person;
 import be.svend.goodviews.models.Tag;
-import be.svend.goodviews.repositories.PersonRepository;
 import be.svend.goodviews.services.crew.PersonService;
 import be.svend.goodviews.services.crew.PersonValidator;
 import be.svend.goodviews.services.film.FilmService;
 import be.svend.goodviews.services.film.FilmValidator;
 import be.svend.goodviews.services.film.properties.GenreService;
 import be.svend.goodviews.services.film.properties.TagService;
+import be.svend.goodviews.services.rating.RatingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,10 +33,11 @@ public class FilmController {
 
     TagService tagService;
     GenreService genreService;
+    RatingService ratingService;
 
     public FilmController(FilmService filmService, FilmValidator filmValidator,
                           PersonValidator personValidator, PersonService personService,
-                          TagService tagService, GenreService genreService) {
+                          TagService tagService, GenreService genreService, RatingService ratingService) {
         this.filmService = filmService;
         this.filmValidator = filmValidator;
 
@@ -45,6 +46,7 @@ public class FilmController {
 
         this.tagService = tagService;
         this.genreService = genreService;
+        this.ratingService = ratingService;
     }
 
     // FIND METHODS
@@ -75,21 +77,6 @@ public class FilmController {
         return ResponseEntity.ok(foundFilms);
     }
 
-    @GetMapping("/findByTag")
-    public ResponseEntity findByTagName(@RequestParam String tagName) {
-        System.out.println("FIND BY TAG NAME CALLED with: " + tagName);
-
-        if (!isValidString(tagName)) return ResponseEntity.badRequest().body("Invalid tagName");
-
-        Optional<Tag> foundTag = tagService.findByName(tagName);
-        if (foundTag.isEmpty()) return ResponseEntity.status(404).body("No such tag in the database");
-
-        List<Film> foundFilms = filmService.findByTag(foundTag.get());
-        if (foundFilms.isEmpty()) return ResponseEntity.status(404).body("No films with that tag");
-
-        return ResponseEntity.ok(foundFilms);
-    }
-
     @GetMapping("/findByGenre")
     public ResponseEntity findByGenreName(@RequestParam String genreName) {
         System.out.println("FIND BY GENRE NAME CALLED with: " + genreName);
@@ -105,16 +92,31 @@ public class FilmController {
         return ResponseEntity.ok(foundFilms);
     }
 
+    @GetMapping("/findByTag")
+    public ResponseEntity findByTagName(@RequestParam String tagName) {
+        System.out.println("FIND BY TAG NAME CALLED with: " + tagName);
+
+        if (!isValidString(tagName)) return ResponseEntity.badRequest().body("Invalid tagName");
+
+        Optional<Tag> foundTag = tagService.findByName(tagName);
+        if (foundTag.isEmpty()) return ResponseEntity.status(404).body("No such tag in the database");
+
+        List<Film> foundFilms = filmService.findByTag(foundTag.get());
+        if (foundFilms.isEmpty()) return ResponseEntity.status(404).body("No films with that tag");
+
+        return ResponseEntity.ok(foundFilms);
+    }
+
     @GetMapping("/findByPerson")
     public ResponseEntity findByPerson(@RequestBody Person person) {
         System.out.println("FIND BY PERSON CALLED with: " + person);
 
         Optional<Person> foundPerson = personValidator.isExistingPerson(person);
-        if (foundPerson.isEmpty()) return ResponseEntity.notFound().build();
+        if (foundPerson.isEmpty()) return ResponseEntity.status(404).body("No such person found");
 
         List<Film> filmsInvolvingPerson = filmService.findFilmsByPersonInvolved(person);
 
-        if (filmsInvolvingPerson.isEmpty()) return ResponseEntity.notFound().build();
+        if (filmsInvolvingPerson.isEmpty()) return ResponseEntity.status(404).body("No films found where that person was involved");
         return ResponseEntity.ok(filmsInvolvingPerson.stream().distinct().collect(Collectors.toList()));
     }
 
@@ -133,7 +135,6 @@ public class FilmController {
       }
 
       if (filmsInvolvingPerson.isEmpty()) return  ResponseEntity.notFound().build();
-
       return ResponseEntity.ok(filmsInvolvingPerson);
   }
 
@@ -165,8 +166,36 @@ public class FilmController {
 
     // UPDATE METHODS
 
+    @PostMapping("/updateFilmWithImdbData")
+    public ResponseEntity updateFilmWithWebDataFromId(@RequestParam String imdbId) {
+        System.out.println("UPDATE FILM FROM IMDB ID CALLED with: " + imdbId);
+
+        if (!isValidString(imdbId)) return ResponseEntity.badRequest().body("Invalid id format");
+
+        Optional<Film> foundFilm = filmValidator.isExistingFilmId(imdbId);
+        if (foundFilm.isEmpty()) return ResponseEntity.badRequest().body("Film not in database");
+
+        Optional<Film> createdFilm = filmService.updateFilmReplaceWithWebDataByImdbId(foundFilm.get());
+        if (createdFilm.isEmpty()) return ResponseEntity.status(500).body("Something went wrong updating");
+
+        return ResponseEntity.ok(createdFilm.get());
+    }
+
     // DELETE METHODS
 
-    // TODO: Delete ratings with ratingService, then films with filmService
+    @DeleteMapping("/delete")
+    public ResponseEntity deleteFilm(@RequestBody Film film) {
+        System.out.println("DELETE FILM CALLED for: " + film);
+
+        Optional<Film> foundFilm = filmValidator.isExistingFilm(film);
+        if (foundFilm.isEmpty()) return ResponseEntity.notFound().build();
+
+        // Delete ratings
+        if (!ratingService.deleteByFilmId(foundFilm.get().getId())) return ResponseEntity.status(500).body("Something went wrong deleting the ratings of the films");
+
+        // Delete film
+        filmService.deleteFilm(foundFilm.get());
+        return ResponseEntity.ok().body("Film deleted");
+    }
 
 }

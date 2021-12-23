@@ -6,8 +6,6 @@ import be.svend.goodviews.repositories.FilmRepository;
 import be.svend.goodviews.repositories.GenreRepository;
 import be.svend.goodviews.repositories.RatingRepository;
 import be.svend.goodviews.services.film.properties.TagService;
-import be.svend.goodviews.services.crew.PersonService;
-import be.svend.goodviews.services.rating.RatingService;
 import be.svend.goodviews.services.update.LogUpdateService;
 import org.springframework.stereotype.Service;
 
@@ -22,31 +20,27 @@ import static be.svend.goodviews.services.film.FilmValidator.isValidFilmIdFormat
 public class FilmService {
     FilmRepository filmRepo;
     FilmValidator filmValidator;
+
     RatingRepository ratingRepo;
     GenreRepository genreRepo;
-    TagService tagService;
 
-    PersonService personService; // Using PersonService to find a films with a particular director or writer, but could use Repo I think
+    TagService tagService; // Used to find whether a suggest tag already exists
+
     LogUpdateService logUpdateService; // Used to log
-    // RatingService ratingService; // Used to delete rating when deleting film // TODO: Add this once RatingService doesn't need to refer to FilmService
 
     // CONSTRUCTOR
 
-    public FilmService(FilmRepository filmRepo,
-                       FilmValidator filmValidator,
-                       PersonService personService,
-                       RatingRepository ratingRepo,
-                       GenreRepository genreRepo,
-                       TagService tagService,
-                       LogUpdateService logUpdateService) {
+    public FilmService(FilmRepository filmRepo, FilmValidator filmValidator,
+                       RatingRepository ratingRepo, GenreRepository genreRepo,
+                       TagService tagService, LogUpdateService logUpdateService) {
         this.filmRepo = filmRepo;
         this.filmValidator = filmValidator;
-        this.personService = personService;
+
         this.ratingRepo = ratingRepo;
         this.genreRepo = genreRepo;
+
         this.tagService = tagService;
         this.logUpdateService = logUpdateService;
-        // this.ratingService = ratingService; // TODO: Add this once RatingService doesn't need to refer to FilmService
     }
 
     // FIND METHODS
@@ -63,8 +57,12 @@ public class FilmService {
         return foundFilm;
     }
 
+    /**
+     * Looks for films with the title or translated title like the string given (presumes a null-check has already been done)
+     * @param name
+     * @return List<Film> - a list of all the films where title or translated title is the string given
+     */
     public List<Film> findByTitle(String name) {
-
         List<Film> foundFilms = filmRepo.findFilmsByTitle(name);
         foundFilms.addAll(filmRepo.findByTranslatedTitle(name));
 
@@ -73,10 +71,6 @@ public class FilmService {
     }
 
     public List<Film> findByGenre(Genre genre) {
-        if (genre.getId() == null) {
-            Optional<Genre> foundGenre = genreRepo.findByName(genre.getName());
-            if (foundGenre.isPresent()) return filmRepo.findAllByGenresContaining(foundGenre.get());
-        }
         return filmRepo.findAllByGenresContaining(genre);
     }
 
@@ -100,26 +94,14 @@ public class FilmService {
         return filmsInvolvingPerson.stream().distinct().collect(Collectors.toList());
     }
 
-    public List<Film> findFilmsByDirectorId(String directorId) {
-        if (directorId == null) return Collections.emptyList();
-
-        Optional<Person> director = personService.findPersonById(directorId);
-        if (director.isEmpty()) return Collections.emptyList();
-
-
-        List<Film> filmsByDirector = filmRepo.findFilmsByDirectorContaining(director.get());
-
+    public List<Film> findFilmsByDirector(Person director) {
+        List<Film> filmsByDirector = filmRepo.findFilmsByDirectorContaining(director);
         return filmsByDirector;
     }
 
-    public List<Film> findFilmsByWriterId(String writerId) {
-        if (writerId == null) return Collections.emptyList();
-
-        Optional<Person> director = personService.findPersonById(writerId);
-        if (director.isEmpty()) return Collections.emptyList();
-
-        List<Film> filmsByDirector = filmRepo.findFilmsByWriterContaining(director.get());
-        return filmsByDirector;
+    public List<Film> findFilmsByWriterId(Person writer) {
+        List<Film> filmsByWriter = filmRepo.findFilmsByWriterContaining(writer);
+        return filmsByWriter;
     }
 
 
@@ -247,32 +229,21 @@ public class FilmService {
         return updatedFilm;
     }
 
-    public List<Film> updateFilmsReplaceWithWebDataByImdbId(List<String> filmIds) {
-        List<Film> films = new ArrayList<>();
+    public List<Film> updateFilmsReplaceWithWebDataByImdbId(List<Film> films) {
+        List<Film> updatedFilms = new ArrayList<>();
 
-        for (String id: filmIds) {
-            Optional<Film> film = updateFilmReplaceWithWebDataByImdbId(id);
-            if (film.isPresent()) films.add(film.get());
+        for (Film film: films) {
+            Optional<Film> updatedFilm = updateFilmReplaceWithWebDataByImdbId(film);
+            if (updatedFilm.isPresent()) updatedFilms.add(updatedFilm.get());
         }
 
         return films;
     }
 
-    public Optional<Film> updateFilmReplaceWithWebDataByImdbId(String filmId) {
-        // Checks
-        if (!isValidFilmIdFormat(filmId)) {
-            System.out.println("Can't update a film that with an invalid id");
-            return Optional.empty();
-        }
-
-        Optional<Film> existingFilm = filmValidator.isExistingFilmId(filmId);
-        if (existingFilm.isEmpty()) {
-            System.out.println("Can't update a film that is nto in the db");
-            return Optional.empty();
-        }
+    public Optional<Film> updateFilmReplaceWithWebDataByImdbId(Film film) {
 
         // Get data
-        Optional<Film> updatedFilm = WebScraper.replaceWithWebData(existingFilm.get());
+        Optional<Film> updatedFilm = WebScraper.replaceWithWebData(film);
 
         // Save data if present
         if (updatedFilm.isEmpty()) return Optional.empty();
@@ -309,6 +280,7 @@ public class FilmService {
         return Optional.of(initialiseAndSaveFilm(foundFilm));
     }
 
+    // TODO: just add a tag as param and check the tag in the suggestionservice
     public Optional<Film> addTagBasedOnFilmIdAndTagString(String filmId, String tagString) {
         // Finding film
         Optional<Film> film = filmValidator.isExistingFilmId(filmId);
@@ -335,31 +307,29 @@ public class FilmService {
 
     // DELETE methods
 
+    /**
+     * Deletes a list of films from the database.
+     * Presumes their ratings are already deleted
+     * @param films
+     */
     public void deleteFilms(List<Film> films) {
-
         for (Film film: films) {
             deleteFilm(film);
         }
     }
 
+    /**
+     * Deletes a film from the database.
+     * Presumes its ratings are already deleted.
+     * @param film
+     */
     public void deleteFilm(Film film) {
-        Optional<Film> existingFilm = findFilmByFilm(film);
-
-        if (existingFilm.isEmpty()) {
-            System.out.println("Can't delete a film with id not in database");
-            return;
-        } else {
-           // ratingService.deleteByFilmId(film.getId()); // TODO: Add this once RatingService doesn't need to refer to FilmService
-
             String title = film.getTitle();
 
             filmRepo.deleteById(film.getId());
             System.out.println("Deleted " + title);
             logUpdateService.createGeneralLog("Deleted " + title);
-        }
     }
-
-
 
     // INTERNAL
 

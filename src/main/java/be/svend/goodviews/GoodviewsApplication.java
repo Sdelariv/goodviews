@@ -35,7 +35,7 @@ public class GoodviewsApplication {
         LogUpdateService logUpdateService = ctx.getBean(LogUpdateService.class);
         FilmService filmService = ctx.getBean(FilmService.class);
 
-/*
+
         User bibi = new User();
         bibi.setUsername("bibi");
         bibi.setFirstName("Bibi");
@@ -64,16 +64,15 @@ public class GoodviewsApplication {
         newUser.setLastName("McFakington");
         newUser.setPassword("fakePassword");
 
-        Film henry = filmService.findById("tt16283668").get();
-        filmService.deleteFilm(henry);
 
+        Film henry = filmService.createFilmByImdbId("tt16283668").get();
         // Film henry = filmService.createFilmByImdbId("tt16283668").get();
 
 
         Rating rating = new Rating();
-        rating.setRatingValue(95);
+        rating.setRatingValue(90);
         rating.setUser(bibi);
-        rating.setFilm(film);
+        rating.setFilm(henry);
         ratingService.createNewRating(rating);
 
         Comment comment = new Comment();
@@ -84,7 +83,7 @@ public class GoodviewsApplication {
 
 
 
- */
+
     }
 
 }
