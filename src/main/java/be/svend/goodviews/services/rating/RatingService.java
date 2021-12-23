@@ -3,7 +3,10 @@ package be.svend.goodviews.services.rating;
 import be.svend.goodviews.models.Comment;
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Rating;
+import be.svend.goodviews.models.User;
+import be.svend.goodviews.repositories.CommentRepository;
 import be.svend.goodviews.repositories.RatingRepository;
+import be.svend.goodviews.services.comment.CommentService;
 import be.svend.goodviews.services.film.FilmService;
 import be.svend.goodviews.services.notification.NotificationService;
 import be.svend.goodviews.services.update.LogUpdateService;
@@ -22,17 +25,20 @@ public class RatingService {
     NotificationService notificationService; // For deleting rating from notifications
     LogUpdateService logUpdateService; // For logupdates
     FilmService filmService; // Need FilmService to calculate and update their averageRating property once a rating gets added, updated or deleted
+    CommentRepository commentRepo; // Needed to delete comments before deleting ratings
 
     public RatingService(RatingRepository ratingRepo,
                          RatingValidator ratingValidator,
                          FilmService filmService,
                          NotificationService notificationService,
-                         LogUpdateService logUpdateService) {
+                         LogUpdateService logUpdateService,
+                         CommentRepository commentRepo) {
         this.ratingRepo = ratingRepo;
         this.ratingValidator = ratingValidator;
         this.filmService = filmService;
         this.logUpdateService = logUpdateService;
         this.notificationService = notificationService;
+        this.commentRepo = commentRepo;
     }
 
     // FIND METHODS
@@ -168,10 +174,19 @@ public class RatingService {
 
         // Deleting comment
         foundRatingWithComment.deleteComment(comment);
-
         saveRating(foundRatingWithComment);
-
         return true;
+
+    }
+
+    private void deleteAllCommentsFromRating(Rating rating) {
+        System.out.println("Deleting all comments from the rating");
+        List<Comment> commentsOfRating = rating.getCommentList();
+        for (Comment comment: commentsOfRating) {
+            deleteCommentFromRating(comment);
+            logUpdateService.deleteCommentIdFromLog(comment);
+            commentRepo.delete(comment);
+        }
 
     }
 
@@ -231,9 +246,18 @@ public class RatingService {
         for (Rating rating : ratingsOfFilm) {
             deleteRating(rating);
         }
-
         return true;
     }
+
+    public void deleteRatingsByUser(User user) {
+        List<Rating> ratingsOfUser = ratingRepo.findByUser_Username(user.getUsername());
+
+        for (Rating rating: ratingsOfUser) {
+            deleteRating(rating);
+            deleteAllCommentsFromRating(rating);
+        }
+    }
+
 
 
     // INTERNAL METHODS

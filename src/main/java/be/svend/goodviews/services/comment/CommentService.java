@@ -139,6 +139,12 @@ public class CommentService {
         return true;
     }
 
+    public void deleteComments(List<Comment> comments) {
+        for (Comment comment: comments) {
+            deleteComment(comment);
+        }
+    }
+
     // INTERNAL
 
     private Optional<Comment> saveComment(Comment comment) {

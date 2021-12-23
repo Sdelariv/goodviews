@@ -53,7 +53,7 @@ public class UserController {
 
     // CREATE METHODS
 
-    @PostMapping()
+    @PostMapping("/add")
     public ResponseEntity addUser(@RequestBody User user) {
         System.out.println("ADDING USER called for: " + user.toString());
 
@@ -71,7 +71,7 @@ public class UserController {
 
     // UPDATE METHODS
 
-    @PostMapping()
+    @PostMapping("/update")
     public ResponseEntity updateUserGenerally(User user) {
         System.out.println("UPDATE USER GENERALLY CALLED for " + user);
 

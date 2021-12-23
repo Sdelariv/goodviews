@@ -9,6 +9,7 @@ import be.svend.goodviews.repositories.update.CommentLogUpdateRepository;
 import be.svend.goodviews.repositories.update.FriendshipLogUpdateRepository;
 import be.svend.goodviews.repositories.update.LogUpdateRepository;
 import be.svend.goodviews.repositories.update.RatingLogUpdateRepository;
+import org.apache.juli.logging.Log;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -146,5 +147,13 @@ public class LogUpdateService {
     private void save(LogUpdate logUpdate) {
         logUpdateRepo.save(logUpdate);
         System.out.println("Log updated");
+    }
+
+    public void deleteCommentIdFromLog(Comment comment) {
+        List<CommentLogUpdate> updatesWithComment = commentLogUpdateRepo.findByComment(comment);
+        for (CommentLogUpdate logUpdate: updatesWithComment) {
+            logUpdate.setComment(null);
+            commentLogUpdateRepo.save(logUpdate);
+        }
     }
 }

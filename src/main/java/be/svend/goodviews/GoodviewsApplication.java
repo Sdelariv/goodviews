@@ -58,28 +58,31 @@ public class GoodviewsApplication {
         film.setId("tt0110367");
 
 
+
         User newUser = new User();
         newUser.setUsername("userToDelete");
         newUser.setFirstName("Fake");
         newUser.setLastName("McFakington");
         newUser.setPassword("fakePassword");
+        newUser = userService.createNewUser(newUser).get();
 
 
-        Film henry = filmService.createFilmByImdbId("tt16283668").get();
-        // Film henry = filmService.createFilmByImdbId("tt16283668").get();
 
+        Film henry = filmService.findById("tt16283668").get();
 
         Rating rating = new Rating();
         rating.setRatingValue(90);
-        rating.setUser(bibi);
+        rating.setUser(newUser);
         rating.setFilm(henry);
         ratingService.createNewRating(rating);
 
         Comment comment = new Comment();
-        comment.setComment("Thank you Bibi!");
+        comment.setComment("Thank you newUser!");
         comment.setUser(sven);
 
-        commentService.createNewComment(comment,"bibitt16283668");
+        commentService.createNewComment(comment,"userToDeletett16283668");
+
+        userService.deleteUser(newUser);
 
 
 

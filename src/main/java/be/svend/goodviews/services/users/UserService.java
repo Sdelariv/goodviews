@@ -178,22 +178,27 @@ public class UserService {
 
         // Delete their logs
         logUpdateService.deleteUserFromLogByUser(existingUser.get());
-        // Delete their ratings and their comments
-        commentService.deleteUserFromCommentsByUsername(user.getUsername());
+        // Delete their name from their comments
+        commentService.deleteUserFromCommentsByUsername(existingUser.get().getUsername());
+        // Delete their ratings
+        ratingService.deleteRatingsByUser(existingUser.get());
         // Delete their friendships
         friendshipService.deleteFriendshipsByUser(existingUser.get());
         // Delete their notifications
         notificationService.deleteNotificationsInvolvingUser(existingUser.get());
 
-        // Delete and check whether it worked
+        // Delete
         userRepo.delete(existingUser.get());
-        if (findByUsername(user.getUsername()).isEmpty()) {
+
+        // Check whether it worked
+        if (findByUsername(user.getUsername()).isPresent()) {
+            System.out.println("Something went wrong deleting");
+            return false;
+        } else {
             System.out.println(user.getUsername() + " succesfully deleted");
             logUpdateService.createGeneralLog("User deleted: " + user.getUsername());
             return true;
         }
-        System.out.println("Something went wrong while deleting");
-        return true;
     }
 
     public void deleteUsers(List<User> users) {

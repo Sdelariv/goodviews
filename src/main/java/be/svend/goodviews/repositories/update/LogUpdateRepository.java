@@ -1,5 +1,6 @@
 package be.svend.goodviews.repositories.update;
 
+import be.svend.goodviews.models.Comment;
 import be.svend.goodviews.models.User;
 
 import be.svend.goodviews.models.update.LogUpdate;
