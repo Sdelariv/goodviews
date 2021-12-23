@@ -12,9 +12,8 @@ public class UserMerger {
         if (user.getFirstName() != null) mergedUser.setFirstName(user.getFirstName());
         if (user.getLastName() != null) mergedUser.setLastName(user.getLastName());
         if (user.getProfileUrl() != null) mergedUser.setProfileUrl(user.getProfileUrl());
-        if (user.getProfileUrl() != null) mergedUser.setPasswordHash(user.getPasswordHash());
+        if (user.getPasswordHash() != null) mergedUser.setPasswordHash(user.getPasswordHash());
         if (user.getTypeOfUser() != null) mergedUser.setTypeOfUser(user.getTypeOfUser());
-        // TODO: add friends when you've added it
 
         return Optional.of(mergedUser);
     }

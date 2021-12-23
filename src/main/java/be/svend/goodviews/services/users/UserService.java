@@ -2,7 +2,6 @@ package be.svend.goodviews.services.users;
 
 import be.svend.goodviews.models.*;
 import be.svend.goodviews.models.notification.Notification;
-import be.svend.goodviews.repositories.notification.NotificationRepository;
 import be.svend.goodviews.repositories.UserRepository;
 import be.svend.goodviews.services.comment.CommentService;
 import be.svend.goodviews.services.notification.NotificationService;
@@ -57,15 +56,6 @@ public class UserService {
         return foundUser;
     }
 
-    /**
-     * Uses the username in the object to find the user in the db and returns it if present
-     * @param user user of which the username will be used to search
-     * @return Optional<User>
-     */
-    public Optional<User> findByUserObject(User user) {
-        return findByUsername(user.getUsername());
-    }
-
     public List<User> findAllUsers() {
         return userRepo.findAll();
     }
@@ -87,15 +77,18 @@ public class UserService {
 
     public Optional<User> createNewUser(User user) {
         if (user.getTypeOfUser() == null) user.setTypeOfUser(TypeOfUser.USER);
-        // TODO: hash the password?
+
+        user.setPassword(user.getPasswordHash()); // Let the hashing be done
 
         Optional<User> createdUser = saveUser(user);
-        if (createdUser.isPresent()) {
-            logUpdateService.createGeneralLog("Created user: " + createdUser.get().getUsername());
-            System.out.println("Created " + createdUser.get().getUsername());
+        if (createdUser.isEmpty()) {
+            System.out.println("Couldn't create new user");
+            return Optional.empty();
         }
-        else System.out.println("Couldn't create new user");
 
+        logUpdateService.createGeneralLog("Created user: " + createdUser.get().getUsername());
+
+        System.out.println("Created " + createdUser.get().getUsername());
         return createdUser;
     }
 
@@ -112,77 +105,16 @@ public class UserService {
 
     // UPDATE METHODS
 
-    public Optional<User> updateUserByAdding(User user) {
+    public Optional<User> updateUserByAdding(User existingUser, User newUser) {
 
-        Optional<User> existingUser = userValidator.isExistingUser(user);
-        if (existingUser.isEmpty()) return Optional.empty();
-
-        Optional<User> userToUpdate = mergeUserWithNewData(existingUser.get(), user);
+        Optional<User> userToUpdate = mergeUserWithNewData(existingUser, newUser);
         if (userToUpdate.isEmpty()) return Optional.empty();
 
         return saveUser(userToUpdate.get());
     }
 
-    public Optional<User> updateUserByReplacing(User user) {
-        Optional<User> existingUser = userValidator.isExistingUser(user);
-        if (existingUser.isEmpty()) return Optional.empty();
-
-        return saveUser(existingUser.get());
-    }
-
-    // TODO: Clean up and fix
-    public Optional<User> changeUsername(User user, String newUsername) {
-        // Check if new username exists already
-        if (findByUsername(newUsername).isPresent()) {
-            System.out.println("Username already exists");
-            return Optional.empty();
-        }
-
-        // Find user to update
-        Optional<User> existingUser = userValidator.isExistingUser(user);
-        if (existingUser.isEmpty()) return Optional.empty();
-
-        // Creating and saving new user object
-        User newUser = makeCopyOf(existingUser.get());
-        newUser.setUsername(newUsername);
-        if (saveUser(newUser).isEmpty()) return Optional.empty();
-
-        // Changing friendships // TODO: make this work
-        List<Friendship> friendships = friendshipService.findAllFriendshipsAndRequestsByUser(existingUser.get());
-        for (Friendship friendship: friendships) {
-            if (friendship.getFriendA().equals(existingUser.get().getUsername())) friendship.setFriendA(newUser);
-            if (friendship.getFriendB().equals(existingUser.get().getUsername())) friendship.setFriendB(newUser);
-            friendshipService.updateFriendship(friendship);
-            System.out.println("Friendship updated");
-        }
-
-        // Fetching old ratings, fetching their ids (to delete later), and updating them to the new User
-        // TODO: make this work
-        List<Rating> ratings = ratingService.findByUsername(user.getUsername());
-        List<String> ratingIdsToDelete = ratings.stream().map(r -> r.getId()).collect(Collectors.toList());
-
-        for (Rating newRating: ratings) {
-            newRating.setUser(newUser);
-            newRating.updateId();
-        }
-
-        // Changing id in comments
-        // TODO: make this work
-        List<Comment> comments = commentService.findByUsername(user.getUsername());
-        for (Comment comment: comments) {
-            comment.setUser(newUser);
-        }
-
-        // Transport notifications
-        // TODO: make this work
-
-        // Deleting the old ratings & saving the new ones
-        ratingService.deleteRatingsById(ratingIdsToDelete);
-        deleteUser(existingUser.get());
-
-        ratingService.createNewRatings(ratings);
-
-        return Optional.of(newUser);
+    public Optional<User> updateUserByReplacing(User userToReplace) {
+        return saveUser(userToReplace);
     }
 
     public Optional<User> changeUserType(User user, TypeOfUser typeOfUser) {

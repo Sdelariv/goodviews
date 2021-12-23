@@ -1,6 +1,7 @@
 package be.svend.goodviews.controller;
 
 import be.svend.goodviews.models.User;
+import be.svend.goodviews.services.StringValidator;
 import be.svend.goodviews.services.users.UserService;
 import be.svend.goodviews.services.users.UserValidator;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+
+import static be.svend.goodviews.services.StringValidator.isValidString;
 
 @RestController
 @RequestMapping("/user")
@@ -31,6 +34,8 @@ public class UserController {
     public ResponseEntity findUserByUsername(@PathVariable String username) {
         System.out.println("FIND USER BY USERNAME called for: " + username);
 
+        if (!isValidString(username)) return ResponseEntity.badRequest().body("Not a valid string input");
+
         Optional<User> foundUser = userService.findByUsername(username);
 
         if (foundUser.isEmpty()) return ResponseEntity.notFound().build();
@@ -50,12 +55,11 @@ public class UserController {
 
     @PostMapping()
     public ResponseEntity addUser(@RequestBody User user) {
-        System.out.println("ADDING USER called for:");
-        System.out.println(user.toString());
+        System.out.println("ADDING USER called for: " + user.toString());
 
         if (!userValidator.hasValidNewUsername(user)) return ResponseEntity.status(405).body("Username already exists");
         if (!userValidator.hasValidPassword(user)) return ResponseEntity.status(400).body("Invalid password supplied");
-        user.setPassword(user.getPasswordHash()); // Let the hashing be done
+
 
         Optional<User> savedUser = userService.createNewUser(user);
 
@@ -67,7 +71,22 @@ public class UserController {
 
     // UPDATE METHODS
 
-    // TODO: Decide whether to have a general one or update each individiual element
+    @PostMapping()
+    public ResponseEntity updateUserGenerally(User user) {
+        System.out.println("UPDATE USER GENERALLY CALLED for " + user);
+
+        Optional<User> existingUser = userValidator.isExistingUser(user);
+        if (existingUser.isEmpty()) return ResponseEntity.notFound().build();
+
+        // TODO: check if current user is that user or an admin
+
+        Optional<User> replacedUser = userService.updateUserByAdding(existingUser.get(), user);
+        if (replacedUser.isEmpty()) return ResponseEntity.status(500).body("Something went wrong updating");
+
+        return ResponseEntity.ok(replacedUser.get());
+    }
+
+    // TODO: Decide whether to have a general one or update each individual element
 
     // DELETE METHODS
 
@@ -83,6 +102,6 @@ public class UserController {
 
         if (!userService.deleteUserByUsername(username)) return ResponseEntity.status(500).body("Was unable to delete user");
 
-        return ResponseEntity.ok("Succesful operation");
+        return ResponseEntity.ok("User deleted");
     }
 }

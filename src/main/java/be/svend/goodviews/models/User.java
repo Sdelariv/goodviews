@@ -29,13 +29,6 @@ public class User {
     @Enumerated(EnumType.STRING)
     private TypeOfUser typeOfUser;
 
-    // TODO: Decide whether you want a friendlist here
-    /*
-    @ManyToMany(fetch = FetchType.EAGER)
-    @Fetch(value = FetchMode.SUBSELECT)
-    private List<User> friendList;
-*/
-
     // CONSTRUCTORS
 
     public User() {
