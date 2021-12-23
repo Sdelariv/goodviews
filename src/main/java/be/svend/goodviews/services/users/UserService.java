@@ -178,15 +178,10 @@ public class UserService {
 
         // Delete their logs
         logUpdateService.deleteUserFromLogByUser(existingUser.get());
-
         // Delete their ratings and their comments
         commentService.deleteUserFromCommentsByUsername(user.getUsername());
-
         // Delete their friendships
-        List<Friendship> friendships = friendshipService.findAllFriendshipsAndRequestsByUser(existingUser.get());
-        for (Friendship friendship: friendships) {
-            friendshipService.deleteFriendship(friendship);
-        }
+        friendshipService.deleteFriendshipsByUser(existingUser.get());
 
         // Delete their notifications
         List<Notification> allNotificationsOf = notificationService.findByTargetUser(existingUser.get());

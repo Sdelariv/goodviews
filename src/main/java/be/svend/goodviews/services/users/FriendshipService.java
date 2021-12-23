@@ -34,6 +34,7 @@ public class FriendshipService {
         this.friendshipRepo = friendshipRepo;
         this.userRepo = userRepo;
         this.userValidator = userValidator;
+
         this.friendRequestService = friendRequestService;
         this.logUpdateService = logUpdateService;
     }
@@ -263,6 +264,13 @@ public class FriendshipService {
         if (foundFriendship.isPresent()) return deleteFriendship(foundFriendship.get());
 
         return false;
+    }
+
+    public void deleteFriendshipsByUser(User user) {
+        List<Friendship> friendships = findAllFriendshipsAndRequestsByUser(user);
+        for (Friendship friendship: friendships) {
+            deleteFriendship(friendship);
+        }
     }
 
     // INTERNAL METHODS
