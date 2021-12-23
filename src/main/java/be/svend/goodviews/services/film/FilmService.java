@@ -25,7 +25,6 @@ public class FilmService {
     GenreRepository genreRepo;
 
     TagService tagService; // Used to find whether a suggest tag already exists
-
     LogUpdateService logUpdateService; // Used to log
 
     // CONSTRUCTOR
