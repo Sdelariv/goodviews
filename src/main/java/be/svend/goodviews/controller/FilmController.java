@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static be.svend.goodviews.services.StringValidator.isValidString;
 import static be.svend.goodviews.services.film.FilmValidator.isValidFilmIdFormat;
 
 @RestController
@@ -52,6 +53,7 @@ public class FilmController {
     public ResponseEntity findById(@PathVariable String id) {
         System.out.println("FIND BY ID called for: " + id);
 
+        if (!isValidString(id)) return ResponseEntity.badRequest().body("Invalid id format");
         if (!isValidFilmIdFormat(id)) return ResponseEntity.badRequest().body("Invalid id format");
 
         Optional<Film> foundFilm = filmService.findById(id);
@@ -64,7 +66,7 @@ public class FilmController {
     public ResponseEntity findByTitle(@RequestParam String title) {
         System.out.println("FIND BY TITLE CALLED with: " + title);
 
-        // TODO: Validate string?
+        if (!isValidString(title)) return ResponseEntity.badRequest().body("Invalid title");
 
         List<Film> foundFilms = filmService.findByTitle(title);
 
@@ -77,7 +79,7 @@ public class FilmController {
     public ResponseEntity findByTagName(@RequestParam String tagName) {
         System.out.println("FIND BY TAG NAME CALLED with: " + tagName);
 
-        // TODO: validate string?
+        if (!isValidString(tagName)) return ResponseEntity.badRequest().body("Invalid tagName");
 
         Optional<Tag> foundTag = tagService.findByName(tagName);
         if (foundTag.isEmpty()) return ResponseEntity.status(404).body("No such tag in the database");
@@ -92,7 +94,7 @@ public class FilmController {
     public ResponseEntity findByGenreName(@RequestParam String genreName) {
         System.out.println("FIND BY GENRE NAME CALLED with: " + genreName);
 
-        // TODO: validate string?
+        if (!isValidString(genreName)) return ResponseEntity.badRequest().body("Invalid genreName");
 
         Optional<Genre> foundGenre = genreService.findByName(genreName);
         if (foundGenre.isEmpty()) return ResponseEntity.status(404).body("No such genre in the database");
@@ -120,7 +122,7 @@ public class FilmController {
   public ResponseEntity findByPersonName(@RequestParam String name) {
       System.out.println("FIND BY PERSON-NAME CALLED with: " + name);
 
-      // TODO: Validate string?
+      if (!isValidString(name)) return ResponseEntity.badRequest().body("Invalid name");
 
       List<Person> foundPersons = personService.FindPersonsByName(name);
       if (foundPersons.isEmpty()) return ResponseEntity.notFound().build();
@@ -150,6 +152,8 @@ public class FilmController {
     @PostMapping("/createFromImdbId") // TODO: Needs to be changed to an object with the id?
     public ResponseEntity createFilmFromImdbId(@RequestParam String imdbId) {
         System.out.println("CREATE FILM FROM IMDB ID CALLED with: " + imdbId);
+
+        if (!isValidString(imdbId)) return ResponseEntity.badRequest().body("Invalid id format");
 
         if (filmValidator.isExistingFilmId(imdbId).isPresent()) return ResponseEntity.badRequest().body("Film already in database");
 
