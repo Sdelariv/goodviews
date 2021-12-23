@@ -123,7 +123,7 @@ public class FilmService {
     }
 
     public Optional<Film> createFilm(Film film) {
-        if (findFilmByFilm(film).isPresent()) {
+        if (filmValidator.isExistingFilm(film).isPresent()) {
             System.out.println("Can't create a film with an id already in the db");
             return Optional.empty();
         }
@@ -177,7 +177,7 @@ public class FilmService {
     }
 
     public Optional<Film> updateFilm(Film film) {
-        Optional<Film> existingFilm = findFilmByFilm(film);
+        Optional<Film> existingFilm = filmValidator.isExistingFilm(film);
 
         if (existingFilm.isEmpty()) {
             System.out.println("Can't update a film with id not in database");
@@ -200,6 +200,7 @@ public class FilmService {
         return films;
     }
 
+    // TODO: Decide whether to keep
     public Optional<Film> updateFilmAddWebDataByImdbId(String filmId) {
         // Checks
         if (!isValidFilmIdFormat(filmId)) {
@@ -240,7 +241,6 @@ public class FilmService {
     }
 
     public Optional<Film> updateFilmReplaceWithWebDataByImdbId(Film film) {
-
         // Get data
         Optional<Film> updatedFilm = WebScraper.replaceWithWebData(film);
 
@@ -327,15 +327,10 @@ public class FilmService {
 
             filmRepo.deleteById(film.getId());
             System.out.println("Deleted " + title);
-            logUpdateService.createGeneralLog("Deleted " + title);
+            logUpdateService.createGeneralLog("Deleted " + title); // TODO: Move to controller?
     }
 
     // INTERNAL
-
-    private Optional<Film> findFilmByFilm(Film film) {
-        return filmValidator.isExistingFilm(film);
-    }
-
 
     /** Saves film and all its unknown properties after all other checks have been completed
      * @param film
