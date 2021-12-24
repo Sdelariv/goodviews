@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static be.svend.goodviews.services.rating.RatingCopier.mergeWithNewData;
+import static be.svend.goodviews.services.rating.RatingValidator.isValidRatingValue;
+
 @Service
 public class RatingService {
     RatingRepository ratingRepo;
@@ -67,11 +70,18 @@ public class RatingService {
 
     // CREATE METHODS
 
+    /**
+     * Presumes that the ratingvalue,user and film checks have been done, and that the rating is new
+     * @param rating
+     * @return
+     */
     public Optional<Rating> createNewRating(Rating rating) {
         System.out.println("Trying to create a new rating");
 
         // Prep
         rating.setDateOfRating(LocalDate.now());
+        rating.updateId();
+        if (rating.getReview() != null) rating.setDateOfReview(LocalDate.now());
 
         // Saving Rating
         Optional<Rating> createdRating = saveRating(rating);
@@ -116,22 +126,32 @@ public class RatingService {
 
     // UPDATE METHODS
 
-    public Optional<Rating> updateRating(Rating rating) {
-
-        Optional<Rating> existingRating = ratingValidator.ratingInDatabase(rating);
+    /**
+     * Will find the rating in the database, and update whatever is new in the given object to the existing rating (which it then saves).
+     * Will update: ratingValue,review,commentList
+     * @param updatedRating
+     * @return Optional<Rating> returns the updatedRating (optional) if present, empty (optional) if it couldn't find it or couldn't update.
+     */
+    public Optional<Rating> updateRating(Rating updatedRating) {
+        Optional<Rating> existingRating = findById(updatedRating.getId());
         if (existingRating.isEmpty()) return Optional.empty();
 
-        if (ratingValidator.isValidRating(rating)) {
-            System.out.println("Made invalid changes to rating");
-            return Optional.empty();
-        }
-        return saveRating(rating);
+        Rating ratingToUpdate = mergeWithNewData(existingRating.get(),updatedRating);
+
+        return saveRating(ratingToUpdate);
     }
 
     // TODO: Figure out whether this is the best place and tactic:
 
+    public Optional<Rating> updateRatingWithRatingValue(Rating rating, Integer ratingValue) {
+        rating.setRatingValue(ratingValue);
+        rating.setDateOfRating(LocalDate.now());
+
+        return updateRating(rating);
+    }
+
     public Optional<Rating> updateRatingValueByUserAndFilmId(String userId, String filmId, Integer ratingValue) {
-        if (!ratingValidator.isValidRatingValue(ratingValue)) return Optional.empty();
+        if (!isValidRatingValue(ratingValue)) return Optional.empty();
 
         Optional<Rating> existingRating = ratingValidator.ratingIdInDatabase(userId+filmId);
         if (existingRating.isEmpty()) return Optional.empty();
@@ -145,8 +165,15 @@ public class RatingService {
         return updateRating(ratingToUpdate);
     }
 
-    public Optional<Rating> updateReviewByUserAndFilmId(String userId, String filmId, String review) {
-        Optional<Rating> existingRating = ratingValidator.ratingIdInDatabase(userId+filmId);
+    public Optional<Rating> updateRatingWithReview(Rating rating, String review) {
+        rating.setReview(review);
+        rating.setDateOfReview(LocalDate.now());
+
+        return updateRating(rating);
+    }
+
+    public Optional<Rating> updateReviewByRatingId(String ratingId, String review) {
+        Optional<Rating> existingRating = ratingValidator.ratingIdInDatabase(ratingId);
         if (existingRating.isEmpty()) return Optional.empty();
 
         Rating ratingToUpdate = existingRating.get();;

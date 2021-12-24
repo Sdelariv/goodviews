@@ -23,7 +23,7 @@ public class RatingValidator {
     public boolean isValidNewRating(Rating rating) {
         if (!isValidRating(rating)) return false;
 
-        if (ratingInDatabase(rating).isPresent()) {
+        if (isInDatabase(rating).isPresent()) {
             System.out.println("Rating already exists");
             return false;
         }
@@ -67,7 +67,9 @@ public class RatingValidator {
         return true;
     }
 
-    public Optional<Rating> ratingInDatabase(Rating rating) {
+    public Optional<Rating> isInDatabase(Rating rating) {
+        rating.updateId();
+        if (rating == null || rating.getId() == null);
         return ratingIdInDatabase(rating.getId());
     }
 

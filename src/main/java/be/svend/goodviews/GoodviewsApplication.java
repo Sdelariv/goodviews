@@ -35,7 +35,7 @@ public class GoodviewsApplication {
         LogUpdateService logUpdateService = ctx.getBean(LogUpdateService.class);
         FilmService filmService = ctx.getBean(FilmService.class);
 
-
+/*
         User bibi = new User();
         bibi.setUsername("bibi");
         bibi.setFirstName("Bibi");
@@ -84,6 +84,7 @@ public class GoodviewsApplication {
 
         userService.deleteUser(newUser);
 
+        */
 
 
 
