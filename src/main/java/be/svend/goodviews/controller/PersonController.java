@@ -36,9 +36,9 @@ public class PersonController {
         return ResponseEntity.ok(foundPerson);
     }
 
-    @GetMapping
+    @GetMapping("/findByName")
     public ResponseEntity findByName(@RequestParam String name) {
-        System.out.println("FIND PERSON BY NAME CALLED for" + name);
+        System.out.println("FIND PERSON BY NAME CALLED for " + name);
 
         if (!isValidString(name)) return ResponseEntity.badRequest().body("Invalid input");
 

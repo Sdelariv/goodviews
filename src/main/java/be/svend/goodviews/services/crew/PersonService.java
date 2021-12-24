@@ -28,6 +28,11 @@ public class PersonService {
        return personRepo.findById(id);
     }
 
+    /**
+     * Looks for everyone whose name contains the name given
+     * @param name
+     * @return List<Person> list of people where their name contains the name given
+     */
     public List<Person> findPersonsByName(String name) {
 
         return personRepo.findByNameContaining(name);
