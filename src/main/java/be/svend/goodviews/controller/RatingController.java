@@ -165,7 +165,11 @@ public class RatingController {
 
         // TODO: Check if it's by the user or an admin
 
+        String filmId = existingRating.get().getFilm().getId();
+
         if (!ratingService.deleteRating(existingRating.get())) return ResponseEntity.status(500).body("Something went wrong deleting the rating");
+
+        filmService.calculateAndUpdateAverageRatingByFilmId(filmId);
 
         return ResponseEntity.ok().body("Rating deleted");
     }

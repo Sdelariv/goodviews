@@ -5,7 +5,6 @@ import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.CommentRepository;
 import be.svend.goodviews.repositories.RatingRepository;
-import be.svend.goodviews.services.film.FilmService;
 import be.svend.goodviews.services.notification.NotificationService;
 import be.svend.goodviews.services.update.LogUpdateService;
 import org.springframework.stereotype.Service;
@@ -23,23 +22,22 @@ public class RatingService {
     RatingRepository ratingRepo;
     RatingValidator ratingValidator;
 
-    NotificationService notificationService; // For deleting rating from notifications
-    LogUpdateService logUpdateService; // For logupdates
-    FilmService filmService; // Need FilmService to calculate and update their averageRating property once a rating gets added, updated or deleted
     CommentRepository commentRepo; // Needed to delete comments before deleting ratings
 
-    public RatingService(RatingRepository ratingRepo,
-                         RatingValidator ratingValidator,
-                         FilmService filmService,
-                         NotificationService notificationService,
-                         LogUpdateService logUpdateService,
-                         CommentRepository commentRepo) {
+    NotificationService notificationService; // For deleting rating from notifications
+    LogUpdateService logUpdateService; // For logupdates
+
+    public RatingService(RatingRepository ratingRepo, RatingValidator ratingValidator,
+                         CommentRepository commentRepo,
+                         NotificationService notificationService, LogUpdateService logUpdateService) {
         this.ratingRepo = ratingRepo;
         this.ratingValidator = ratingValidator;
-        this.filmService = filmService;
+
+        this.commentRepo = commentRepo;
+
         this.logUpdateService = logUpdateService;
         this.notificationService = notificationService;
-        this.commentRepo = commentRepo;
+
     }
 
     // FIND METHODS
@@ -160,8 +158,6 @@ public class RatingService {
         ratingToUpdate.setRatingValue(ratingValue);
         ratingToUpdate.setDateOfRating(LocalDate.now());
 
-        filmService.calculateAndUpdateAverageRatingByFilmId(filmId); // TODO: Move to Controller
-
         return updateRating(ratingToUpdate);
     }
 
@@ -254,7 +250,6 @@ public class RatingService {
 
         // Post info // TODO: Move to Controller
         logUpdateService.createGeneralLog("Deleted " + username + "'s rating of " + filmTitle);
-        filmService.calculateAndUpdateAverageRatingByFilmId(filmId);
 
         return true;
     }
