@@ -74,6 +74,7 @@ public class RatingValidator {
     }
 
     public Optional<Rating> ratingIdInDatabase(String ratingId) {
+        if (ratingId == null) return Optional.empty();
         return ratingRepo.findById(ratingId);
     }
 

@@ -144,6 +144,21 @@ public class RatingController {
     }
 
 
+    // DELETE METHODS
+
+    @DeleteMapping("{ratingId}")
+    public ResponseEntity deleteRatingByRatingId(@PathVariable String ratingId) {
+        System.out.println("DELETE RATING CALLED for id: " + ratingId);
+
+        if (!isValidString(ratingId)) return ResponseEntity.status(400).body("Invalid input");
+
+        Optional<Rating> existingRating = ratingValidator.ratingIdInDatabase(ratingId);
+        if (existingRating.isEmpty()) return ResponseEntity.status(404).body("Rating not found");
+
+        if (!ratingService.deleteRating(existingRating.get())) return ResponseEntity.status(500).body("Something went wrong deleting the rating");
+
+        return ResponseEntity.ok().body("Rating deleted");
+    }
 
 
 }

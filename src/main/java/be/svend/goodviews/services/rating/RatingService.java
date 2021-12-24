@@ -249,10 +249,12 @@ public class RatingService {
     }
 
     public boolean deleteRating(Rating rating) {
-        if (rating == null) return false;
         if (rating.getId() == null) return false;
+        String ratingId = rating.getId();
 
-        deleteRatingById(rating.getId());
+        ratingRepo.delete(rating);
+
+        if (findById(ratingId).isPresent()) return false;
         return true;
     }
 
