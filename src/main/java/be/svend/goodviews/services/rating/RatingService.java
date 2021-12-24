@@ -223,22 +223,7 @@ public class RatingService {
         Optional<Rating> foundRating = findById(ratingId);
         if (foundRating.isEmpty()) System.out.println("Failed");
 
-        // Delete rating from log + notifications
-        logUpdateService.deleteRatingFromLogByRating(foundRating.get());
-        notificationService.deleteNotificationsByRating(foundRating.get());
-
-        // Prep info for log and updating rating average
-        String filmId = foundRating.get().getFilm().getId();
-        String filmTitle = foundRating.get().getFilm().getTitle();
-        String username = foundRating.get().getUser().getUsername();
-
-        // Delete the rating
-        ratingRepo.delete(foundRating.get());
-        System.out.println("Succesfully deleted the rating");
-
-        // Post info // TODO: Move to Controller
-        logUpdateService.createGeneralLog("Deleted " + username + "'s rating of " + filmTitle);
-        filmService.calculateAndUpdateAverageRatingByFilmId(filmId);
+        deleteRating(foundRating.get());
         return true;
     }
 
@@ -252,11 +237,28 @@ public class RatingService {
         if (rating.getId() == null) return false;
         String ratingId = rating.getId();
 
-        ratingRepo.delete(rating);
+        // Delete traces
+        logUpdateService.deleteRatingFromLogByRating(rating);
+        deleteAllCommentsFromRating(rating);
+        notificationService.deleteNotificationsByRating(rating);
 
+        // Prep info for log and updating rating average
+        String filmId = rating.getFilm().getId();
+        String filmTitle = rating.getFilm().getTitle();
+        String username = rating.getUser().getUsername();
+
+        // Delete
+        ratingRepo.delete(rating);
+        System.out.println("Succesfully deleted the rating");
         if (findById(ratingId).isPresent()) return false;
+
+        // Post info // TODO: Move to Controller
+        logUpdateService.createGeneralLog("Deleted " + username + "'s rating of " + filmTitle);
+        filmService.calculateAndUpdateAverageRatingByFilmId(filmId);
+
         return true;
     }
+
 
     public void deleteAllRating(List<Rating> ratings) {
         for (Rating rating: ratings) {
@@ -278,7 +280,6 @@ public class RatingService {
 
         for (Rating rating: ratingsOfUser) {
             deleteRating(rating);
-            deleteAllCommentsFromRating(rating);
         }
     }
 
