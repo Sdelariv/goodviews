@@ -69,7 +69,7 @@ public class UserController {
         return ResponseEntity.ok(savedUser.get());
     }
 
-    // UPDATE METHODS
+    // UPDATE METHODS TODO: Decide whether to have a general one or update each individual element
 
     @PostMapping("/update")
     public ResponseEntity updateUserGenerally(User user) {
@@ -86,7 +86,6 @@ public class UserController {
         return ResponseEntity.ok(replacedUser.get());
     }
 
-    // TODO: Decide whether to have a general one or update each individual element
 
     // DELETE METHODS
 
@@ -100,7 +99,7 @@ public class UserController {
 
         // TODO: check if current user is that user or an admin
 
-        if (!userService.deleteUserByUsername(username)) return ResponseEntity.status(500).body("Was unable to delete user");
+        if (!userService.deleteUser(existingUser.get())) return ResponseEntity.status(500).body("Something went wrong trying to delete the user.");
 
         return ResponseEntity.ok("User deleted");
     }

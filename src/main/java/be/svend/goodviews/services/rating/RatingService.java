@@ -183,8 +183,8 @@ public class RatingService {
         System.out.println("Deleting all comments from the rating");
         List<Comment> commentsOfRating = rating.getCommentList();
         for (Comment comment: commentsOfRating) {
-            deleteCommentFromRating(comment);
             logUpdateService.deleteCommentIdFromLog(comment);
+            logUpdateService.createGeneralLog("Deleting comment of " + comment.getUser().getUsername() + " on " + rating.getUser().getUsername() + "'s rating");
             commentRepo.delete(comment);
         }
 

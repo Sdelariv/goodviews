@@ -1,7 +1,6 @@
 package be.svend.goodviews.services.users;
 
 import be.svend.goodviews.models.*;
-import be.svend.goodviews.models.notification.Notification;
 import be.svend.goodviews.repositories.UserRepository;
 import be.svend.goodviews.services.comment.CommentService;
 import be.svend.goodviews.services.notification.NotificationService;
@@ -12,9 +11,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import static be.svend.goodviews.services.users.UserMerger.mergeUserWithNewData;
+import static be.svend.goodviews.services.StringValidator.isValidString;
+import static be.svend.goodviews.services.users.UserCopier.mergeUserWithNewData;
 
 
 @Service
@@ -127,28 +126,28 @@ public class UserService {
     }
 
     public Optional<User> updatePassword(User user, String password) {
-        userValidator.isValidPassword(password); // TODO: Move to controller
+        userValidator.isValidPassword(password); // TODO: Move to controller?
 
         user.setPassword(password);
         return saveUser(user);
     }
 
     public Optional<User> updateFirstName(User user, String firstName) {
-        // TODO: Have a general string checker
+        if (!isValidString(firstName)) return Optional.empty(); // TODO: move to controller?
 
         user.setFirstName(firstName);
         return saveUser(user);
     }
 
     public Optional<User> updateLastName(User user, String lastName) {
-        // TODO: Have a general string checker
+        if (!isValidString(lastName)) return Optional.empty(); // TODO: move to controller?
 
         user.setLastName(lastName);
         return saveUser(user);
     }
 
     public Optional<User> updatePosterUrl(User user, String profileUrl) {
-        // TODO: Have a general string checker
+        if (!isValidString(profileUrl)) return Optional.empty(); // TODO: move to controller?
 
         user.setProfileUrl(profileUrl);
         return saveUser(user);
@@ -169,26 +168,27 @@ public class UserService {
     // DELETE METHODS
 
     public boolean deleteUserByUsername(String username) {
-        return deleteUser(new User(username));
+        Optional<User> existingUser = userValidator.isExistingUserWithUsername(username);
+        if (existingUser.isEmpty()) return false;
+
+        return deleteUser(existingUser.get());
     }
 
     public boolean deleteUser(User user) {
-        Optional<User> existingUser = userValidator.isExistingUser(user);
-        if (existingUser.isEmpty()) return false;
-
+        // TODO: Move this to controller?
         // Delete their logs
-        logUpdateService.deleteUserFromLogByUser(existingUser.get());
+        logUpdateService.deleteUserFromLogByUser(user);
         // Delete their name from their comments
-        commentService.deleteUserFromCommentsByUsername(existingUser.get().getUsername());
-        // Delete their ratings
-        ratingService.deleteRatingsByUser(existingUser.get());
+        commentService.deleteUserFromCommentsByUsername(user.getUsername());
+        // Delete their ratings (and its comments)
+        ratingService.deleteRatingsByUser(user);
         // Delete their friendships
-        friendshipService.deleteFriendshipsByUser(existingUser.get());
+        friendshipService.deleteFriendshipsByUser(user);
         // Delete their notifications
-        notificationService.deleteNotificationsInvolvingUser(existingUser.get());
+        notificationService.deleteNotificationsInvolvingUser(user);
 
         // Delete
-        userRepo.delete(existingUser.get());
+        userRepo.delete(user);
 
         // Check whether it worked
         if (findByUsername(user.getUsername()).isPresent()) {
@@ -215,17 +215,5 @@ public class UserService {
         return userRepo.findByUsername(user.getUsername());
     }
 
-
-    private User makeCopyOf(User existingUser) {
-        User newUser = new User();
-        newUser.setProfileUrl(existingUser.getProfileUrl());
-        newUser.setFirstName(existingUser.getFirstName());
-        newUser.setLastName(existingUser.getLastName());
-        newUser.setUsername(existingUser.getUsername());
-        newUser.setPasswordHash(existingUser.getPasswordHash());
-        newUser.setTypeOfUser(existingUser.getTypeOfUser());
-
-        return newUser;
-    }
 
 }
