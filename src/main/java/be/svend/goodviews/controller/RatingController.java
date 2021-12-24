@@ -83,6 +83,8 @@ public class RatingController {
         if (!ratingValidator.hasValidUser(rating)) return ResponseEntity.status(400).body("Invalid user attached to the rating");
         if (ratingValidator.isInDatabase(rating).isPresent()) return ResponseEntity.status(400).body("Rating already exists"); // TODO: Can take this out if you don't care about new/update
 
+        // TODO: Check if it's by the user or an admin
+
         // Save rating and update its average
         Optional<Rating> savedRating = ratingService.createNewRating(rating);
         if (savedRating.isEmpty()) return ResponseEntity.status(500).body("Something went wrong saving the rating");
@@ -105,6 +107,8 @@ public class RatingController {
         if (!ratingValidator.hasValidUser(rating)) return ResponseEntity.status(400).body("Invalid user attached to the rating");
         if (ratingValidator.isInDatabase(rating).isEmpty()) return ResponseEntity.status(400).body("Rating doesn't exist"); // TODO: Can take this out if you don't care about new/update
 
+        // TODO: Check if it's by the user or an admin
+
         // Save rating and update its average
         Optional<Rating> savedRating = ratingService.updateRating(rating);
         if (savedRating.isEmpty()) return ResponseEntity.status(500).body("Something went wrong saving the rating");
@@ -123,6 +127,8 @@ public class RatingController {
         Optional<Rating> existingRating = ratingValidator.ratingIdInDatabase(ratingId);
         if (existingRating.isEmpty()) return ResponseEntity.status(404).body("Rating not found");
 
+        // TODO: Check if it's by the user or an admin
+
         Optional<Rating> savedRating = ratingService.updateRatingWithReview(existingRating.get(),review);
         if (savedRating.isEmpty()) return ResponseEntity.status(500).body("Something went wrong updating the rating");
 
@@ -136,6 +142,8 @@ public class RatingController {
 
         Optional<Rating> existingRating = ratingValidator.ratingIdInDatabase(ratingId);
         if (existingRating.isEmpty()) return ResponseEntity.status(404).body("Rating not found");
+
+        // TODO: Check if it's by the user or an admin
 
         Optional<Rating> savedRating = ratingService.updateRatingWithRatingValue(existingRating.get(),ratingValue);
         if (savedRating.isEmpty()) return ResponseEntity.status(500).body("Something went wrong updating the rating");
@@ -154,6 +162,8 @@ public class RatingController {
 
         Optional<Rating> existingRating = ratingValidator.ratingIdInDatabase(ratingId);
         if (existingRating.isEmpty()) return ResponseEntity.status(404).body("Rating not found");
+
+        // TODO: Check if it's by the user or an admin
 
         if (!ratingService.deleteRating(existingRating.get())) return ResponseEntity.status(500).body("Something went wrong deleting the rating");
 
