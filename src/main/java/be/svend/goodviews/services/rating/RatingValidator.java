@@ -33,19 +33,19 @@ public class RatingValidator {
     }
 
     public boolean isValidRating(Rating rating) {
-        if (rating == null) return false;
+        if (rating == null || rating.getRatingValue() == null) return false;
 
-        if (!isValidRatingValue(rating.getRatingValue())) {
+        if (!hasValidRatingValue(rating)) {
             System.out.println("Invalid ratingValue");
             return false;
         }
 
-        if (!ratingHasValidFilm(rating)) {
+        if (!hasValidFilm(rating)) {
             System.out.println("Rating has no film");
             return false;
         }
 
-        if (!ratingHasValidUser(rating)){
+        if (!hasValidUser(rating)){
             System.out.println("Rating has no valid user");
             return false;
         }
@@ -53,7 +53,13 @@ public class RatingValidator {
         return true;
     }
 
-    public boolean isValidRatingValue(Integer ratingValue) {
+    public static boolean hasValidRatingValue(Rating rating) {
+        if (rating == null || rating.getRatingValue() == null) return false;
+
+        return isValidRatingValue(rating.getRatingValue());
+    }
+
+    public static boolean isValidRatingValue(Integer ratingValue) {
         if (ratingValue == null) return false;
         if (ratingValue < 0) return false;
         if (ratingValue > 100) return false;
@@ -69,18 +75,18 @@ public class RatingValidator {
         return ratingRepo.findById(ratingId);
     }
 
-    private boolean ratingHasValidUser(Rating rating) {
-        if (rating.getUser() == null) return false;
-        if (rating.getUser().getUsername() == null) return false;
+    public boolean hasValidUser(Rating rating) {
+        if (rating == null) return false;
+        if (rating.getUser() == null || rating.getUser().getUsername() == null) return false;
         if (userRepo.findByUsername(rating.getUser().getUsername()).isEmpty()) return false;
 
         return true;
     }
 
-    private boolean ratingHasValidFilm(Rating rating) {
-        if (rating.getFilm() == null) return false;
-        if (rating.getFilm().getId() == null) return false;
-        if( filmRepo.findById(rating.getFilm().getId()).isEmpty()) return false;
+    public boolean hasValidFilm(Rating rating) {
+        if (rating == null) return false;
+        if (rating.getFilm() == null || rating.getFilm().getId() == null) return false;
+        if (filmRepo.findById(rating.getFilm().getId()).isEmpty()) return false;
 
         return true;
     }

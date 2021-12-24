@@ -1,12 +1,10 @@
 package be.svend.goodviews.services.rating;
 
 import be.svend.goodviews.models.Comment;
-import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.CommentRepository;
 import be.svend.goodviews.repositories.RatingRepository;
-import be.svend.goodviews.services.comment.CommentService;
 import be.svend.goodviews.services.film.FilmService;
 import be.svend.goodviews.services.notification.NotificationService;
 import be.svend.goodviews.services.update.LogUpdateService;
@@ -72,22 +70,19 @@ public class RatingService {
     public Optional<Rating> createNewRating(Rating rating) {
         System.out.println("Trying to create a new rating");
 
-        // Check whether the rating is new and valid
-        if (rating.updateId().isEmpty()) {
-            System.out.println("Can't create new Rating without a user or film");
-            return Optional.empty();
-        }
-        if (!ratingValidator.isValidNewRating(rating)) return Optional.empty();
+        // Prep
+        rating.setDateOfRating(LocalDate.now());
 
         // Saving Rating
-        rating.setDateOfRating(LocalDate.now());
         Optional<Rating> createdRating = saveRating(rating);
-        if (createdRating.isPresent()) System.out.println("Created " + createdRating.get());
-        else System.out.println("Couldn't create this new rating " + rating);
+        if (createdRating.isEmpty()) {
+            System.out.println("Couldn't create this new rating " + rating);
+            return Optional.empty();
+        }
 
-        // Other updates
-        filmService.calculateAndUpdateAverageRatingByFilmId(rating.getFilm().getId()); // TODO: Move to Controller
-        logUpdateService.createRatingUpdate(createdRating.get());
+        // Log-update
+        System.out.println("Created " + createdRating.get());
+        logUpdateService.createRatingUpdate(createdRating.get()); // TODO: Move to controller?
 
         return createdRating;
     }
