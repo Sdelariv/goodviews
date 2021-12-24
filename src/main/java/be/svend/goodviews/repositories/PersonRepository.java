@@ -11,6 +11,6 @@ public interface PersonRepository extends JpaRepository<Person, String> {
 
     List<Person> findByName(String name);
 
-
+    List<Person> findByNameContaining(String name);
 }
 

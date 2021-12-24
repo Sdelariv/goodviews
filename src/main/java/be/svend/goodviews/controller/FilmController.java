@@ -77,6 +77,19 @@ public class FilmController {
         return ResponseEntity.ok(foundFilms);
     }
 
+    @GetMapping("/findByPartialTitle")
+    public ResponseEntity findByPartialTitle(@RequestParam String partialTitle) {
+        System.out.println("FIND BY PARTIAL TITLE CALLED with: " + partialTitle);
+
+        if (!isValidString(partialTitle)) return ResponseEntity.badRequest().body("Invalid title");
+
+        List<Film> foundFilms = filmService.findByPartialTitle(partialTitle);
+
+        if (foundFilms.isEmpty()) return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok(foundFilms);
+    }
+
     @GetMapping("/findByGenre")
     public ResponseEntity findByGenreName(@RequestParam String genreName) {
         System.out.println("FIND BY GENRE NAME CALLED with: " + genreName);
@@ -126,7 +139,7 @@ public class FilmController {
 
       if (!isValidString(name)) return ResponseEntity.badRequest().body("Invalid name");
 
-      List<Person> foundPersons = personService.FindPersonsByName(name);
+      List<Person> foundPersons = personService.findPersonsByName(name);
       if (foundPersons.isEmpty()) return ResponseEntity.notFound().build();
 
       List<Film> filmsInvolvingPerson = new ArrayList<>();

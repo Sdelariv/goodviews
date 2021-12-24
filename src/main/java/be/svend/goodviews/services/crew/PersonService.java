@@ -23,14 +23,14 @@ public class PersonService {
     // FIND METHODS
 
     public Optional<Person> findPersonById(String id) {
-       if (!personValidator.isValidIdFormat(id)) return Optional.empty(); // TODO: Delete this?
+       if (!personValidator.isValidIdFormat(id)) return Optional.empty(); // TODO: Move to controller?
 
        return personRepo.findById(id);
     }
 
-    public List<Person> FindPersonsByName(String name) {
-        // TODO: make sure it can contain the name
-        return personRepo.findByName(name);
+    public List<Person> findPersonsByName(String name) {
+
+        return personRepo.findByNameContaining(name);
     }
 
     // CREATE METHODS

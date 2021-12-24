@@ -4,12 +4,12 @@ import be.svend.goodviews.models.Person;
 import be.svend.goodviews.services.crew.PersonService;
 import be.svend.goodviews.services.crew.PersonValidator;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
+
+import static be.svend.goodviews.services.StringValidator.isValidString;
 
 @RestController
 @RequestMapping("/person")
@@ -28,7 +28,21 @@ public class PersonController {
     public ResponseEntity findPersonById(@PathVariable String id) {
         System.out.println("FIND PERSON BY ID called with " + id);
 
+        if (!isValidString(id)) return ResponseEntity.badRequest().body("Invalid input");
+
         Optional<Person> foundPerson = personService.findPersonById(id);
+        if (foundPerson.isEmpty()) return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok(foundPerson);
+    }
+
+    @GetMapping
+    public ResponseEntity findByName(@RequestParam String name) {
+        System.out.println("FIND PERSON BY NAME CALLED for" + name);
+
+        if (!isValidString(name)) return ResponseEntity.badRequest().body("Invalid input");
+
+        List<Person> foundPerson = personService.findPersonsByName(name);
         if (foundPerson.isEmpty()) return ResponseEntity.notFound().build();
 
         return ResponseEntity.ok(foundPerson);

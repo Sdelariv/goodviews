@@ -65,7 +65,13 @@ public class FilmService {
         List<Film> foundFilms = filmRepo.findFilmsByTitle(name);
         foundFilms.addAll(filmRepo.findByTranslatedTitle(name));
 
-        // TODO: Look for films that contain the name (instead of are equal to)
+        return foundFilms;
+    }
+
+    public List<Film> findByPartialTitle(String partialTitle) {
+        List<Film> foundFilms = filmRepo.findFilmsByTitleContaining(partialTitle);
+        foundFilms.addAll(filmRepo.findByTranslatedTitleContaining(partialTitle));
+
         return foundFilms;
     }
 

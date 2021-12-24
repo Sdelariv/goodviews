@@ -26,4 +26,8 @@ public interface FilmRepository extends JpaRepository<Film, String> {
     List<Film> findFilmsByTitle(String title);
 
     List<Film> findByTranslatedTitle(String title);
+
+    List<Film> findFilmsByTitleContaining(String partialTitle);
+
+    List<Film> findByTranslatedTitleContaining(String partialTitle);
 }

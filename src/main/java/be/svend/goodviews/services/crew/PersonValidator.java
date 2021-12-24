@@ -35,6 +35,8 @@ public class PersonValidator {
      * @return
      */
     public boolean isValidIdFormat(String id) {
+        if (id == null) return false;
+
         return id.startsWith("nm");
     }
 
