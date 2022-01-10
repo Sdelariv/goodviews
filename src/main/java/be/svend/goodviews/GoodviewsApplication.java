@@ -10,6 +10,7 @@ import be.svend.goodviews.services.film.FilmService;
 import be.svend.goodviews.services.notification.SuggestionService;
 import be.svend.goodviews.services.rating.RatingService;
 import be.svend.goodviews.services.rating.RatingValidator;
+import be.svend.goodviews.services.rating.WantToSeeService;
 import be.svend.goodviews.services.update.LogUpdateService;
 import be.svend.goodviews.services.users.FriendshipService;
 import be.svend.goodviews.services.users.UserService;
@@ -34,7 +35,7 @@ public class GoodviewsApplication {
         RatingRepository ratingRepo = ctx.getBean(RatingRepository.class);
         LogUpdateService logUpdateService = ctx.getBean(LogUpdateService.class);
         FilmService filmService = ctx.getBean(FilmService.class);
-
+        WantToSeeService wantToSeeService = ctx.getBean(WantToSeeService.class);
 
         User bibi = new User();
         bibi.setUsername("bibi");
@@ -50,12 +51,15 @@ public class GoodviewsApplication {
 
 
 
-        Rating rating = ratingRepo.findByUser_Username("bibi").get(1);
+        Rating rating = ratingRepo.findByUser_Username("bibi").get(0);
         User waddles = userService.findByUsername("waddles").get();
-        ratingService.addLikeToRating(rating,waddles);
-        ratingService.removeLikeFromRatingByUser(rating,waddles);
 
-        Rating rating2 = ratingRepo.findById("sdelarivtt4468740").get();
+        Film film = filmService.findById("tt0062622").get();
+        wantToSeeService.createWantToSee(waddles,film);
+
+
+
+
 
 
 /*

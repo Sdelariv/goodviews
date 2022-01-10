@@ -5,7 +5,9 @@ import be.svend.goodviews.models.User;
 import be.svend.goodviews.models.WantToSee;
 import be.svend.goodviews.repositories.WantToSeeRepository;
 import be.svend.goodviews.services.film.FilmValidator;
+import be.svend.goodviews.services.update.LogUpdateService;
 import be.svend.goodviews.services.users.UserValidator;
+import org.apache.juli.logging.Log;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,23 +22,28 @@ public class WantToSeeService {
     UserValidator userValidator;
     RatingValidator ratingValidator;
 
+    LogUpdateService logUpdateService;
+
     // CONSTRUCTOR
 
     public WantToSeeService(WantToSeeRepository wantToSeeRepo,
                             FilmValidator filmValidator,
                             UserValidator userValidator,
-                            RatingValidator ratingValidator) {
+                            RatingValidator ratingValidator,
+                            LogUpdateService logUpdateService) {
         this.wantToSeeRepo = wantToSeeRepo;
         this.filmValidator = filmValidator;
         this.userValidator = userValidator;
         this.ratingValidator = ratingValidator;
+
+        this.logUpdateService = logUpdateService;
     }
 
 
     // FIND METHODS
 
     public List<WantToSee> findByUser(User user) {
-        return wantToSeeRepo.findAllContainingUser(user);
+        return wantToSeeRepo.findAllByUser(user);
     }
 
     public List<WantToSee> findByUsers(List<User> users) {
@@ -50,7 +57,7 @@ public class WantToSeeService {
     }
 
     public Optional<WantToSee> findByUserAndFilm(User user, Film film) {
-        return wantToSeeRepo.findContainingUserAndFilm(user,film);
+        return wantToSeeRepo.findByUserAndFilm(user,film);
     }
 
     // CREATE METHODS
@@ -75,6 +82,12 @@ public class WantToSeeService {
             return Optional.empty();
         }
 
+        if (wantToSeeRepo.findByUserAndFilm(user, film).isPresent()) {
+            System.out.println("Want-To-See already exists");
+            return Optional.empty();
+        }
+
+        logUpdateService.createGeneralLog(user.getUsername() + " wants to see " + film.getTitle());
         return Optional.of(wantToSeeRepo.save(wantToSee));
     }
 
@@ -91,7 +104,7 @@ public class WantToSeeService {
     }
 
     public void deleteByUser(User user) {
-        List<WantToSee> allFromUser = wantToSeeRepo.findAllContainingUser(user);
+        List<WantToSee> allFromUser = wantToSeeRepo.findAllByUser(user);
 
         for (WantToSee wantToSee: allFromUser) {
             deleteWantToSee(wantToSee);

@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface WantToSeeRepository extends JpaRepository<WantToSee, Long> {
 
-    List<WantToSee> findAllContainingUser(User user);
+    List<WantToSee> findAllByUser(User user);
 
-    Optional<WantToSee> findContainingUserAndFilm(User user, Film film);
+    Optional<WantToSee> findByUserAndFilm(User user, Film film);
 }
