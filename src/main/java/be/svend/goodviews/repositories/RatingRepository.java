@@ -2,6 +2,7 @@ package be.svend.goodviews.repositories;
 
 import be.svend.goodviews.models.Comment;
 import be.svend.goodviews.models.Rating;
+import be.svend.goodviews.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -14,4 +15,6 @@ public interface RatingRepository extends JpaRepository<Rating, String> {
     List<Rating> findByUser_Username(String userId);
 
     Optional<Rating> findRatingByCommentListContaining(Comment comment);
+
+    List<Rating> findByUserLikesContaining(User user);
 }

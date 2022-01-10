@@ -2,6 +2,7 @@ package be.svend.goodviews.models;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +28,9 @@ public class Rating {
 
     @OneToMany(fetch = FetchType.EAGER)
     private List<Comment> commentList;
+
+    @OneToMany
+    private List<User> userLikes;
 
     // GETTERS & SETTERS
 
@@ -117,6 +121,28 @@ public class Rating {
         this.commentList.remove(comment);
     }
 
+    public List<User> getUserLikes() {
+        return userLikes;
+    }
+
+    public void setUserLikes(List<User> userLikes) {
+        this.userLikes = userLikes;
+    }
+
+    public void addUserLike(User user) {
+        if (this.userLikes == null) userLikes = new ArrayList<>();
+
+        if (this.getUserLikes().contains(user)) return;
+        this.userLikes.add(user);
+    }
+
+    public void deleteUserLike(User user) {
+        if (this.userLikes == null) return;
+
+        if (!this.getUserLikes().contains(user)) return;
+        this.userLikes.remove(user);
+    }
+
     // OTHER METHODS
 
 
@@ -128,6 +154,9 @@ public class Rating {
         String filmTitle = "/";
         if (film != null) if (film.getTitle() != null) filmTitle = film.getTitle();
 
+        String likeUsernames = "/";
+        if (userLikes != null) likeUsernames = userLikes.stream().map(ul -> ul.getUsername()).toString();
+
         return "Rating{" +
                 "id='" + id + '\'' +
                 ", ratingValue=" + ratingValue +
@@ -136,6 +165,7 @@ public class Rating {
                 ", dateOfReview=" + dateOfReview +
                 ", user=" + userName +
                 ", film=" + filmTitle +
+                ", likes=" + likeUsernames +
                 '}';
     }
 

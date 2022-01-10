@@ -35,7 +35,7 @@ public class GoodviewsApplication {
         LogUpdateService logUpdateService = ctx.getBean(LogUpdateService.class);
         FilmService filmService = ctx.getBean(FilmService.class);
 
-/*
+
         User bibi = new User();
         bibi.setUsername("bibi");
         bibi.setFirstName("Bibi");
@@ -48,12 +48,13 @@ public class GoodviewsApplication {
         sven.setLastName("Delarivière");
         sven.setPassword("myPassword");
 
-        User waddles = new User();
-        waddles.setUsername("waddles");
-        waddles.setFirstName("Waddles");
-        waddles.setLastName("The Pig");
-        waddles.setPassword("hisPassword");
 
+
+        Rating rating = ratingRepo.findByUser_Username("bibi").get(0);
+        User waddles = userService.findByUsername("waddles").get();
+        ratingService.addLikeToRating(rating,waddles);
+
+/*
         Film film = new Film();
         film.setId("tt0110367");
 

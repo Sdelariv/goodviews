@@ -179,6 +179,28 @@ public class RatingService {
         return updateRating(ratingToUpdate);
     }
 
+    /**
+     * Presumes that the rating and user exist
+     * @param rating
+     * @param user
+     * @return
+     */
+    public Optional<Rating> addLikeToRating(Rating rating, User user) {
+        rating.addUserLike(user);
+        logUpdateService.createGeneralLog(user.getUsername() + " has liked " + rating.getUser().getUsername() + "'s rating of " + rating.getFilm().getTitle());
+        return saveRating(rating);
+    }
+
+    public void deleteLikesFromUser(User user) {
+        // Looking for their ratings with their likes
+        List<Rating> ratingWithLikes = ratingRepo.findByUserLikesContaining(user);
+        ratingWithLikes.forEach(rating -> {
+            rating.deleteUserLike(user);
+            saveRating(rating);
+        });
+
+    }
+
     public Optional<Rating> addCommentToRating(Rating rating, Comment comment) {
         rating.addComment(comment);
         return saveRating(rating);
@@ -205,7 +227,6 @@ public class RatingService {
             logUpdateService.createGeneralLog("Deleting comment of " + comment.getUser().getUsername() + " on " + rating.getUser().getUsername() + "'s rating");
             commentRepo.delete(comment);
         }
-
     }
 
 
