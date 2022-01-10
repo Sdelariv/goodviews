@@ -69,11 +69,14 @@ public class CommentService {
      * @param ratingId - the RatingId of the Rating object to which the comment needs to get added to its list
      * @return
      */
-    public Optional<Comment> createNewComment(Comment comment, String ratingId) {
+    public Optional<Comment> createNewComment(Comment comment) {
         System.out.println("Trying to create new comment");
 
         // Finding the rating to add a comment to
-        Optional<Rating> ratingToComment = ratingRepo.findById(ratingId);
+        if (comment.getRating() == null || comment.getRating().getId() == null) {
+            System.out.println("Invalid rating");
+        }
+        Optional<Rating> ratingToComment = ratingRepo.findById(comment.getRating().getId());
         if (ratingToComment.isEmpty()) {
             System.out.println("Invalid rating");
             return Optional.empty();

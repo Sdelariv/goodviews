@@ -54,6 +54,18 @@ public class GoodviewsApplication {
         User waddles = userService.findByUsername("waddles").get();
         ratingService.addLikeToRating(rating,waddles);
 
+        Rating rating2 = ratingRepo.findById("sdelarivtt4468740").get();
+
+
+
+        Comment comment2 = new Comment();
+        comment2.setComment("Rgr!");
+        comment2.setUser(waddles);
+        comment2.setRating(rating2);
+
+
+        commentService.createNewComment(comment2);
+
 /*
         Film film = new Film();
         film.setId("tt0110367");
@@ -77,9 +89,7 @@ public class GoodviewsApplication {
         rating.setFilm(henry);
         ratingService.createNewRating(rating);
 
-        Comment comment = new Comment();
-        comment.setComment("Thank you newUser!");
-        comment.setUser(sven);
+
 
         commentService.createNewComment(comment,"userToDeletett16283668");
 

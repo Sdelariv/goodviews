@@ -190,9 +190,10 @@ public class RatingService {
      * @return
      */
     public Optional<Rating> addLikeToRating(Rating rating, User user) {
-
-        System.out.println(rating.getUserLikes());
-        rating.addUserLike(user);
+        if (!rating.addUserLike(user)) {
+            System.out.println("Like already exists");
+            return Optional.empty();
+        }
         logUpdateService.createGeneralLog(user.getUsername() + " has liked " + rating.getUser().getUsername() + "'s rating of " + rating.getFilm().getTitle());
         return saveRating(rating);
     }

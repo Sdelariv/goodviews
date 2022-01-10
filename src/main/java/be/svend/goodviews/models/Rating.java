@@ -110,11 +110,12 @@ public class Rating {
         this.userLikes = userLikes;
     }
 
-    public void addUserLike(User user) {
+    public boolean addUserLike(User user) {
         if (this.userLikes == null) userLikes = new ArrayList<>();
 
-        if (this.getUserLikes().contains(user)) return;
+        if (this.getUserLikes().contains(user)) return false;
         this.userLikes.add(user);
+        return true;
     }
 
     public void deleteUserLike(User user) {
