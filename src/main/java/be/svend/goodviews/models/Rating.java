@@ -29,7 +29,7 @@ public class Rating {
     @ManyToOne(fetch = FetchType.EAGER)
     private Film film;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<User> userLikes;
 
     // GETTERS & SETTERS

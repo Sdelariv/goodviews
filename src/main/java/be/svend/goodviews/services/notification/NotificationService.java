@@ -9,6 +9,7 @@ import be.svend.goodviews.models.notification.FriendRequestNotification;
 import be.svend.goodviews.models.notification.Notification;
 
 import be.svend.goodviews.repositories.notification.CommentNotificationRepository;
+import be.svend.goodviews.repositories.notification.LikeNotificationRepository;
 import be.svend.goodviews.repositories.notification.NotificationRepository;
 import org.springframework.stereotype.Service;
 
@@ -23,13 +24,16 @@ import java.util.Optional;
 public class NotificationService {
     NotificationRepository notificationRepo;
     CommentNotificationRepository commentNotificationRepo;
+    LikeNotificationRepository likeNotificationRepo;
 
     // CONSTRUCTORS
 
     public NotificationService(NotificationRepository notificationRepo,
-                               CommentNotificationRepository commentNotificationRepo) {
+                               CommentNotificationRepository commentNotificationRepo,
+                               LikeNotificationRepository likeNotificationRepo) {
         this.notificationRepo = notificationRepo;
         this.commentNotificationRepo = commentNotificationRepo;
+        this.likeNotificationRepo = likeNotificationRepo;
 
     }
 
@@ -46,7 +50,15 @@ public class NotificationService {
 
     // CREATE METHODS
 
+    public Notification createGeneralNotification(String message, User originUser, User targetUser) {
+        Notification notification = new Notification();
+        notification.setMessage(message);
+        notification.setTargetUser(targetUser);
+        notification.setOriginUser(originUser);
 
+        notificationRepo.save(notification);
+        return notification;
+    }
 
     // UPDATE METHODS
 
@@ -84,6 +96,7 @@ public class NotificationService {
     public void deleteNotificationsByRating(Rating rating) {
         List<Notification> allNotifications = new ArrayList<>();
         allNotifications.addAll(commentNotificationRepo.findByRating(rating));
+        allNotifications.addAll(likeNotificationRepo.findByRating(rating));
         deleteNotifications(allNotifications);
     }
 

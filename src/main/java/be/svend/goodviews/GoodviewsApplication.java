@@ -50,7 +50,7 @@ public class GoodviewsApplication {
 
 
 
-        Rating rating = ratingRepo.findByUser_Username("bibi").get(0);
+        Rating rating = ratingRepo.findByUser_Username("bibi").get(1);
         User waddles = userService.findByUsername("waddles").get();
         ratingService.addLikeToRating(rating,waddles);
 
@@ -59,8 +59,8 @@ public class GoodviewsApplication {
 
 
         Comment comment2 = new Comment();
-        comment2.setComment("Rgr!");
-        comment2.setUser(waddles);
+        comment2.setComment("I am most disappoint!");
+        comment2.setUser(bibi);
         comment2.setRating(rating2);
 
 

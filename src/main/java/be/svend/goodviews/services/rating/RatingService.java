@@ -2,9 +2,9 @@ package be.svend.goodviews.services.rating;
 
 import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.models.User;
-import be.svend.goodviews.repositories.CommentRepository;
 import be.svend.goodviews.repositories.RatingRepository;
 import be.svend.goodviews.services.comment.CommentService;
+import be.svend.goodviews.services.notification.LikeNotificationService;
 import be.svend.goodviews.services.notification.NotificationService;
 import be.svend.goodviews.services.update.LogUpdateService;
 import org.springframework.stereotype.Service;
@@ -25,18 +25,23 @@ public class RatingService {
     CommentService commentService;  // Needed to delete comments before deleting ratings
 
     NotificationService notificationService; // For deleting rating from notifications
+    LikeNotificationService likeNotificationService; // For notifying about likes
+
     LogUpdateService logUpdateService; // For logupdates
 
     public RatingService(RatingRepository ratingRepo, RatingValidator ratingValidator,
                          CommentService commentService,
-                         NotificationService notificationService, LogUpdateService logUpdateService) {
+                         NotificationService notificationService, LikeNotificationService likeNotificationService,
+                         LogUpdateService logUpdateService) {
         this.ratingRepo = ratingRepo;
         this.ratingValidator = ratingValidator;
 
         this.commentService = commentService;
 
-        this.logUpdateService = logUpdateService;
         this.notificationService = notificationService;
+        this.likeNotificationService = likeNotificationService;
+        this.logUpdateService = logUpdateService;
+
 
     }
 
@@ -190,14 +195,24 @@ public class RatingService {
             System.out.println("Like already exists");
             return Optional.empty();
         }
+
+        Optional<Rating> savedRating = saveRating(rating);
+        if (savedRating.isEmpty()) {
+            System.out.println("Something went wrong liking");
+            return Optional.empty();
+        }
+
         logUpdateService.createGeneralLog(user.getUsername() + " has liked " + rating.getUser().getUsername() + "'s rating of " + rating.getFilm().getTitle());
-        return saveRating(rating);
+        likeNotificationService.createLikeNotification(user,rating);
+
+        return savedRating;
     }
 
     public void removeLikeFromRatingByUser(Rating rating, User user) {
         rating.deleteUserLike(user);
 
         logUpdateService.createGeneralLog(user.getUsername() + " has unliked " + rating.getUser().getUsername() + "'s rating of " + rating.getFilm().getTitle());
+        likeNotificationService.deleteLikeNotification(user,rating);
         saveRating(rating);
     }
 
@@ -207,6 +222,7 @@ public class RatingService {
         for (Rating rating: ratingWithLikes) {
             rating.deleteUserLike(user);
             saveRating(rating);
+            likeNotificationService.deleteLikeNotification(user, rating);
         }
     }
 
