@@ -6,23 +6,30 @@ import be.svend.goodviews.models.WantToSee;
 import be.svend.goodviews.repositories.WantToSeeRepository;
 import be.svend.goodviews.services.film.FilmValidator;
 import be.svend.goodviews.services.users.UserValidator;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class WantToSeeService {
     WantToSeeRepository wantToSeeRepo;
 
     FilmValidator filmValidator;
     UserValidator userValidator;
+    RatingValidator ratingValidator;
 
     // CONSTRUCTOR
 
-    public WantToSeeService(WantToSeeRepository wantToSeeRepo, FilmValidator filmValidator, UserValidator userValidator) {
+    public WantToSeeService(WantToSeeRepository wantToSeeRepo,
+                            FilmValidator filmValidator,
+                            UserValidator userValidator,
+                            RatingValidator ratingValidator) {
         this.wantToSeeRepo = wantToSeeRepo;
         this.filmValidator = filmValidator;
         this.userValidator = userValidator;
+        this.ratingValidator = ratingValidator;
     }
 
 
@@ -42,16 +49,31 @@ public class WantToSeeService {
         return allWantToSee;
     }
 
+    public Optional<WantToSee> findByUserAndFilm(User user, Film film) {
+        return wantToSeeRepo.findContainingUserAndFilm(user,film);
+    }
+
     // CREATE METHODS
 
     public Optional<WantToSee> createWantToSee(User user, Film film) {
         WantToSee wantToSee = new WantToSee();
 
-        if (filmValidator.isExistingFilm(film).isEmpty()) return Optional.empty();
+        if (filmValidator.isExistingFilm(film).isEmpty()) {
+            System.out.println("Invalid film");
+            return Optional.empty();
+        }
         wantToSee.setFilm(film);
 
-        if (userValidator.isExistingUser(user).isEmpty()) return Optional.empty();
+        if (userValidator.isExistingUser(user).isEmpty()) {
+            System.out.println("Invalid user");
+            return Optional.empty();
+        }
         wantToSee.setUser(user);
+
+        if (ratingValidator.ratingIdInDatabase(user.getUsername() + film.getId()).isPresent()) {
+            System.out.println("Film already rated");
+            return Optional.empty();
+        }
 
         return Optional.of(wantToSeeRepo.save(wantToSee));
     }
@@ -65,6 +87,22 @@ public class WantToSeeService {
         if (existingWantToSee.isEmpty()) return false;
 
         wantToSeeRepo.delete(existingWantToSee.get());
+        return true;
+    }
+
+    public void deleteByUser(User user) {
+        List<WantToSee> allFromUser = wantToSeeRepo.findAllContainingUser(user);
+
+        for (WantToSee wantToSee: allFromUser) {
+            deleteWantToSee(wantToSee);
+        }
+    }
+
+    public boolean deleteByUserAndFilm(User user, Film film) {
+        Optional<WantToSee> wantToSee = findByUserAndFilm(user, film);
+        if (wantToSee.isEmpty()) return false;
+
+        wantToSeeRepo.delete(wantToSee.get());
         return true;
     }
 }

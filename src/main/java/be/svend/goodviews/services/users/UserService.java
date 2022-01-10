@@ -5,6 +5,7 @@ import be.svend.goodviews.repositories.UserRepository;
 import be.svend.goodviews.services.comment.CommentService;
 import be.svend.goodviews.services.notification.NotificationService;
 import be.svend.goodviews.services.rating.RatingService;
+import be.svend.goodviews.services.rating.WantToSeeService;
 import be.svend.goodviews.services.update.LogUpdateService;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,7 @@ public class UserService {
     FriendshipService friendshipService; // Used to delete the user or change the username from existing friendships
     RatingService ratingService; // Need RatingService to migrate the ratings of a username change
     CommentService commentService; // Need CommentService to delete username from comments of a deleted user
+    WantToSeeService wantToSeeService; // Needed to delete the user's want to see list
 
     // CONSTRUCTORS
 
@@ -35,7 +37,8 @@ public class UserService {
                        CommentService commentService,
                        FriendshipService friendshipService,
                        NotificationService notificationService,
-                       LogUpdateService logUpdateService) {
+                       LogUpdateService logUpdateService,
+                       WantToSeeService wantToSeeService) {
         this.userRepo = userRepo;
         this.userValidator = userValidator;
         this.ratingService = ratingService;
@@ -43,6 +46,7 @@ public class UserService {
         this.friendshipService = friendshipService;
         this.notificationService = notificationService;
         this.logUpdateService = logUpdateService;
+        this.wantToSeeService = wantToSeeService;
     }
 
     // FIND METHODS
@@ -183,6 +187,7 @@ public class UserService {
         // Delete their ratings (and its comments)
         ratingService.deleteRatingsByUser(user);
         ratingService.removeLikesByUser(user);
+        wantToSeeService.deleteByUser(user);
         // Delete their friendships
         friendshipService.deleteFriendshipsByUser(user);
         // Delete their notifications

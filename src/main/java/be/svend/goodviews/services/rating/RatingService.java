@@ -26,12 +26,14 @@ public class RatingService {
 
     NotificationService notificationService; // For deleting rating from notifications
     LikeNotificationService likeNotificationService; // For notifying about likes
+    WantToSeeService wantToSeeService; // To delete wantToSee of films seen
 
     LogUpdateService logUpdateService; // For logupdates
 
     public RatingService(RatingRepository ratingRepo, RatingValidator ratingValidator,
                          CommentService commentService,
                          NotificationService notificationService, LikeNotificationService likeNotificationService,
+                         WantToSeeService wantToSeeService,
                          LogUpdateService logUpdateService) {
         this.ratingRepo = ratingRepo;
         this.ratingValidator = ratingValidator;
@@ -40,9 +42,9 @@ public class RatingService {
 
         this.notificationService = notificationService;
         this.likeNotificationService = likeNotificationService;
+        this.wantToSeeService = wantToSeeService;
+
         this.logUpdateService = logUpdateService;
-
-
     }
 
     // FIND METHODS
@@ -92,6 +94,9 @@ public class RatingService {
             System.out.println("Couldn't create this new rating " + rating);
             return Optional.empty();
         }
+
+        // Remove WantToSee if present
+        wantToSeeService.deleteByUserAndFilm(rating.getUser(), rating.getFilm());
 
         // Log-update
         System.out.println("Created " + createdRating.get());
