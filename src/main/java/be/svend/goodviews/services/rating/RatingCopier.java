@@ -20,6 +20,9 @@ public class RatingCopier {
             ratingToUpdate.setDateOfReview(LocalDate.now());
         }
 
+        if (updatedRating.getUserLikes() != null)
+            ratingToUpdate.setUserLikes(updatedRating.getUserLikes());
+
         return ratingToUpdate;
     }
 }

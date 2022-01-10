@@ -1,6 +1,5 @@
 package be.svend.goodviews.services.rating;
 
-import be.svend.goodviews.models.Comment;
 import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.CommentRepository;
@@ -8,7 +7,6 @@ import be.svend.goodviews.repositories.RatingRepository;
 import be.svend.goodviews.services.comment.CommentService;
 import be.svend.goodviews.services.notification.NotificationService;
 import be.svend.goodviews.services.update.LogUpdateService;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -24,19 +22,17 @@ public class RatingService {
     RatingRepository ratingRepo;
     RatingValidator ratingValidator;
 
-    CommentRepository commentRepo; // Needed to delete comments before deleting ratings
-    CommentService commentService;
+    CommentService commentService;  // Needed to delete comments before deleting ratings
 
     NotificationService notificationService; // For deleting rating from notifications
     LogUpdateService logUpdateService; // For logupdates
 
     public RatingService(RatingRepository ratingRepo, RatingValidator ratingValidator,
-                         CommentRepository commentRepo, CommentService commentService,
+                         CommentService commentService,
                          NotificationService notificationService, LogUpdateService logUpdateService) {
         this.ratingRepo = ratingRepo;
         this.ratingValidator = ratingValidator;
 
-        this.commentRepo = commentRepo;
         this.commentService = commentService;
 
         this.logUpdateService = logUpdateService;
@@ -198,18 +194,21 @@ public class RatingService {
         return saveRating(rating);
     }
 
-    public void deleteLikesFromUser(User user) {
-        // Looking for their ratings with their likes
-        List<Rating> ratingWithLikes = ratingRepo.findByUserLikesContaining(user);
-        ratingWithLikes.forEach(rating -> {
-            rating.deleteUserLike(user);
-            saveRating(rating);
-        });
+    public void removeLikeFromRatingByUser(Rating rating, User user) {
+        rating.deleteUserLike(user);
 
+        logUpdateService.createGeneralLog(user.getUsername() + " has unliked " + rating.getUser().getUsername() + "'s rating of " + rating.getFilm().getTitle());
+        saveRating(rating);
     }
 
+    public void removeLikesByUser(User user) {
+        List<Rating> ratingWithLikes = ratingRepo.findByUserLikesContaining(user);
 
-
+        for (Rating rating: ratingWithLikes) {
+            rating.deleteUserLike(user);
+            saveRating(rating);
+        }
+    }
 
 
     // DELETE METHODS
@@ -238,7 +237,7 @@ public class RatingService {
 
         // Delete traces
         logUpdateService.deleteRatingFromLogByRating(rating);
-        commentService.deleteAllCommentsFromRating(rating);
+        commentService.deleteAllCommentsContainingRating(rating);
         notificationService.deleteNotificationsByRating(rating);
 
         // Prep info for log and updating rating average

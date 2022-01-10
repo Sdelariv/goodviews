@@ -182,7 +182,7 @@ public class UserService {
         commentService.deleteUserFromCommentsByUsername(user.getUsername());
         // Delete their ratings (and its comments)
         ratingService.deleteRatingsByUser(user);
-        ratingService.deleteLikesFromUser(user);
+        ratingService.removeLikesByUser(user);
         // Delete their friendships
         friendshipService.deleteFriendshipsByUser(user);
         // Delete their notifications

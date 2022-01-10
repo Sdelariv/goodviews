@@ -1,6 +1,5 @@
 package be.svend.goodviews.controller;
 
-import be.svend.goodviews.models.Comment;
 import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.services.film.FilmService;
 import be.svend.goodviews.services.rating.RatingService;

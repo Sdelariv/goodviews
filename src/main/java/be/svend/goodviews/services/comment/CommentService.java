@@ -6,7 +6,6 @@ import be.svend.goodviews.repositories.CommentRepository;
 import be.svend.goodviews.repositories.RatingRepository;
 import be.svend.goodviews.repositories.UserRepository;
 import be.svend.goodviews.services.notification.CommentNotificationService;
-import be.svend.goodviews.services.rating.RatingService;
 import be.svend.goodviews.services.update.LogUpdateService;
 import org.springframework.stereotype.Service;
 
@@ -25,20 +24,24 @@ public class CommentService {
 
     LogUpdateService logUpdateService; // To update the log
 
+    CommentValidator commentValidator;
+
     CommentNotificationService commentNotificationService; // To send notifications
 
     // CONSTRUCTORS
 
-    public CommentService(CommentRepository commentRepo,
-                          RatingRepository ratingRepo,
-                          UserRepository userRepo,
+    public CommentService(CommentRepository commentRepo, RatingRepository ratingRepo, UserRepository userRepo,
+                          CommentValidator commentValidator,
                           CommentNotificationService commentNotificationService,
                           LogUpdateService logUpdateService) {
         this.commentRepo = commentRepo;
         this.ratingRepo = ratingRepo;
         this.userRepo = userRepo;
 
+        this.commentValidator = commentValidator;
+
         this.commentNotificationService = commentNotificationService;
+
         this.logUpdateService = logUpdateService;
     }
 
@@ -66,19 +69,25 @@ public class CommentService {
     /**
      * Creates a new Comment and adds it to the Rating based on its ratingId
      * @param comment - The new comment to be added to the db and linked to the rating
-     * @param ratingId - the RatingId of the Rating object to which the comment needs to get added to its list
      * @return
      */
     public Optional<Comment> createNewComment(Comment comment) {
         System.out.println("Trying to create new comment");
 
-        // Finding the rating to add a comment to
-        if (comment.getRating() == null || comment.getRating().getId() == null) {
-            System.out.println("Invalid rating");
+        // Validation
+        if (commentValidator.isExistingComment(comment).isPresent()) {
+            System.out.println("Comment already exists");
+            return Optional.empty();
         }
-        Optional<Rating> ratingToComment = ratingRepo.findById(comment.getRating().getId());
-        if (ratingToComment.isEmpty()) {
+
+        Optional<Rating> existingRating = commentValidator.hasExistingRating(comment);
+        if (existingRating.isEmpty()) {
             System.out.println("Invalid rating");
+            return Optional.empty();
+        }
+
+        if (commentValidator.hasExistingUser(comment).isEmpty()) {
+            System.out.println("Invalid user");
             return Optional.empty();
         }
 
@@ -86,12 +95,9 @@ public class CommentService {
         Comment validatedComment = addDateTimeAndNullifyId(comment);
         Optional<Comment> savedComment = saveComment(validatedComment);
 
-        // Linking the comment to the relevant Rating
-        comment.setRating(ratingToComment.get());
-
         // Sending notifications + updating Log
         commentNotificationService.sendCommentNotification(savedComment.get());
-        logUpdateService.createCommentUpdate(ratingToComment.get(),savedComment.get());
+        logUpdateService.createCommentUpdate(existingRating.get(),savedComment.get());
         return savedComment;
     }
 
@@ -145,7 +151,7 @@ public class CommentService {
     }
 
 
-    public void deleteAllCommentsFromRating(Rating rating) {
+    public void deleteAllCommentsContainingRating(Rating rating) {
         System.out.println("Deleting all comments from the rating");
         List<Comment> commentsOfRating = commentRepo.findAllByRating(rating);
         for (Comment comment: commentsOfRating) {
