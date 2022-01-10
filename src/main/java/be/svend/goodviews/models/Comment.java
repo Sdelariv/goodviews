@@ -20,6 +20,9 @@ public class Comment {
     @ManyToOne
     private User user;
 
+    @ManyToOne
+    private Rating rating;
+
 
     // GETTERS & SETTERS
 
@@ -64,6 +67,14 @@ public class Comment {
         this.updated = updated;
     }
 
+    public Rating getRating() {
+        return rating;
+    }
+
+    public void setRating(Rating rating) {
+        this.rating = rating;
+    }
+
     // OTHER
 
     @Override
@@ -72,6 +83,7 @@ public class Comment {
                 "id=" + id +
                 ", date=" + dateTime +
                 ", user=" + user + '\'' +
+                ", rating=" + rating +
                 ", comment='" + comment +
                 '}';
     }

@@ -20,11 +20,6 @@ public class RatingCopier {
             ratingToUpdate.setDateOfReview(LocalDate.now());
         }
 
-        if (updatedRating.getCommentList() != null
-                && !ratingToUpdate.getCommentList().containsAll(updatedRating.getCommentList())) {
-            ratingToUpdate.setCommentList(updatedRating.getCommentList());
-        }
-
         return ratingToUpdate;
     }
 }

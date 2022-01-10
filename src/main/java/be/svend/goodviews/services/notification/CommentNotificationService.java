@@ -4,6 +4,7 @@ import be.svend.goodviews.models.Comment;
 import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.models.notification.CommentNotification;
+import be.svend.goodviews.repositories.CommentRepository;
 import be.svend.goodviews.repositories.RatingRepository;
 import be.svend.goodviews.repositories.notification.CommentNotificationRepository;
 import be.svend.goodviews.repositories.notification.NotificationRepository;
@@ -21,6 +22,7 @@ public class CommentNotificationService {
     NotificationRepository notificationRepo;
     CommentNotificationRepository commentNotificationRepo;
     CommentValidator commentValidator;
+    CommentRepository commentRepo;
 
     RatingRepository ratingRepo;
 
@@ -30,6 +32,7 @@ public class CommentNotificationService {
 
     public CommentNotificationService(CommentNotificationRepository commentNotificationRepo,
                                       CommentValidator commentValidator,
+                                      CommentRepository commentRepo,
                                       NotificationRepository notificationRepo,
                                       RatingRepository ratingRepo,
                                       NotificationService notificationService) {
@@ -38,6 +41,7 @@ public class CommentNotificationService {
         this.notificationRepo = notificationRepo;
         this.ratingRepo = ratingRepo;
         this.notificationService = notificationService;
+        this.commentRepo = commentRepo;
     }
 
     // FIND METHODS
@@ -103,13 +107,12 @@ public class CommentNotificationService {
 
         commentNotification.setOriginUser(comment.getUser());
 
-        Optional<Rating> ratingWithComment = ratingRepo.findRatingByCommentListContaining(comment);
-        if (ratingWithComment.isEmpty()) {
-            System.out.println("Something went wrong fetching the comment");
+        if (comment.getRating() == null) {
+            System.out.println("Something went wrong fetching the rating");
             return Optional.empty();
         }
-        commentNotification.setRating(ratingWithComment.get());
-        commentNotification.setTargetUser(ratingWithComment.get().getUser());
+        commentNotification.setRating(comment.getRating());
+        commentNotification.setTargetUser(comment.getUser());
 
         return Optional.of(commentNotification);
     }
@@ -117,20 +120,21 @@ public class CommentNotificationService {
     // TODO: Clean up this method
     private List<CommentNotification> createReplyNotifications(Comment comment) {
         // Find rating-thread
-        Optional<Rating> ratingWithComment = ratingRepo.findRatingByCommentListContaining(comment);
-        if (ratingWithComment.isEmpty()) {
-            System.out.println("Something went wrong fetching the comment");
+        Rating ratingWithComment = comment.getRating();
+        if (ratingWithComment == null) {
+            System.out.println("Something went wrong fetching the rating");
             return Collections.emptyList();
         }
+        List<Comment> ratingComments = commentRepo.findAllByRating(ratingWithComment);
 
         // Make list of ReplyNotifications for people who already commented (not the commenter itself or the thread-owner)
         List<CommentNotification> replyNotifications = new ArrayList<>();
         List<User> usersAlreadyDone = new ArrayList<>();
 
-        for (Comment commentInThread: ratingWithComment.get().getCommentList()) {
+        for (Comment commentInThread: ratingComments) {
             // Check if it's the thread-owner
-            if (commentInThread.getUser() == null || ratingWithComment.get().getUser() == null) continue;
-            if (commentInThread.getUser().equals(ratingWithComment.get().getUser())) continue;
+            if (commentInThread.getUser() == null || comment.getUser() == null) continue;
+            if (commentInThread.getUser().equals(comment.getUser())) continue;
 
             // Check if it's the commenter themselves
             if (commentInThread.getUser() == null || comment.getUser() == null) continue;
@@ -141,7 +145,7 @@ public class CommentNotificationService {
 
             CommentNotification replyNotification = new CommentNotification();
             replyNotification.setOriginUser(commentInThread.getUser());
-            replyNotification.setRating(ratingWithComment.get());
+            replyNotification.setRating(ratingWithComment);
             replyNotification.setComment(commentInThread);
             replyNotification.setMessage(comment.getUser().getUsername() + " has replied to a conversation you are in");
 

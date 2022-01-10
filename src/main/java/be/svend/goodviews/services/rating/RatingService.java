@@ -5,8 +5,10 @@ import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.CommentRepository;
 import be.svend.goodviews.repositories.RatingRepository;
+import be.svend.goodviews.services.comment.CommentService;
 import be.svend.goodviews.services.notification.NotificationService;
 import be.svend.goodviews.services.update.LogUpdateService;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -23,17 +25,19 @@ public class RatingService {
     RatingValidator ratingValidator;
 
     CommentRepository commentRepo; // Needed to delete comments before deleting ratings
+    CommentService commentService;
 
     NotificationService notificationService; // For deleting rating from notifications
     LogUpdateService logUpdateService; // For logupdates
 
     public RatingService(RatingRepository ratingRepo, RatingValidator ratingValidator,
-                         CommentRepository commentRepo,
+                         CommentRepository commentRepo, CommentService commentService,
                          NotificationService notificationService, LogUpdateService logUpdateService) {
         this.ratingRepo = ratingRepo;
         this.ratingValidator = ratingValidator;
 
         this.commentRepo = commentRepo;
+        this.commentService = commentService;
 
         this.logUpdateService = logUpdateService;
         this.notificationService = notificationService;
@@ -186,6 +190,8 @@ public class RatingService {
      * @return
      */
     public Optional<Rating> addLikeToRating(Rating rating, User user) {
+
+        System.out.println(rating.getUserLikes());
         rating.addUserLike(user);
         logUpdateService.createGeneralLog(user.getUsername() + " has liked " + rating.getUser().getUsername() + "'s rating of " + rating.getFilm().getTitle());
         return saveRating(rating);
@@ -201,33 +207,8 @@ public class RatingService {
 
     }
 
-    public Optional<Rating> addCommentToRating(Rating rating, Comment comment) {
-        rating.addComment(comment);
-        return saveRating(rating);
-    }
 
-    public boolean deleteCommentFromRating(Comment comment) {
-        // Looking for rating
-        Optional<Rating> ratingWithComment = ratingRepo.findRatingByCommentListContaining(comment);
-        if (ratingWithComment.isEmpty()) return false;
-        Rating foundRatingWithComment = ratingWithComment.get();
 
-        // Deleting comment
-        foundRatingWithComment.deleteComment(comment);
-        saveRating(foundRatingWithComment);
-        return true;
-
-    }
-
-    private void deleteAllCommentsFromRating(Rating rating) {
-        System.out.println("Deleting all comments from the rating");
-        List<Comment> commentsOfRating = rating.getCommentList();
-        for (Comment comment: commentsOfRating) {
-            logUpdateService.deleteCommentIdFromLog(comment);
-            logUpdateService.createGeneralLog("Deleting comment of " + comment.getUser().getUsername() + " on " + rating.getUser().getUsername() + "'s rating");
-            commentRepo.delete(comment);
-        }
-    }
 
 
     // DELETE METHODS
@@ -256,7 +237,7 @@ public class RatingService {
 
         // Delete traces
         logUpdateService.deleteRatingFromLogByRating(rating);
-        deleteAllCommentsFromRating(rating);
+        commentService.deleteAllCommentsFromRating(rating);
         notificationService.deleteNotificationsByRating(rating);
 
         // Prep info for log and updating rating average

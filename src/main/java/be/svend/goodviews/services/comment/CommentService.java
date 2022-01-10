@@ -26,20 +26,18 @@ public class CommentService {
     LogUpdateService logUpdateService; // To update the log
 
     CommentNotificationService commentNotificationService; // To send notifications
-    RatingService ratingService; // Need ratingService to add or delete a comment from a Rating
 
     // CONSTRUCTORS
 
     public CommentService(CommentRepository commentRepo,
                           RatingRepository ratingRepo,
                           UserRepository userRepo,
-                          RatingService ratingService,
                           CommentNotificationService commentNotificationService,
                           LogUpdateService logUpdateService) {
         this.commentRepo = commentRepo;
         this.ratingRepo = ratingRepo;
         this.userRepo = userRepo;
-        this.ratingService = ratingService;
+
         this.commentNotificationService = commentNotificationService;
         this.logUpdateService = logUpdateService;
     }
@@ -55,7 +53,8 @@ public class CommentService {
         if (ratingInDb.isEmpty()) return Collections.emptyList();
 
         // Sorting by DateTime
-        return ratingInDb.get().getCommentList().stream().sorted(Comparator.comparing(c -> c.getDateTime())).collect(Collectors.toList());
+        List<Comment> ratingComments = commentRepo.findAllByRating(ratingInDb.get());
+        return ratingComments.stream().sorted(Comparator.comparing(c -> c.getDateTime())).collect(Collectors.toList());
     }
 
     public List<Comment> findByUsername(String username) {
@@ -85,7 +84,7 @@ public class CommentService {
         Optional<Comment> savedComment = saveComment(validatedComment);
 
         // Linking the comment to the relevant Rating
-        ratingService.addCommentToRating(ratingToComment.get(),savedComment.get());
+        comment.setRating(ratingToComment.get());
 
         // Sending notifications + updating Log
         commentNotificationService.sendCommentNotification(savedComment.get());
@@ -129,9 +128,6 @@ public class CommentService {
         Optional<Comment> existingComment = findById(comment.getId());
         if (existingComment.isEmpty()) return false;
 
-        // Deleting comment from Rating
-        ratingService.deleteCommentFromRating(comment);
-
         // Deleting comment
         System.out.println("Deleting comment: " + comment.getComment());
         logUpdateService.createGeneralLog(comment.getUser() + "'s comment was deleted");
@@ -142,6 +138,17 @@ public class CommentService {
     public void deleteComments(List<Comment> comments) {
         for (Comment comment: comments) {
             deleteComment(comment);
+        }
+    }
+
+
+    public void deleteAllCommentsFromRating(Rating rating) {
+        System.out.println("Deleting all comments from the rating");
+        List<Comment> commentsOfRating = commentRepo.findAllByRating(rating);
+        for (Comment comment: commentsOfRating) {
+            logUpdateService.deleteCommentIdFromLog(comment);
+            logUpdateService.createGeneralLog("Deleting comment of " + comment.getUser().getUsername() + " on " + rating.getUser().getUsername() + "'s rating");
+            commentRepo.delete(comment);
         }
     }
 

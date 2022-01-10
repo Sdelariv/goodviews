@@ -1,5 +1,8 @@
 package be.svend.goodviews.models;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -27,9 +30,6 @@ public class Rating {
     private Film film;
 
     @OneToMany(fetch = FetchType.EAGER)
-    private List<Comment> commentList;
-
-    @OneToMany
     private List<User> userLikes;
 
     // GETTERS & SETTERS
@@ -100,25 +100,6 @@ public class Rating {
 
         this.id = this.getUser().getUsername() + this.getFilm().getId();
         return Optional.of(this.id);
-    }
-
-    public List<Comment> getCommentList() {
-        return commentList;
-    }
-
-    public void setCommentList(List<Comment> commentList) {
-        this.commentList = commentList;
-    }
-
-    public void addComment(Comment comment) {
-        if (this.getCommentList().contains(comment)) return;
-
-        this.commentList.add(comment);
-    }
-
-    public void deleteComment(Comment comment) {
-        if (!this.getCommentList().contains(comment)) return;
-        this.commentList.remove(comment);
     }
 
     public List<User> getUserLikes() {

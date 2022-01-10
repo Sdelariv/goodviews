@@ -14,7 +14,5 @@ public interface RatingRepository extends JpaRepository<Rating, String> {
 
     List<Rating> findByUser_Username(String userId);
 
-    Optional<Rating> findRatingByCommentListContaining(Comment comment);
-
     List<Rating> findByUserLikesContaining(User user);
 }
