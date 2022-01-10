@@ -21,8 +21,14 @@ public class WantToSee {
 
     private LocalDateTime dateCreated;
 
-    // GETTERS & SETTERS
+    // CONSTRUCTORS
 
+    public WantToSee() {
+        this.dateCreated = LocalDateTime.now();
+    }
+
+
+    // GETTERS & SETTERS
 
     public Long getId() {
         return id;
