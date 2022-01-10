@@ -118,11 +118,12 @@ public class Rating {
         return true;
     }
 
-    public void deleteUserLike(User user) {
-        if (this.userLikes == null) return;
+    public boolean deleteUserLike(User user) {
+        if (this.userLikes == null) return false;
 
-        if (!this.getUserLikes().contains(user)) return;
+        if (!this.getUserLikes().contains(user)) return false;
         this.userLikes.remove(user);
+        return true;
     }
 
     // OTHER METHODS

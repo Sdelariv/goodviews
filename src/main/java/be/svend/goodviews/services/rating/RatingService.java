@@ -209,7 +209,9 @@ public class RatingService {
     }
 
     public void removeLikeFromRatingByUser(Rating rating, User user) {
-        rating.deleteUserLike(user);
+        if (ratingValidator.isInDatabase(rating).isEmpty()) return;
+
+        if (!rating.deleteUserLike(user)) return;
 
         logUpdateService.createGeneralLog(user.getUsername() + " has unliked " + rating.getUser().getUsername() + "'s rating of " + rating.getFilm().getTitle());
         likeNotificationService.deleteLikeNotification(user,rating);

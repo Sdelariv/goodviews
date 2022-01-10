@@ -53,20 +53,15 @@ public class GoodviewsApplication {
         Rating rating = ratingRepo.findByUser_Username("bibi").get(1);
         User waddles = userService.findByUsername("waddles").get();
         ratingService.addLikeToRating(rating,waddles);
+        ratingService.removeLikeFromRatingByUser(rating,waddles);
 
         Rating rating2 = ratingRepo.findById("sdelarivtt4468740").get();
 
 
-
-        Comment comment2 = new Comment();
-        comment2.setComment("I am most disappoint!");
-        comment2.setUser(bibi);
-        comment2.setRating(rating2);
-
-
-        commentService.createNewComment(comment2);
-
 /*
+
+
+
         Film film = new Film();
         film.setId("tt0110367");
 
@@ -83,21 +78,23 @@ public class GoodviewsApplication {
 
         Film henry = filmService.findById("tt16283668").get();
 
-        Rating rating = new Rating();
-        rating.setRatingValue(90);
-        rating.setUser(newUser);
-        rating.setFilm(henry);
-        ratingService.createNewRating(rating);
+        Rating newRating = new Rating();
+        newRating.setRatingValue(90);
+        newRating.setUser(newUser);
+        newRating.setFilm(henry);
+        ratingService.createNewRating(newRating);
 
+        Comment comment = new Comment();
+        comment.setComment("This is a comment from a user that will get deleted!");
+        comment.setUser(newUser);
+        comment.setRating(rating2);
+        commentService.createNewComment(comment);
 
-
-        commentService.createNewComment(comment,"userToDeletett16283668");
+        commentService.createNewComment(comment);
 
         userService.deleteUser(newUser);
 
         */
-
-
 
     }
 
