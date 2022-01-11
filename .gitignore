@@ -5,6 +5,7 @@ target/
 !**/src/test/**/target/
 goodviews.iml
 out/
+C:\Users\svend\IdeaProjects\goodviews\src\main\resources\application.properties
 
 ### STS ###
 .apt_generated
