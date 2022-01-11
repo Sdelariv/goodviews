@@ -58,8 +58,8 @@ class FriendshipServiceTest {
         nonExistingUser = new User();
         nonExistingUser.setUsername("I don't exist");
 
-        friendshipService.requestFriendship(sven,"bibi");
-        friendshipService.createFriendship(bibi,waddles);
+        // friendshipService.requestFriendship(sven,"bibi");
+        // friendshipService.createFriendship(bibi,waddles);
     }
 
     @Test
@@ -100,7 +100,7 @@ class FriendshipServiceTest {
 
     @Test
     void requestFriendship() {
-        friendshipService.requestFriendship(user,"bibi");
+        // friendshipService.requestFriendship(user,"bibi");
         assertTrue(friendshipService.findAllFriendRequestsByUser(user).size() > 0);
     }
 

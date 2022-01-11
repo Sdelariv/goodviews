@@ -132,25 +132,19 @@ public class FriendshipService {
     // CREATE METHODS
 
     /**
-     * Creates a new pending Friendship (unless the users don't exists, or are the same) and sends a notification to the receiver
-     * @param requester - the user requesting the Friendship (will be found based on usernameOfRequested)
-     * @param usernameOfRequested - the username of the User whose Friendship is requested
+     * Creates a new pending Friendship (assumes the users don't exists, or are the same) and sends a notification to the receiver
+     * @param requester - the user requesting the Friendship
+     * @param target - the user whose Friendship is requested
      * @return true if it worked, false if it didn't
      */
-    public boolean requestFriendship (User requester, String usernameOfRequested) {
-        Optional<User> friendA = userValidator.isExistingUser(requester);
-        Optional<User> friendB = userValidator.isExistingUserWithUsername(usernameOfRequested);
-        if (friendA.isEmpty() || friendB.isEmpty()) return false;
-
-        if (requester.getUsername().equals(usernameOfRequested)) return false;
-
+    public boolean requestFriendship (User requester, User target) {
         // Create request
-        Optional<Friendship> createdFriendship = createRequestedFriendship(friendA.get(),friendB.get());
+        Optional<Friendship> createdFriendship = createRequestedFriendship(requester,target);
         if (createdFriendship.isEmpty()) return false;
 
         // Add notification + Log
-        friendRequestService.sendFriendRequestNotification(createdFriendship.get(),friendB.get());
-        logUpdateService.createGeneralLog(friendA.get(),friendA.get().getUsername() + " has requested friendship with " + friendB.get().getUsername());
+        friendRequestService.sendFriendRequestNotification(createdFriendship.get(),target);
+        logUpdateService.createGeneralLog(requester,requester.getUsername() + " has requested friendship with " + target.getUsername());
 
         return true;
     }
@@ -221,6 +215,7 @@ public class FriendshipService {
         System.out.println("Friendship denied");
 
         friendRequestService.deleteFriendRequest(friendship);
+        logUpdateService.createGeneralLog(friendship.getFriendB().getUsername() + " has denied friendship with " + friendship.getFriendA().getUsername());
 
         return deleteFriendship(friendship);
     }
@@ -240,18 +235,15 @@ public class FriendshipService {
     // DELETE METHODS
 
     /**
-     * Looks for Friendship in db based on id, and then deletes it from the db
+     * Deletes friendship (assumes it exists) and logs it
      * @param friendship
      * @return boolean - false if not found, true if found and deleted
      */
     public boolean deleteFriendship(Friendship friendship) {
-        Optional<Friendship> friendshipInDb = friendshipRepo.findById(friendship.getId());
-        if (friendshipInDb.isEmpty()) return false;
-
         friendRequestService.deleteNotificationsByFriendship(friendship);
         logUpdateService.deleteFriendshipFromLogByFriendship(friendship);
 
-        friendshipRepo.delete(friendshipInDb.get());
+        friendshipRepo.delete(friendship);
         System.out.println("Friendship deleted");
         logUpdateService.createGeneralLog("Friendship deleted between " + friendship.getFriendA().getUsername() + " and " + friendship.getFriendB().getUsername());
         return true;
