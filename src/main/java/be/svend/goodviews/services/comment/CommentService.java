@@ -23,26 +23,23 @@ public class CommentService {
     UserRepository userRepo;
 
     LogUpdateService logUpdateService; // To update the log
+    CommentNotificationService commentNotificationService; // To send notifications
 
     CommentValidator commentValidator;
-
-    CommentNotificationService commentNotificationService; // To send notifications
 
     // CONSTRUCTORS
 
     public CommentService(CommentRepository commentRepo, RatingRepository ratingRepo, UserRepository userRepo,
-                          CommentValidator commentValidator,
-                          CommentNotificationService commentNotificationService,
-                          LogUpdateService logUpdateService) {
+                          CommentNotificationService commentNotificationService, LogUpdateService logUpdateService,
+                          CommentValidator commentValidator) {
         this.commentRepo = commentRepo;
         this.ratingRepo = ratingRepo;
         this.userRepo = userRepo;
 
-        this.commentValidator = commentValidator;
-
         this.commentNotificationService = commentNotificationService;
-
         this.logUpdateService = logUpdateService;
+
+        this.commentValidator = commentValidator;
     }
 
     // FIND METHODS
@@ -67,29 +64,12 @@ public class CommentService {
     // CREATE METHODS
 
     /**
-     * Creates a new Comment and adds it to the Rating based on its ratingId
-     * @param comment - The new comment to be added to the db and linked to the rating
+     * Creates a new Comment, assuming validation has happened already.
+     * @param comment - The new comment to be added
      * @return
      */
     public Optional<Comment> createNewComment(Comment comment) {
         System.out.println("Trying to create new comment");
-
-        // Validation
-        if (commentValidator.isExistingComment(comment).isPresent()) {
-            System.out.println("Comment already exists");
-            return Optional.empty();
-        }
-
-        Optional<Rating> existingRating = commentValidator.hasExistingRating(comment);
-        if (existingRating.isEmpty()) {
-            System.out.println("Invalid rating");
-            return Optional.empty();
-        }
-
-        if (commentValidator.hasExistingUser(comment).isEmpty()) {
-            System.out.println("Invalid user");
-            return Optional.empty();
-        }
 
         // Prepare and save comment
         Comment validatedComment = addDateTimeAndNullifyId(comment);
@@ -97,14 +77,14 @@ public class CommentService {
 
         // Sending notifications + updating Log
         commentNotificationService.sendCommentNotification(savedComment.get());
-        logUpdateService.createCommentUpdate(existingRating.get(),savedComment.get());
+        logUpdateService.createCommentUpdate(savedComment.get().getRating(),savedComment.get());
         return savedComment;
     }
 
     // UPDATE METHODS
 
     public Optional<Comment> updateComment(Comment comment) {
-        // Finding comment
+        // Finding comment // TODO: Finds the comment twice now (in controller and here) - fix?
         Optional<Comment> existingComment = findById(comment.getId());
         if (existingComment.isEmpty()) return Optional.empty();
 
@@ -133,14 +113,14 @@ public class CommentService {
     // DELETE
 
     public boolean deleteComment(Comment comment) {
-        // Find comment
-        Optional<Comment> existingComment = findById(comment.getId());
-        if (existingComment.isEmpty()) return false;
-
-        // Deleting comment
         System.out.println("Deleting comment: " + comment.getComment());
-        logUpdateService.createGeneralLog(comment.getUser() + "'s comment was deleted");
+        String username = comment.getUser().getUsername();
+
         commentRepo.delete(comment);
+
+        if (commentValidator.isExistingComment(comment).isPresent()) return false;
+
+        logUpdateService.createGeneralLog(username + "'s comment was deleted");
         return true;
     }
 
