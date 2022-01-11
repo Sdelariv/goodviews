@@ -53,7 +53,7 @@ public class FilmController {
 
     @GetMapping("/{id}")
     public ResponseEntity findById(@PathVariable String id) {
-        System.out.println("FIND BY ID called for: " + id);
+        System.out.println("FIND FILM BY ID called for: " + id);
 
         if (!isValidString(id)) return ResponseEntity.badRequest().body("Invalid id format");
         if (!isValidFilmIdFormat(id)) return ResponseEntity.badRequest().body("Invalid id format");

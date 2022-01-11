@@ -41,6 +41,10 @@ public class FriendshipService {
 
     // FIND METHODS
 
+    public Optional<Friendship> findFriendshipById(String id) {
+        return friendshipRepo.findById(id);
+    }
+
     /**
      * Finds every kind of Friendship in the db
      * @return List<Friendship> list of all Friendships in the db
