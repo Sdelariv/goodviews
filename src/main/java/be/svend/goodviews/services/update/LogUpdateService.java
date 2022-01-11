@@ -9,7 +9,6 @@ import be.svend.goodviews.repositories.update.CommentLogUpdateRepository;
 import be.svend.goodviews.repositories.update.FriendshipLogUpdateRepository;
 import be.svend.goodviews.repositories.update.LogUpdateRepository;
 import be.svend.goodviews.repositories.update.RatingLogUpdateRepository;
-import org.apache.juli.logging.Log;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

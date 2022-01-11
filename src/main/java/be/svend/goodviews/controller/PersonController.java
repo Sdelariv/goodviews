@@ -48,7 +48,8 @@ public class PersonController {
         return ResponseEntity.ok(foundPerson);
     }
 
-    // CREATE METHODS
 
-    // TODO: Continue
+
+    // Don't need the rest because they get created by adding films
+
 }

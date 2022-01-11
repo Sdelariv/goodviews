@@ -150,7 +150,6 @@ public class RatingController {
         return ResponseEntity.ok(savedRating.get());
     }
 
-
     // DELETE METHODS
 
     @DeleteMapping("{ratingId}")

@@ -23,7 +23,6 @@ public class RatingService {
     RatingValidator ratingValidator;
 
     CommentService commentService;  // Needed to delete comments before deleting ratings
-
     NotificationService notificationService; // For deleting rating from notifications
     LikeNotificationService likeNotificationService; // For notifying about likes
     WantToSeeService wantToSeeService; // To delete wantToSee of films seen
@@ -39,7 +38,6 @@ public class RatingService {
         this.ratingValidator = ratingValidator;
 
         this.commentService = commentService;
-
         this.notificationService = notificationService;
         this.likeNotificationService = likeNotificationService;
         this.wantToSeeService = wantToSeeService;
@@ -302,7 +300,6 @@ public class RatingService {
             deleteRating(rating);
         }
     }
-
 
 
     // INTERNAL METHODS
