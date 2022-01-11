@@ -76,10 +76,6 @@ public class SuggestionService {
 
     // CREATE METHODS
     public boolean sendGenreSuggestion(String suggestedGenreName, Film film, User suggester) {
-        // Check if existing  TODO: Will have to move this to controller
-        if (userValidator.isExistingUser(suggester).isEmpty()) return false;
-        if (filmValidator.isExistingFilm(film).isEmpty()) return false;
-        else film = filmValidator.isExistingFilm(film).get();
 
         // See if film already has that genre
         if (film.getGenres().contains(new Genre(suggestedGenreName))) {
