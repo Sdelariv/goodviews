@@ -5,11 +5,9 @@ target/
 !**/src/test/**/target/
 goodviews.iml
 out/
-<<<<<<< HEAD
+
 src/main/resources/application.properties
-=======
-src\main\resources\application.properties
->>>>>>> 2a353db09c5456c42662a0d247591deb48fa044a
+src/main/java/be/svend/goodviews/test
 
 ### STS ###
 .apt_generated
