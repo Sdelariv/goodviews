@@ -94,5 +94,46 @@ public class SuggestionController {
         return ResponseEntity.ok().body("Genre suggestion sent");
     }
 
+    @PostMapping("/suggestTag")
+    public ResponseEntity createTagSuggestion(@RequestParam String suggestedTagName, @RequestParam String filmId, @RequestParam String suggesterUsername) {
+        System.out.println("CREATE TAG SUGGESTION CALLED for " + filmId + " and genre: " + suggestedTagName);
+
+        if (!isValidString(suggestedTagName) || !isValidString(filmId) || !isValidString(suggesterUsername))
+            return ResponseEntity.badRequest().body("Invalid input");
+
+        Optional<User> suggester = userValidator.isExistingUserWithUsername(suggesterUsername);
+        if (suggester.isEmpty()) return ResponseEntity.status(400).body("No such user found");
+
+        Optional<Film> film = filmValidator.isExistingFilmId(filmId);
+        if (film.isEmpty()) return ResponseEntity.status(400).body("No such film found");
+
+        if (!suggestionService.sendTagSuggestion(suggestedTagName, film.get(), suggester.get()))
+            return ResponseEntity.badRequest().body("Suggestion invalid (film already has that tag or suggestion already exists");
+        return ResponseEntity.ok().body("Tag suggestion sent");
+    }
+
+    @PostMapping("/suggestFilm")
+    public ResponseEntity createFilmSuggestion(@RequestParam String suggestedFilmId, @RequestParam String suggesterUsername) {
+        System.out.println("CREATE FILM SUGGESTION CALLED for " + suggestedFilmId);
+
+        if (!isValidString(suggestedFilmId) || !isValidString(suggesterUsername))
+            return ResponseEntity.badRequest().body("Invalid input");
+
+        Optional<User> suggester = userValidator.isExistingUserWithUsername(suggesterUsername);
+        if (suggester.isEmpty()) return ResponseEntity.status(400).body("No such user found");
+
+        // Check if film is already in Db
+        suggestedFilmId = suggestedFilmId.trim();
+        if (filmValidator.isExistingFilmId(suggestedFilmId).isPresent()) return ResponseEntity.badRequest().body("Film already in db");
+
+        if (!suggestionService.sendFilmSuggestion(suggestedFilmId, suggester.get()))
+            return ResponseEntity.badRequest().body("Suggestion invalid (film doesn't exist or suggestion already exists)");
+        return ResponseEntity.ok().body("Film suggestion sent");
+    }
+
+    // UPDATE METHODS
+
+
+    // TODO: continue
 }
 

@@ -74,6 +74,10 @@ public class SuggestionService {
 
     public List<FilmSuggestion> findAllFilmSuggestions() { return filmSuggestionRepo.findAll(); }
 
+    public Optional<Notification> findById(Long id) {
+        return notificationRepo.findById(id);
+    }
+
     // CREATE METHODS
     public boolean sendGenreSuggestion(String suggestedGenreName, Film film, User suggester) {
 
@@ -94,11 +98,6 @@ public class SuggestionService {
     }
 
     public boolean sendTagSuggestion(String suggestedTagName, Film film, User suggester) {
-        // Check if existing  TODO: Will have to move this to controller
-        if (userValidator.isExistingUser(suggester).isEmpty()) return false;
-        if (filmValidator.isExistingFilm(film).isEmpty()) return false;
-        else film = filmValidator.isExistingFilm(film).get();
-
         // Check if film already has tag
         if (film.getTags().contains(new Tag(suggestedTagName))) {
             System.out.println("Film already has that tag");
@@ -116,19 +115,7 @@ public class SuggestionService {
     }
 
     public boolean sendFilmSuggestion(String suggestedFilmId, User suggester) {
-        // Check if existing
-        if (userValidator.isExistingUser(suggester).isEmpty()) {
-            System.out.println("Invalid user");
-            return false;
-        }
-
-        // Check if film is already in Db
-        suggestedFilmId = suggestedFilmId.trim();
-        if (filmValidator.isExistingFilmId(suggestedFilmId).isPresent()) {
-            System.out.println("Film already exists in db");
-            return false;
-        }
-
+        // TODO: Move all of this to Controller?
         // Check if film exists on IMDB
         if (!filmValidator.isValidFilmIdFormat(suggestedFilmId)) return false;
         Optional<Film> filmFromIMDB = filmService.fetchFilmByImdbId(suggestedFilmId);
