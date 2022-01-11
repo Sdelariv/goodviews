@@ -93,8 +93,3 @@ public class SuggestionController {
     }
 
 
-<<<<<<< HEAD
-}
-=======
-}
->>>>>>> 2a353db09c5456c42662a0d247591deb48fa044a
