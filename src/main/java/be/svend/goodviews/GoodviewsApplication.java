@@ -48,8 +48,7 @@ public class GoodviewsApplication {
         sven.setFirstName("Sven");
         sven.setLastName("Delarivière");
         sven.setPassword("myPassword");
-
-
+/*
 
         Rating rating = ratingRepo.findByUser_Username("bibi").get(0);
         User waddles = userService.findByUsername("waddles").get();
@@ -57,7 +56,12 @@ public class GoodviewsApplication {
         Film film = filmService.findById("tt0062622").get();
         wantToSeeService.createWantToSee(waddles,film);
 
+        filmService.createFilmByImdbId("tt10095582");
 
+
+
+ */
+       ratingService.deleteRatingById("sdelarivtt10872600");
 
 
 

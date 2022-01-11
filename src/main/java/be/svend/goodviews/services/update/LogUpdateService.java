@@ -121,10 +121,12 @@ public class LogUpdateService {
         System.out.println("Deleting ratings from the logs");
         for (RatingLogUpdate logUpdate: ratingLogUpdatesWithRating) {
             logUpdate.setRating(null);
+            logUpdate.setClassified(true);
             save(logUpdate);
         }
         for (CommentLogUpdate logUpdate: commentLogUpdatesWithRating) {
             logUpdate.setRating(null);
+            logUpdate.setClassified(true);
             save(logUpdate);
         }
 

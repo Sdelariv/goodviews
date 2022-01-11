@@ -100,6 +100,7 @@ public class WantToSeeService {
         if (existingWantToSee.isEmpty()) return false;
 
         wantToSeeRepo.delete(existingWantToSee.get());
+        logUpdateService.createGeneralLog(wantToSee.getUser().getUsername() + "'s want-to-see of " + wantToSee.getFilm().getTitle() + " has been deleted");
         return true;
     }
 
