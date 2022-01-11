@@ -78,9 +78,10 @@ public class SuggestionController {
 
     @PostMapping("/suggestGenre")
     public ResponseEntity createGenreSuggestion(@RequestParam String suggestedGenreName, @RequestParam String filmId, @RequestParam String suggesterUsername) {
-        System.out.println("CREATE GENRE SUGGESTION CALLED for " + filmId + " and genre: " +  suggestedGenreName);
+        System.out.println("CREATE GENRE SUGGESTION CALLED for " + filmId + " and genre: " + suggestedGenreName);
 
-        if (!isValidString(suggestedGenreName) || !isValidString(filmId) || !isValidString(suggesterUsername)) return ResponseEntity.badRequest().body("Invalid input");
+        if (!isValidString(suggestedGenreName) || !isValidString(filmId) || !isValidString(suggesterUsername))
+            return ResponseEntity.badRequest().body("Invalid input");
 
         Optional<User> suggester = userValidator.isExistingUserWithUsername(suggesterUsername);
         if (suggester.isEmpty()) return ResponseEntity.status(400).body("No such user found");
@@ -88,8 +89,10 @@ public class SuggestionController {
         Optional<Film> film = filmValidator.isExistingFilmId(filmId);
         if (film.isEmpty()) return ResponseEntity.status(400).body("No such film found");
 
-        if (!suggestionService.sendGenreSuggestion(suggestedGenreName,film.get(),suggester.get())) return ResponseEntity.badRequest().body("Suggestion invalid (film already has that genre or suggestion already exists");
+        if (!suggestionService.sendGenreSuggestion(suggestedGenreName, film.get(), suggester.get()))
+            return ResponseEntity.badRequest().body("Suggestion invalid (film already has that genre or suggestion already exists");
         return ResponseEntity.ok().body("Genre suggestion sent");
     }
 
+}
 
