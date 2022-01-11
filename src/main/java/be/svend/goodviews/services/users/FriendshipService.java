@@ -5,7 +5,6 @@ import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.FriendshipRepository;
 import be.svend.goodviews.repositories.UserRepository;
 import be.svend.goodviews.services.notification.FriendRequestService;
-import be.svend.goodviews.services.notification.NotificationService;
 import be.svend.goodviews.services.update.LogUpdateService;
 import org.springframework.stereotype.Service;
 
@@ -105,7 +104,7 @@ public class FriendshipService {
      * @param user - user whose open requests you are looking for
      * @return List<Friendship> list of all unaccepted friendships in the db for the given user
      * */
-    public List<Friendship> findAllFriendRequestsOfUser(User user) {
+    public List<Friendship> findAllFriendRequestsForUser(User user) {
         Optional<User> friendInDb = userValidator.isExistingUser(user);
         if (friendInDb.isEmpty()) return Collections.emptyList();
 
@@ -125,7 +124,7 @@ public class FriendshipService {
         List<Friendship> friendships = new ArrayList<>();
         friendships.addAll(findAllFriendsByUser(user));
         friendships.addAll(findAllFriendRequestsByUser(user));
-        friendships.addAll(findAllFriendRequestsOfUser(user));
+        friendships.addAll(findAllFriendRequestsForUser(user));
 
         return friendships;
     }
