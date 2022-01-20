@@ -37,7 +37,7 @@ public class WantToSeeController {
         if (!isValidString(username)) return ResponseEntity.badRequest().body("Invalid username format");
 
         Optional<User> foundUser = userValidator.isExistingUserWithUsername(username);
-        if (foundUser.isEmpty()) return ResponseEntity.notFound().build();
+        if (foundUser.isEmpty()) return ResponseEntity.status(400).body("No user user");
 
         List<WantToSee> foundWantToSees = wtsService.findByUser(foundUser.get());
 
