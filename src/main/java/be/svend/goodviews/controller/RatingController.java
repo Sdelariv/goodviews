@@ -7,8 +7,11 @@ import be.svend.goodviews.services.rating.RatingValidator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static be.svend.goodviews.services.StringValidator.isValidString;
 import static be.svend.goodviews.services.film.FilmValidator.isValidFilmIdFormat;
@@ -58,6 +61,7 @@ public class RatingController {
         return ResponseEntity.ok(filmRatings);
     }
 
+    @CrossOrigin
     @GetMapping("/findByUsername")
     public ResponseEntity findRatingsByUsername(@RequestParam String username) {
         System.out.println("FIND RATINGS BY USERNAME CALLED for " + username);
@@ -66,6 +70,10 @@ public class RatingController {
 
         List<Rating> userRatings = ratingService.findByUsername(username);
         if (userRatings.isEmpty()) return ResponseEntity.notFound().build();
+
+        // Sort
+        userRatings = userRatings.stream().sorted(Comparator.comparing(r -> r.getDateOfRating())).collect(Collectors.toList());
+        Collections.reverse(userRatings);
 
         return ResponseEntity.ok(userRatings);
     }

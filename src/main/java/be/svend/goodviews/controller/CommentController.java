@@ -42,6 +42,7 @@ public class CommentController {
         return ResponseEntity.ok(comment.get());
     }
 
+    @CrossOrigin
     @GetMapping("/findByRatingId")
     public ResponseEntity findCommentsByRatingId(@RequestParam String ratingId) {
         System.out.println("FIND COMMENTS BY RATING ID CALLED for " + ratingId);
@@ -51,7 +52,6 @@ public class CommentController {
         if (ratingValidator.ratingIdInDatabase(ratingId).isEmpty()) return ResponseEntity.status(404).body("Rating not in database");
 
         List<Comment> commentsOfRating = commentService.findByRatingId(ratingId);
-        if (commentsOfRating.isEmpty()) return ResponseEntity.notFound().build();
 
         return ResponseEntity.ok(commentsOfRating);
     }

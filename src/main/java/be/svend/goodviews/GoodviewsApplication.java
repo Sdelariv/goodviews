@@ -48,20 +48,30 @@ public class GoodviewsApplication {
         sven.setFirstName("Sven");
         sven.setLastName("Delarivière");
         sven.setPassword("myPassword");
-/*
 
-        Rating rating = ratingRepo.findByUser_Username("bibi").get(0);
         User waddles = userService.findByUsername("waddles").get();
 
-        Film film = filmService.findById("tt0062622").get();
-        wantToSeeService.createWantToSee(waddles,film);
+        Rating emma = ratingService.findById("sdelarivtt9214832").get();
+        Film spider = filmService.findById("tt10872600").get();
 
-        filmService.createFilmByImdbId("tt10095582");
+        wantToSeeService.createWantToSee(sven,spider);
 
+/*
+        Film film = filmService.findById("tt10095582").get();
+        Rating rating = new Rating();
+        rating.setRatingValue(80);
+        rating.setFilm(film);
+        rating.setUser(sven);
+        ratingService.createNewRating(rating);
 
 
  */
-       ratingService.deleteRatingById("sdelarivtt10872600");
+
+
+
+
+
+
 
 
 

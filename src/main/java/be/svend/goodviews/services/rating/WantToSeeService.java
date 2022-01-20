@@ -7,7 +7,6 @@ import be.svend.goodviews.repositories.WantToSeeRepository;
 import be.svend.goodviews.services.film.FilmValidator;
 import be.svend.goodviews.services.update.LogUpdateService;
 import be.svend.goodviews.services.users.UserValidator;
-import org.apache.juli.logging.Log;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
