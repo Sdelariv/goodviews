@@ -51,7 +51,7 @@ public class GoodviewsApplication {
 
         User waddles = userService.findByUsername("waddles").get();
 
-        Film film = filmService.createFilmByImdbId("tt7740496").get();
+        Film film = filmService.createFilmByImdbId("tt10293406").get();
 
         wantToSeeService.createWantToSee(sven,film);
 
