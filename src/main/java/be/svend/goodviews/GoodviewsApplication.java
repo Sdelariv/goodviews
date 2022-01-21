@@ -51,10 +51,10 @@ public class GoodviewsApplication {
 
         User waddles = userService.findByUsername("waddles").get();
 
-        Film film = filmService.createFilmByImdbId("tt10293406").get();
 
-        wantToSeeService.createWantToSee(sven,film);
-
+        friendshipService.createFriendship(waddles,sven);
+        friendshipService.createFriendship(waddles,bibi);
+        friendshipService.createFriendship(bibi,sven);
 /*
         Film film = filmService.findById("tt10095582").get();
         Rating rating = new Rating();

@@ -82,7 +82,7 @@ public class FriendshipController {
         Optional<User> user = userValidator.isExistingUserWithUsername(username);
         if (user.isEmpty()) return ResponseEntity.status(400).body("No such user");
 
-        List<Friendship> friendships = friendshipService.findAllFriendsByUser(user.get());
+        List<Friendship> friendships = friendshipService.findAllFriendshipsByUser(user.get());
         if (friendships.isEmpty()) return ResponseEntity.notFound().build();
 
         return ResponseEntity.ok(friendships);

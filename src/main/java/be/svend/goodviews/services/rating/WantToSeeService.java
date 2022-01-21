@@ -86,7 +86,8 @@ public class WantToSeeService {
             return Optional.empty();
         }
 
-        logUpdateService.createGeneralLog(user.getUsername() + " wants to see " + film.getTitle());
+        logUpdateService.createWantToSeeUpdate(user,film);
+
         return Optional.of(wantToSeeRepo.save(wantToSee));
     }
 

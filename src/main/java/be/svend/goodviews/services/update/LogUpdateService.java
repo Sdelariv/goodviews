@@ -9,6 +9,9 @@ import be.svend.goodviews.repositories.update.CommentLogUpdateRepository;
 import be.svend.goodviews.repositories.update.FriendshipLogUpdateRepository;
 import be.svend.goodviews.repositories.update.LogUpdateRepository;
 import be.svend.goodviews.repositories.update.RatingLogUpdateRepository;
+import be.svend.goodviews.services.users.FriendFinder;
+import be.svend.goodviews.services.users.FriendshipService;
+import org.apache.juli.logging.Log;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,18 +25,35 @@ public class LogUpdateService {
     RatingLogUpdateRepository ratingLogUpdateRepo;
     FriendshipLogUpdateRepository friendshipLogUpdateRepo;
     CommentLogUpdateRepository commentLogUpdateRepo;
+    FriendFinder friendFinder;
 
     public LogUpdateService(LogUpdateRepository logUpdateRepo,
                             RatingLogUpdateRepository ratingLogUpdateRepo,
                             FriendshipLogUpdateRepository friendshipLogUpdateRepo,
-                            CommentLogUpdateRepository commentLogUpdateRepo) {
+                            CommentLogUpdateRepository commentLogUpdateRepo,
+
+                            FriendFinder friendFinder) {
         this.logUpdateRepo = logUpdateRepo;
         this.ratingLogUpdateRepo = ratingLogUpdateRepo;
         this.friendshipLogUpdateRepo = friendshipLogUpdateRepo;
         this.commentLogUpdateRepo = commentLogUpdateRepo;
+        this.friendFinder = friendFinder;
     }
 
     // FIND METHODS
+
+    public List<LogUpdate> findByUserFriendsExcludingClassified(User user) {
+        List<User> friends = friendFinder.findAllFriendsByUser(user);
+
+        List<LogUpdate> logUpdatesInvolvingFriends = new ArrayList<>();
+
+        for (User friend: friends) {
+            logUpdatesInvolvingFriends.addAll(logUpdateRepo.findByUserAndIsClassifiedFalse(friend));
+            logUpdatesInvolvingFriends.addAll(logUpdateRepo.findByOtherUserAndIsClassifiedFalse(friend));
+        }
+
+        return logUpdatesInvolvingFriends.stream().distinct().sorted(Comparator.comparing(lu -> lu.getDateTime())).collect(Collectors.toList());
+    }
 
     public List<LogUpdate> findByUserIncludingClassified(User user) {
         List<LogUpdate> logsByUser = new ArrayList<>();
@@ -95,6 +115,13 @@ public class LogUpdateService {
     public void createFriendshipUpdate(Friendship friendship) {
         FriendshipLogUpdate friendshipLogUpdate = new FriendshipLogUpdate(friendship);
         save(friendshipLogUpdate);
+    }
+
+    public void createWantToSeeUpdate(User user, Film film) {
+        LogUpdate logUpdate = new LogUpdate(user.getUsername() + " wants to see " + film.getTitle());
+        logUpdate.setUser(user);
+        logUpdate.setClassified(false);
+        save(logUpdate);
     }
 
     // DELETE METHODS

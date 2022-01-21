@@ -73,7 +73,7 @@ public class FriendshipService {
      * @param user - user whose friends you are looking for
      * @return List<Friendship> list of all accepted Friendships in the db where the given user is one of the friends
      * */
-    public List<Friendship> findAllFriendsByUser(User user) {
+    public List<Friendship> findAllFriendshipsByUser(User user) {
         Optional<User> friendInDb = userValidator.isExistingUser(user);
         if (friendInDb.isEmpty()) return Collections.emptyList();
 
@@ -122,7 +122,7 @@ public class FriendshipService {
      */
     public List<Friendship> findAllFriendshipsAndRequestsByUser(User user) {
         List<Friendship> friendships = new ArrayList<>();
-        friendships.addAll(findAllFriendsByUser(user));
+        friendships.addAll(findAllFriendshipsByUser(user));
         friendships.addAll(findAllFriendRequestsByUser(user));
         friendships.addAll(findAllFriendRequestsForUser(user));
 
