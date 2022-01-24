@@ -1,10 +1,7 @@
 package be.svend.goodviews.services.update;
 
 import be.svend.goodviews.models.*;
-import be.svend.goodviews.models.update.CommentLogUpdate;
-import be.svend.goodviews.models.update.FriendshipLogUpdate;
-import be.svend.goodviews.models.update.LogUpdate;
-import be.svend.goodviews.models.update.RatingLogUpdate;
+import be.svend.goodviews.models.update.*;
 import be.svend.goodviews.repositories.update.CommentLogUpdateRepository;
 import be.svend.goodviews.repositories.update.FriendshipLogUpdateRepository;
 import be.svend.goodviews.repositories.update.LogUpdateRepository;
@@ -118,10 +115,11 @@ public class LogUpdateService {
     }
 
     public void createWantToSeeUpdate(User user, Film film) {
-        LogUpdate logUpdate = new LogUpdate(user.getUsername() + " wants to see " + film.getTitle());
-        logUpdate.setUser(user);
-        logUpdate.setClassified(false);
-        save(logUpdate);
+        WtsLogUpdate wtsLogUpdate = new WtsLogUpdate(user.getUsername() + " wants to see " + film.getTitle());
+        wtsLogUpdate.setUser(user);
+        wtsLogUpdate.setClassified(false);
+        wtsLogUpdate.setFilm(film);
+        save(wtsLogUpdate);
     }
 
     // DELETE METHODS
