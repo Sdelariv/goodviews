@@ -6,6 +6,8 @@ import be.svend.goodviews.repositories.update.CommentLogUpdateRepository;
 import be.svend.goodviews.repositories.update.FriendshipLogUpdateRepository;
 import be.svend.goodviews.repositories.update.LogUpdateRepository;
 import be.svend.goodviews.repositories.update.RatingLogUpdateRepository;
+import be.svend.goodviews.services.comment.CommentService;
+import be.svend.goodviews.services.rating.RatingService;
 import be.svend.goodviews.services.users.FriendFinder;
 import be.svend.goodviews.services.users.FriendshipService;
 import org.apache.juli.logging.Log;
@@ -22,22 +24,66 @@ public class LogUpdateService {
     RatingLogUpdateRepository ratingLogUpdateRepo;
     FriendshipLogUpdateRepository friendshipLogUpdateRepo;
     CommentLogUpdateRepository commentLogUpdateRepo;
+
+    CommentService commentService;
+
     FriendFinder friendFinder;
 
     public LogUpdateService(LogUpdateRepository logUpdateRepo,
                             RatingLogUpdateRepository ratingLogUpdateRepo,
                             FriendshipLogUpdateRepository friendshipLogUpdateRepo,
                             CommentLogUpdateRepository commentLogUpdateRepo,
+                            CommentService commentService,
 
                             FriendFinder friendFinder) {
         this.logUpdateRepo = logUpdateRepo;
         this.ratingLogUpdateRepo = ratingLogUpdateRepo;
         this.friendshipLogUpdateRepo = friendshipLogUpdateRepo;
         this.commentLogUpdateRepo = commentLogUpdateRepo;
+        this.commentService = commentService;
         this.friendFinder = friendFinder;
     }
 
     // FIND METHODS
+
+    public List<TimelineDTO> findTimelinebyUserAndOffset(User user,Integer offset) {
+        List<User> friends = friendFinder.findAllFriendsByUser(user);
+
+        List<LogUpdate> logUpdatesInvolvingFriends = new ArrayList<>();
+
+        for (User friend: friends) {
+            logUpdatesInvolvingFriends.addAll(logUpdateRepo.findByUserAndIsClassifiedFalse(friend));
+            logUpdatesInvolvingFriends.addAll(logUpdateRepo.findByOtherUserAndIsClassifiedFalse(friend));
+        }
+
+        // TODO: offset first
+
+        List<TimelineDTO> timeline = new ArrayList<>();
+
+        // TODO: make into submethod
+
+        for (LogUpdate update: logUpdatesInvolvingFriends) {
+            if (update instanceof RatingLogUpdate) {
+                //TODO: make into submethod
+                RatingLogUpdate ratingLogUpdate = (RatingLogUpdate) update;
+                TimelineDTO ratingUpdate = new TimelineDTO();
+
+                ratingUpdate.setType("RatingUpdate");
+                ratingUpdate.setId(ratingLogUpdate.getId());
+
+                ratingUpdate.setUser(ratingLogUpdate.getUser());
+                ratingUpdate.setDateTime(ratingLogUpdate.getDateTime());
+
+                ratingUpdate.setRating(ratingLogUpdate.getRating());
+                ratingUpdate.setCommentList(commentService.findByRatingId(ratingLogUpdate.getRating().getId()));
+
+                timeline.add(ratingUpdate);
+            }
+        }
+
+        return timeline;
+
+    }
 
     public List<LogUpdate> findByUserFriendsExcludingClassified(User user) {
         List<User> friends = friendFinder.findAllFriendsByUser(user);
