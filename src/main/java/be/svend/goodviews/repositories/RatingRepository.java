@@ -18,5 +18,5 @@ public interface RatingRepository extends JpaRepository<Rating, String> {
 
     Integer countRatingsByUser_Username(String userId);
 
-    List<Rating> findTop3ByOrderByDateOfRating();
+    List<Rating> findTop3ByOrderByDateOfRatingDesc();
 }

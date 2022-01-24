@@ -51,25 +51,6 @@ public class GoodviewsApplication {
 
         User waddles = userService.findByUsername("waddles").get();
 
-        Film serenity = filmService.findById("tt0379786").get();
-        Film batman = filmService.findById("tt1877830").get();
-        Film interstellar = filmService.findById("tt0816692").get();
-        Film nightmare = filmService.findById("tt7740496").get();
-        Film dog = filmService.findById("tt10293406").get();
-        Film space = filmService.findById("tt0062622").get();
-
-        wantToSeeService.createWantToSee(waddles,serenity);
-        wantToSeeService.createWantToSee(waddles,interstellar);
-
-        Rating rating = new Rating();
-        rating.setRatingValue(100);
-        rating.setUser(waddles);
-        rating.setFilm(space);
-        ratingService.createNewRating(rating);
-
-        wantToSeeService.createWantToSee(sven,nightmare);
-        wantToSeeService.createWantToSee(sven,batman);
-        wantToSeeService.createWantToSee(sven,dog);
 
 
 /*

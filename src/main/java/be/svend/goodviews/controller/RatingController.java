@@ -99,7 +99,7 @@ public class RatingController {
         public ResponseEntity findLatestRatings() {
         System.out.println("FIND LATEST RATINGS CALLED");
 
-        List<Rating> latestRatings = ratingRepo.findTop3ByOrderByDateOfRating();
+        List<Rating> latestRatings = ratingRepo.findTop3ByOrderByDateOfRatingDesc();
 
         return ResponseEntity.ok(latestRatings);
     }
