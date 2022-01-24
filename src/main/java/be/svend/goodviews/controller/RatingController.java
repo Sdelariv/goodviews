@@ -1,6 +1,7 @@
 package be.svend.goodviews.controller;
 
 import be.svend.goodviews.models.Rating;
+import be.svend.goodviews.repositories.RatingRepository;
 import be.svend.goodviews.services.film.FilmService;
 import be.svend.goodviews.services.rating.RatingService;
 import be.svend.goodviews.services.rating.RatingValidator;
@@ -23,13 +24,16 @@ import static be.svend.goodviews.services.rating.RatingValidator.isValidRatingVa
 public class RatingController {
     RatingService ratingService;
     RatingValidator ratingValidator;
+    RatingRepository ratingRepo;
 
     FilmService filmService; // To update the average rating of the film
 
     public RatingController(RatingService ratingService, RatingValidator ratingValidator,
+                            RatingRepository ratingRepo,
                             FilmService filmService) {
         this.ratingService = ratingService;
         this.ratingValidator = ratingValidator;
+        this.ratingRepo = ratingRepo;
 
         this.filmService = filmService;
     }
@@ -76,6 +80,28 @@ public class RatingController {
         Collections.reverse(userRatings);
 
         return ResponseEntity.ok(userRatings);
+    }
+
+    @CrossOrigin
+    @GetMapping("/findNumberByUsername")
+    public ResponseEntity findNumberOfRatingsByUsername(@RequestParam String username) {
+        System.out.println("FIND NUMBER OF RATINGS BY USERNAME CALLED for " + username);
+
+        if (!isValidString(username)) return ResponseEntity.badRequest().body("Invalid input format");
+
+        Integer numberOfRatings = ratingRepo.countRatingsByUser_Username(username);
+
+        return ResponseEntity.ok(numberOfRatings);
+    }
+
+    @CrossOrigin
+    @GetMapping("/latestRatings")
+        public ResponseEntity findLatestRatings() {
+        System.out.println("FIND LATEST RATINGS CALLED");
+
+        List<Rating> latestRatings = ratingRepo.findTop3ByOrderByDateOfRating();
+
+        return ResponseEntity.ok(latestRatings);
     }
 
     // CREATE METHODS

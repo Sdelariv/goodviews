@@ -2,6 +2,7 @@ package be.svend.goodviews.controller;
 
 import be.svend.goodviews.models.Friendship;
 import be.svend.goodviews.models.User;
+import be.svend.goodviews.repositories.RatingRepository;
 import be.svend.goodviews.services.users.FriendFinder;
 import be.svend.goodviews.services.users.FriendshipService;
 import be.svend.goodviews.services.users.UserScrubber;
@@ -20,14 +21,17 @@ import static be.svend.goodviews.services.StringValidator.isValidString;
 public class FriendshipController {
     FriendshipService friendshipService;
     FriendFinder friendFinder;
+    RatingRepository ratingRepo;
 
     UserValidator userValidator;
 
     public FriendshipController(FriendshipService friendshipService,
                                 FriendFinder friendFinder,
+                                RatingRepository ratingRepo,
                                 UserValidator userValidator) {
         this.friendshipService = friendshipService;
         this.friendFinder = friendFinder;
+        this.ratingRepo = ratingRepo;
         this.userValidator = userValidator;
     }
 
@@ -115,6 +119,8 @@ public class FriendshipController {
 
         return ResponseEntity.ok(scrubbedFriends);
     }
+
+
 
     // CREATE METHODS
 
