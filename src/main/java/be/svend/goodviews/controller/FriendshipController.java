@@ -2,11 +2,14 @@ package be.svend.goodviews.controller;
 
 import be.svend.goodviews.models.Friendship;
 import be.svend.goodviews.models.User;
+import be.svend.goodviews.services.users.FriendFinder;
 import be.svend.goodviews.services.users.FriendshipService;
+import be.svend.goodviews.services.users.UserScrubber;
 import be.svend.goodviews.services.users.UserValidator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,12 +19,15 @@ import static be.svend.goodviews.services.StringValidator.isValidString;
 @RequestMapping("/friendship")
 public class FriendshipController {
     FriendshipService friendshipService;
+    FriendFinder friendFinder;
 
     UserValidator userValidator;
 
     public FriendshipController(FriendshipService friendshipService,
+                                FriendFinder friendFinder,
                                 UserValidator userValidator) {
         this.friendshipService = friendshipService;
+        this.friendFinder = friendFinder;
         this.userValidator = userValidator;
     }
 
@@ -72,8 +78,9 @@ public class FriendshipController {
         return ResponseEntity.ok(friendships);
     }
 
-    @GetMapping("/{username}/friends")
-    public ResponseEntity findFriendsByUsername(@PathVariable String username) {
+
+    @GetMapping("/{username}/friendships")
+    public ResponseEntity findFriendshipsByUsername(@PathVariable String username) {
         System.out.println("FIND FRIENDS BY USERNAME for: " + username);
         if (!isValidString(username)) return ResponseEntity.badRequest().body("Invalid username format");
 
@@ -86,6 +93,27 @@ public class FriendshipController {
         if (friendships.isEmpty()) return ResponseEntity.notFound().build();
 
         return ResponseEntity.ok(friendships);
+    }
+
+    @CrossOrigin
+    @GetMapping("/{username}/friendlist")
+    public ResponseEntity findFriendsByUsername(@PathVariable String username) {
+        System.out.println("FIND FRIENDS BY USERNAME for: " + username);
+        if (!isValidString(username)) return ResponseEntity.badRequest().body("Invalid username format");
+
+        // TODO: Check if user has clearance for that request (admin or relevant user)
+
+        Optional<User> user = userValidator.isExistingUserWithUsername(username);
+        if (user.isEmpty()) return ResponseEntity.status(400).body("No such user");
+
+        List<User> friends = friendFinder.findAllFriendsByUser(user.get());
+        if (friends.isEmpty()) return ResponseEntity.notFound().build();
+
+        // Scrub
+        List<User> scrubbedFriends = new ArrayList<>();
+        friends.forEach(u -> scrubbedFriends.add(UserScrubber.scrubAllExceptUsername(u)));
+
+        return ResponseEntity.ok(scrubbedFriends);
     }
 
     // CREATE METHODS
