@@ -18,6 +18,8 @@ public interface NotificationRepository extends JpaRepository<Notification,Long>
 
     List<Notification> findByTargetUser(User user);
 
+    List<Notification> findByTargetUser_Username(String username);
+
     List<Notification> findByOriginUser(User user);
 
     List<Notification> findByOriginUserAndTargetUser(User origin, User target);

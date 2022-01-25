@@ -144,7 +144,8 @@ public class CommentNotificationService {
             if (usersAlreadyDone.contains(commentInThread.getUser())) continue;
 
             CommentNotification replyNotification = new CommentNotification();
-            replyNotification.setOriginUser(commentInThread.getUser());
+            replyNotification.setOriginUser(comment.getUser());
+            replyNotification.setTargetUser(commentInThread.getUser());
             replyNotification.setRating(ratingWithComment);
             replyNotification.setComment(commentInThread);
             replyNotification.setMessage(comment.getUser().getUsername() + " has replied to a conversation you are in");

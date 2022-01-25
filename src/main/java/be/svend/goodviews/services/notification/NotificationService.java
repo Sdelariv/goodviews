@@ -38,6 +38,9 @@ public class NotificationService {
     }
 
     // FIND METHODS
+    public List<Notification> findByTargetUsername(String username) {
+        return notificationRepo.findByTargetUser_Username(username);
+    }
 
     public List<Notification> findByTargetUser(User targetUser) {
         return notificationRepo.findByTargetUser(targetUser);
