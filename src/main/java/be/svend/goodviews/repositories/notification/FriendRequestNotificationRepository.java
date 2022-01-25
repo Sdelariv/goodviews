@@ -9,4 +9,6 @@ import java.util.List;
 public interface FriendRequestNotificationRepository extends JpaRepository<FriendRequestNotification,Long> {
 
     List<FriendRequestNotification> findByTargetUser(User targetUser);
+
+    Integer countFriendRequestNotificationByTargetUser_UsernameAndSeenFalse(String username);
 }

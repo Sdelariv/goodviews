@@ -22,4 +22,6 @@ public interface NotificationRepository extends JpaRepository<Notification,Long>
 
     List<Notification> findByOriginUserAndTargetUser(User origin, User target);
 
+    Integer countNotificationsByTargetUser_UsernameAndSeenFalse(String username);
+
 }

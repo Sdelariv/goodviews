@@ -112,7 +112,7 @@ public class CommentNotificationService {
             return Optional.empty();
         }
         commentNotification.setRating(comment.getRating());
-        commentNotification.setTargetUser(comment.getUser());
+        commentNotification.setTargetUser(comment.getRating().getUser());
 
         return Optional.of(commentNotification);
     }
