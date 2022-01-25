@@ -3,6 +3,8 @@ package be.svend.goodviews.DTOs;
 import be.svend.goodviews.models.Comment;
 import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.models.update.RatingLogUpdate;
+import be.svend.goodviews.services.rating.RatingScrubber;
+import be.svend.goodviews.services.users.UserScrubber;
 
 import java.util.List;
 
@@ -18,10 +20,9 @@ public class RatingUpdateDTO extends TimelineDTO {
 
         super.setUpdateString(ratingLogUpdate.getUpdateString());
         super.setDateTime(ratingLogUpdate.getDateTime());
-        super.setUser(ratingLogUpdate.getUser());
-        super.setOtherUser(ratingLogUpdate.getOtherUser());
+        super.setUser(UserScrubber.scrubAllExceptUsername(ratingLogUpdate.getUser()));
 
-        this.setRating(ratingLogUpdate.getRating());
+        this.setRating(RatingScrubber.scrubRatingOfUserInfo(ratingLogUpdate.getRating()));
         this.setCommentList(commentList);
     }
 

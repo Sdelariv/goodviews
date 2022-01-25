@@ -6,13 +6,17 @@ import be.svend.goodviews.models.update.CommentLogUpdate;
 import be.svend.goodviews.services.rating.RatingScrubber;
 import be.svend.goodviews.services.users.UserScrubber;
 
+import java.util.List;
+
 public class CommentUpdateDTO extends TimelineDTO{
 
     private Comment comment;
 
     private Rating rating;
 
-    public CommentUpdateDTO(CommentLogUpdate commentLogUpdate) {
+    private List<Comment> commentList;
+
+    public CommentUpdateDTO(CommentLogUpdate commentLogUpdate, List<Comment> commentList) {
         super.setType(UpdateType.COMMENT);
         super.setId(commentLogUpdate.getId());
 
@@ -24,6 +28,7 @@ public class CommentUpdateDTO extends TimelineDTO{
 
         this.setComment(commentLogUpdate.getComment());
         this.setRating(RatingScrubber.scrubRatingOfUserInfo(commentLogUpdate.getRating()));
+        this.setCommentList(commentList);
     }
 
     // GETTERS & SETTERS
@@ -43,5 +48,13 @@ public class CommentUpdateDTO extends TimelineDTO{
 
     public void setRating(Rating rating) {
         this.rating = rating;
+    }
+
+    public List<Comment> getCommentList() {
+        return commentList;
+    }
+
+    public void setCommentList(List<Comment> commentList) {
+        this.commentList = commentList;
     }
 }

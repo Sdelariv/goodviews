@@ -1,5 +1,6 @@
 package be.svend.goodviews.controller;
 
+import be.svend.goodviews.DTOs.TimelineDTO;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.models.update.LogUpdate;
 import be.svend.goodviews.services.rating.RatingService;
@@ -43,8 +44,7 @@ public class TimeLineController {
         Optional<User> foundUser = userValidator.isExistingUserWithUsername(username);
         if (foundUser.isEmpty()) return ResponseEntity.status(400).body("No user user");
 
-        List<LogUpdate> foundUpdates = logUpdateService.findByUserFriendsExcludingClassified(foundUser.get()).stream().sorted(Comparator.comparing(u -> u.getDateTime())).collect(Collectors.toList());
-        Collections.reverse(foundUpdates);
+        List<TimelineDTO> foundUpdates = logUpdateService.findTimelinebyUserAndOffset(foundUser.get(), 0);
 
         return ResponseEntity.ok(foundUpdates);
     }

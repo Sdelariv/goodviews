@@ -1,8 +1,9 @@
 package be.svend.goodviews.services.update;
 
-import be.svend.goodviews.DTOs.TimelineDTO;
+import be.svend.goodviews.DTOs.*;
 import be.svend.goodviews.models.*;
 import be.svend.goodviews.models.update.*;
+import be.svend.goodviews.repositories.CommentRepository;
 import be.svend.goodviews.repositories.update.CommentLogUpdateRepository;
 import be.svend.goodviews.repositories.update.FriendshipLogUpdateRepository;
 import be.svend.goodviews.repositories.update.LogUpdateRepository;
@@ -12,6 +13,7 @@ import be.svend.goodviews.services.users.FriendFinder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,7 +25,7 @@ public class LogUpdateService {
     FriendshipLogUpdateRepository friendshipLogUpdateRepo;
     CommentLogUpdateRepository commentLogUpdateRepo;
 
-    CommentService commentService;
+    CommentRepository commentRepo;
 
     FriendFinder friendFinder;
 
@@ -31,14 +33,14 @@ public class LogUpdateService {
                             RatingLogUpdateRepository ratingLogUpdateRepo,
                             FriendshipLogUpdateRepository friendshipLogUpdateRepo,
                             CommentLogUpdateRepository commentLogUpdateRepo,
-                            CommentService commentService,
+                            CommentRepository commentRepo,
 
                             FriendFinder friendFinder) {
         this.logUpdateRepo = logUpdateRepo;
         this.ratingLogUpdateRepo = ratingLogUpdateRepo;
         this.friendshipLogUpdateRepo = friendshipLogUpdateRepo;
         this.commentLogUpdateRepo = commentLogUpdateRepo;
-        this.commentService = commentService;
+        this.commentRepo = commentRepo;
         this.friendFinder = friendFinder;
     }
 
@@ -54,34 +56,22 @@ public class LogUpdateService {
             logUpdatesInvolvingFriends.addAll(logUpdateRepo.findByOtherUserAndIsClassifiedFalse(friend));
         }
 
-        // TODO: offset first
+        // Sort
+        logUpdatesInvolvingFriends.stream().sorted(Comparator.comparing(e -> e.getDateTime())).collect(Collectors.toList());
+        Collections.reverse(logUpdatesInvolvingFriends);
 
-        List<TimelineDTO> timeline = new ArrayList<>();
+        // Offset
+        if (offset >= logUpdatesInvolvingFriends.size()) return Collections.emptyList();
+        logUpdatesInvolvingFriends.subList(offset,logUpdatesInvolvingFriends.size());
 
-        // TODO: make into submethod
-
-        for (LogUpdate update: logUpdatesInvolvingFriends) {
-            if (update instanceof RatingLogUpdate) {
-                //TODO: make into submethod
-                RatingLogUpdate ratingLogUpdate = (RatingLogUpdate) update;
-                TimelineDTO ratingUpdate = new TimelineDTO();
-
-                ratingUpdate.setType("RatingUpdate");
-                ratingUpdate.setId(ratingLogUpdate.getId());
-
-                ratingUpdate.setUser(ratingLogUpdate.getUser());
-                ratingUpdate.setDateTime(ratingLogUpdate.getDateTime());
-
-                ratingUpdate.setRating(ratingLogUpdate.getRating());
-                ratingUpdate.setCommentList(commentService.findByRatingId(ratingLogUpdate.getRating().getId()));
-
-                timeline.add(ratingUpdate);
-            }
-        }
+        // Create DTO
+        List<TimelineDTO> timeline = createDTOs(logUpdatesInvolvingFriends);
 
         return timeline;
 
     }
+
+
 
     public List<LogUpdate> findByUserFriendsExcludingClassified(User user) {
         List<User> friends = friendFinder.findAllFriendsByUser(user);
@@ -225,5 +215,29 @@ public class LogUpdateService {
             logUpdate.setComment(null);
             commentLogUpdateRepo.save(logUpdate);
         }
+    }
+
+    private List<TimelineDTO> createDTOs(List<LogUpdate> logUpdatesInvolvingFriends) {
+        List<TimelineDTO> timeline = new ArrayList<>();
+
+        for (LogUpdate update: logUpdatesInvolvingFriends) {
+            if (update instanceof RatingLogUpdate) {
+                RatingUpdateDTO ratingDTO = new RatingUpdateDTO((RatingLogUpdate) update, commentRepo.findAllByRating(((RatingLogUpdate) update).getRating()));
+                timeline.add(ratingDTO);
+            }
+            if (update instanceof CommentLogUpdate) {
+                CommentUpdateDTO commentDTO = new CommentUpdateDTO((CommentLogUpdate) update, commentRepo.findAllByRating(((CommentLogUpdate) update).getRating()));
+                timeline.add(commentDTO);
+            }
+            if (update instanceof FriendshipLogUpdate) {
+                FriendUpdateDTO friendDTO = new FriendUpdateDTO((FriendshipLogUpdate) update);
+                timeline.add(friendDTO);
+            }
+            if (update instanceof WtsLogUpdate) {
+                WtsUpdateDTO wtsDTO = new WtsUpdateDTO((WtsLogUpdate) update);
+                timeline.add(wtsDTO);
+            }
+        }
+        return timeline;
     }
 }
