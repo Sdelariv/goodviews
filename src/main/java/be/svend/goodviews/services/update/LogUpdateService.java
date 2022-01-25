@@ -1,5 +1,6 @@
 package be.svend.goodviews.services.update;
 
+import be.svend.goodviews.DTOs.TimelineDTO;
 import be.svend.goodviews.models.*;
 import be.svend.goodviews.models.update.*;
 import be.svend.goodviews.repositories.update.CommentLogUpdateRepository;
@@ -7,10 +8,7 @@ import be.svend.goodviews.repositories.update.FriendshipLogUpdateRepository;
 import be.svend.goodviews.repositories.update.LogUpdateRepository;
 import be.svend.goodviews.repositories.update.RatingLogUpdateRepository;
 import be.svend.goodviews.services.comment.CommentService;
-import be.svend.goodviews.services.rating.RatingService;
 import be.svend.goodviews.services.users.FriendFinder;
-import be.svend.goodviews.services.users.FriendshipService;
-import org.apache.juli.logging.Log;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -46,7 +44,7 @@ public class LogUpdateService {
 
     // FIND METHODS
 
-    public List<TimelineDTO> findTimelinebyUserAndOffset(User user,Integer offset) {
+    public List<TimelineDTO> findTimelinebyUserAndOffset(User user, Integer offset) {
         List<User> friends = friendFinder.findAllFriendsByUser(user);
 
         List<LogUpdate> logUpdatesInvolvingFriends = new ArrayList<>();

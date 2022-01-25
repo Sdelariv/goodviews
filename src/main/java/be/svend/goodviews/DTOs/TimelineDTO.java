@@ -1,12 +1,8 @@
-package be.svend.goodviews.models.update;
+package be.svend.goodviews.DTOs;
 
-import be.svend.goodviews.models.Comment;
-import be.svend.goodviews.models.Film;
-import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.models.User;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class TimelineDTO {
 
@@ -20,13 +16,8 @@ public class TimelineDTO {
 
     private String updateString;
 
-    private String type;
+    private UpdateType type;
 
-    private Film film;
-
-    private Rating rating;
-
-    private List<Comment> commentList;
 
     // GETTERS & SETTERS
 
@@ -71,35 +62,11 @@ public class TimelineDTO {
         this.updateString = updateString;
     }
 
-    public String getType() {
+    public UpdateType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(UpdateType type) {
         this.type = type;
-    }
-
-    public Film getFilm() {
-        return film;
-    }
-
-    public void setFilm(Film film) {
-        this.film = film;
-    }
-
-    public Rating getRating() {
-        return rating;
-    }
-
-    public void setRating(Rating rating) {
-        this.rating = rating;
-    }
-
-    public List<Comment> getCommentList() {
-        return commentList;
-    }
-
-    public void setCommentList(List<Comment> commentList) {
-        this.commentList = commentList;
     }
 }
