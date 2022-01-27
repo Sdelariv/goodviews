@@ -53,16 +53,10 @@ public class GoodviewsApplication {
 
 
 
-/*
-        Film film = filmService.findById("tt10095582").get();
-        Rating rating = new Rating();
-        rating.setRatingValue(80);
-        rating.setFilm(film);
-        rating.setUser(sven);
-        ratingService.createNewRating(rating);
 
 
- */
+
+
 
 
 

@@ -69,4 +69,5 @@ public class TimelineDTO {
     public void setType(UpdateType type) {
         this.type = type;
     }
+
 }

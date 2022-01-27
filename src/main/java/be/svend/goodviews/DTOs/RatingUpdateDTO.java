@@ -14,7 +14,11 @@ public class RatingUpdateDTO extends TimelineDTO {
 
     private List<Comment> commentList;
 
-    public RatingUpdateDTO(RatingLogUpdate ratingLogUpdate, List<Comment> commentList) {
+    private boolean userWantsToSee;
+
+    private Integer userHasRated;
+
+    public RatingUpdateDTO(RatingLogUpdate ratingLogUpdate, List<Comment> commentList, boolean userWantsToSee, int userHasRated) {
         super.setType(UpdateType.RATING);
         super.setId(ratingLogUpdate.getId());
 
@@ -24,6 +28,9 @@ public class RatingUpdateDTO extends TimelineDTO {
 
         this.setRating(RatingScrubber.scrubRatingOfUserInfo(ratingLogUpdate.getRating()));
         this.setCommentList(commentList);
+
+        this.setUserWantsToSee(userWantsToSee);
+        this.setUserHasRated(userHasRated);
     }
 
     // GETTERS & SETTERS
@@ -43,5 +50,21 @@ public class RatingUpdateDTO extends TimelineDTO {
 
     public void setCommentList(List<Comment> commentList) {
         this.commentList = commentList;
+    }
+
+    public boolean isUserWantsToSee() {
+        return userWantsToSee;
+    }
+
+    public void setUserWantsToSee(boolean userWantsToSee) {
+        this.userWantsToSee = userWantsToSee;
+    }
+
+    public Integer getUserHasRated() {
+        return userHasRated;
+    }
+
+    public void setUserHasRated(int userHasRated) {
+        this.userHasRated = userHasRated;
     }
 }

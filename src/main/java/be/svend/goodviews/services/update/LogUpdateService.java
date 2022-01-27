@@ -4,18 +4,17 @@ import be.svend.goodviews.DTOs.*;
 import be.svend.goodviews.models.*;
 import be.svend.goodviews.models.update.*;
 import be.svend.goodviews.repositories.CommentRepository;
+import be.svend.goodviews.repositories.RatingRepository;
+import be.svend.goodviews.repositories.WantToSeeRepository;
 import be.svend.goodviews.repositories.update.CommentLogUpdateRepository;
 import be.svend.goodviews.repositories.update.FriendshipLogUpdateRepository;
 import be.svend.goodviews.repositories.update.LogUpdateRepository;
 import be.svend.goodviews.repositories.update.RatingLogUpdateRepository;
-import be.svend.goodviews.services.comment.CommentService;
+
 import be.svend.goodviews.services.users.FriendFinder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,23 +25,25 @@ public class LogUpdateService {
     CommentLogUpdateRepository commentLogUpdateRepo;
 
     CommentRepository commentRepo;
+    RatingRepository ratingRepo;
+    WantToSeeRepository wtsRepo;
 
     FriendFinder friendFinder;
 
-    public LogUpdateService(LogUpdateRepository logUpdateRepo,
-                            RatingLogUpdateRepository ratingLogUpdateRepo,
-                            FriendshipLogUpdateRepository friendshipLogUpdateRepo,
-                            CommentLogUpdateRepository commentLogUpdateRepo,
-                            CommentRepository commentRepo,
-
-                            FriendFinder friendFinder) {
+    public LogUpdateService(LogUpdateRepository logUpdateRepo, RatingLogUpdateRepository ratingLogUpdateRepo, FriendshipLogUpdateRepository friendshipLogUpdateRepo, CommentLogUpdateRepository commentLogUpdateRepo, CommentRepository commentRepo, RatingRepository ratingRepo, WantToSeeRepository wtsRepo, FriendFinder friendFinder) {
         this.logUpdateRepo = logUpdateRepo;
         this.ratingLogUpdateRepo = ratingLogUpdateRepo;
         this.friendshipLogUpdateRepo = friendshipLogUpdateRepo;
         this.commentLogUpdateRepo = commentLogUpdateRepo;
         this.commentRepo = commentRepo;
+        this.ratingRepo = ratingRepo;
+        this.wtsRepo = wtsRepo;
         this.friendFinder = friendFinder;
     }
+
+
+
+
 
     // FIND METHODS
 
@@ -65,7 +66,7 @@ public class LogUpdateService {
         logUpdatesInvolvingFriends.subList(offset,logUpdatesInvolvingFriends.size());
 
         // Create DTO
-        List<TimelineDTO> timeline = createDTOs(logUpdatesInvolvingFriends);
+        List<TimelineDTO> timeline = createDTOs(logUpdatesInvolvingFriends, user);
 
         return timeline;
 
@@ -217,16 +218,24 @@ public class LogUpdateService {
         }
     }
 
-    private List<TimelineDTO> createDTOs(List<LogUpdate> logUpdatesInvolvingFriends) {
+    private List<TimelineDTO> createDTOs(List<LogUpdate> logUpdatesInvolvingFriends, User user) {
         List<TimelineDTO> timeline = new ArrayList<>();
 
         for (LogUpdate update: logUpdatesInvolvingFriends) {
             if (update instanceof RatingLogUpdate) {
-                RatingUpdateDTO ratingDTO = new RatingUpdateDTO((RatingLogUpdate) update, commentRepo.findAllByRating(((RatingLogUpdate) update).getRating()));
+                List<Comment> commentList = commentRepo.findAllByRating(((RatingLogUpdate) update).getRating());
+                boolean userHasSeen = wtsRepo.findByUserAndFilm(user, ((RatingLogUpdate) update).getRating().getFilm()).isPresent();
+                int userHasRated = findUserRating(((RatingLogUpdate) update).getRating().getFilm(), user);
+
+                RatingUpdateDTO ratingDTO = new RatingUpdateDTO((RatingLogUpdate) update, commentList, userHasSeen, userHasRated);
                 timeline.add(ratingDTO);
             }
             if (update instanceof CommentLogUpdate) {
-                CommentUpdateDTO commentDTO = new CommentUpdateDTO((CommentLogUpdate) update, commentRepo.findAllByRating(((CommentLogUpdate) update).getRating()));
+                List<Comment> commentList = commentRepo.findAllByRating(((CommentLogUpdate) update).getRating());
+                boolean userHasSeen = wtsRepo.findByUserAndFilm(user, ((CommentLogUpdate) update).getRating().getFilm()).isPresent();
+                int userHasRated = findUserRating(((CommentLogUpdate) update).getRating().getFilm(), user);
+
+                CommentUpdateDTO commentDTO = new CommentUpdateDTO((CommentLogUpdate) update, commentList, userHasSeen, userHasRated);
                 timeline.add(commentDTO);
             }
             if (update instanceof FriendshipLogUpdate) {
@@ -234,10 +243,30 @@ public class LogUpdateService {
                 timeline.add(friendDTO);
             }
             if (update instanceof WtsLogUpdate) {
-                WtsUpdateDTO wtsDTO = new WtsUpdateDTO((WtsLogUpdate) update);
+                boolean userHasSeen = wtsRepo.findByUserAndFilm(user, (((WtsLogUpdate) update).getFilm())).isPresent();
+                int userHasRated = findUserRating(((WtsLogUpdate) update).getFilm(), user);
+
+                WtsUpdateDTO wtsDTO = new WtsUpdateDTO((WtsLogUpdate) update, userHasRated, userHasSeen);
                 timeline.add(wtsDTO);
             }
         }
+
+        // Sort
+        timeline = timeline.stream().sorted(Comparator.comparing(u -> u.getDateTime())).collect(Collectors.toList());
+        Collections.reverse(timeline);
+
         return timeline;
+    }
+
+    private int findUserRating(Film film, User user) {
+        int userHasRated = -1;
+        Optional<Rating> rating = ratingRepo.findById(user.getUsername() + film.getId());
+
+
+        if (rating.isPresent()) {
+            userHasRated = rating.get().getRatingValue();
+        }
+
+        return userHasRated;
     }
 }

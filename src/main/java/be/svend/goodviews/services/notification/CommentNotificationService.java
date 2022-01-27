@@ -133,8 +133,8 @@ public class CommentNotificationService {
 
         for (Comment commentInThread: ratingComments) {
             // Check if it's the thread-owner
-            if (commentInThread.getUser() == null || comment.getUser() == null) continue;
-            if (commentInThread.getUser().equals(comment.getUser())) continue;
+            if (commentInThread.getUser() == null || comment.getRating().getUser() == null) continue;
+            if (commentInThread.getUser().equals(comment.getRating().getUser())) continue;
 
             // Check if it's the commenter themselves
             if (commentInThread.getUser() == null || comment.getUser() == null) continue;
