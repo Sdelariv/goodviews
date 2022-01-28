@@ -3,7 +3,9 @@ package be.svend.goodviews.services.rating;
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.models.WantToSee;
+import be.svend.goodviews.models.update.WtsLogUpdate;
 import be.svend.goodviews.repositories.WantToSeeRepository;
+import be.svend.goodviews.repositories.update.WtsLogUpdateRepository;
 import be.svend.goodviews.services.film.FilmValidator;
 import be.svend.goodviews.services.update.LogUpdateService;
 import be.svend.goodviews.services.users.UserValidator;
@@ -16,6 +18,7 @@ import java.util.Optional;
 @Service
 public class WantToSeeService {
     WantToSeeRepository wantToSeeRepo;
+    WtsLogUpdateRepository wtsLogUpdateRepo;
 
     FilmValidator filmValidator;
     UserValidator userValidator;
@@ -25,12 +28,13 @@ public class WantToSeeService {
 
     // CONSTRUCTOR
 
-    public WantToSeeService(WantToSeeRepository wantToSeeRepo,
+    public WantToSeeService(WantToSeeRepository wantToSeeRepo, WtsLogUpdateRepository wtsLogUpdateRepo,
                             FilmValidator filmValidator,
                             UserValidator userValidator,
                             RatingValidator ratingValidator,
                             LogUpdateService logUpdateService) {
         this.wantToSeeRepo = wantToSeeRepo;
+        this.wtsLogUpdateRepo = wtsLogUpdateRepo;
         this.filmValidator = filmValidator;
         this.userValidator = userValidator;
         this.ratingValidator = ratingValidator;
@@ -57,6 +61,10 @@ public class WantToSeeService {
 
     public Optional<WantToSee> findByUserAndFilm(User user, Film film) {
         return wantToSeeRepo.findByUserAndFilm(user,film);
+    }
+
+    public Optional<WantToSee> findById(Long wtsId) {
+        return wantToSeeRepo.findById(wtsId);
     }
 
     // CREATE METHODS
@@ -99,8 +107,15 @@ public class WantToSeeService {
         Optional<WantToSee> existingWantToSee = wantToSeeRepo.findById(wantToSee.getId());
         if (existingWantToSee.isEmpty()) return false;
 
+        List<WtsLogUpdate> logsToClassify = wtsLogUpdateRepo.findByUserAndFilm(wantToSee.getUser(),wantToSee.getFilm());
+        for (WtsLogUpdate logToClassify: logsToClassify) {
+            logToClassify.setClassified(true);
+            wtsLogUpdateRepo.save(logToClassify);
+        }
+
         wantToSeeRepo.delete(existingWantToSee.get());
         logUpdateService.createGeneralLog(wantToSee.getUser().getUsername() + "'s want-to-see of " + wantToSee.getFilm().getTitle() + " has been deleted");
+
         return true;
     }
 

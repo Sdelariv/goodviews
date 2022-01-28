@@ -1,10 +1,13 @@
 package be.svend.goodviews.controller;
 
+import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Rating;
+import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.RatingRepository;
 import be.svend.goodviews.services.film.FilmService;
 import be.svend.goodviews.services.rating.RatingService;
 import be.svend.goodviews.services.rating.RatingValidator;
+import be.svend.goodviews.services.users.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,15 +30,17 @@ public class RatingController {
     RatingRepository ratingRepo;
 
     FilmService filmService; // To update the average rating of the film
+    UserService userService; // To check whether a new rating is of an existing user
 
     public RatingController(RatingService ratingService, RatingValidator ratingValidator,
                             RatingRepository ratingRepo,
-                            FilmService filmService) {
+                            FilmService filmService, UserService userService) {
         this.ratingService = ratingService;
         this.ratingValidator = ratingValidator;
         this.ratingRepo = ratingRepo;
 
         this.filmService = filmService;
+        this.userService = userService;
     }
 
     // FIND METHODS
@@ -104,8 +109,32 @@ public class RatingController {
         return ResponseEntity.ok(latestRatings);
     }
 
+    @CrossOrigin
+    @GetMapping("/currentRatingStatus")
+    public ResponseEntity findCurrentRatingStatusByUsernameAndFilmId(@RequestParam String username, @RequestParam String filmId) {
+        System.out.println("FIND CURRENT RATING STATUS BY USERNAME AND FILM ID CALLED for" + username + " & " + filmId);
+
+        if (!isValidString(username) || !isValidString(filmId)) return ResponseEntity.status(400).body("Invalid format");
+
+        Optional<Rating> foundRating = ratingService.findById(username + filmId);
+        if (foundRating.isPresent()) return ResponseEntity.ok(foundRating.get());
+
+        Optional<Film> foundFilm = filmService.findById(filmId);
+        if (foundFilm.isEmpty()) return ResponseEntity.status(404).body("No such film");
+
+        Optional<User> foundUser = userService.findByUsername(username);
+        if (foundUser.isEmpty()) return ResponseEntity.status(404).body("No such user");
+
+        Rating rating = new Rating();
+        rating.setFilm(foundFilm.get());
+        rating.setUser(foundUser.get());
+        return ResponseEntity.ok(rating);
+
+    }
+
     // CREATE METHODS
 
+    @CrossOrigin
     @PostMapping("/create")
     public ResponseEntity createNewRating(@RequestBody Rating rating) {
         System.out.println("CREATE NEW RATING CALLED for " + rating);
@@ -114,7 +143,6 @@ public class RatingController {
         if (!hasValidRatingValue(rating)) return ResponseEntity.status(400).body("Invalid ratingValue");
         if (!ratingValidator.hasValidFilm(rating)) return ResponseEntity.status(400).body("No valid film attached to the rating");
         if (!ratingValidator.hasValidUser(rating)) return ResponseEntity.status(400).body("Invalid user attached to the rating");
-        if (ratingValidator.isInDatabase(rating).isPresent()) return ResponseEntity.status(400).body("Rating already exists"); // TODO: Can take this out if you don't care about new/update
 
         // TODO: Check if it's by the user or an admin
 
