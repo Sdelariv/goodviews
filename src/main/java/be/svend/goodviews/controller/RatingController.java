@@ -146,8 +146,13 @@ public class RatingController {
 
         // TODO: Check if it's by the user or an admin
 
-        // Save rating and update its average
-        Optional<Rating> savedRating = ratingService.createNewRating(rating);
+        // Check if create or update is required
+        Optional<Rating> savedRating;
+        if (ratingValidator.isInDatabase(rating).isPresent()) {
+            savedRating = ratingService.updateRating(rating);
+        } else {
+            savedRating = ratingService.createNewRating(rating);
+        }
         if (savedRating.isEmpty()) return ResponseEntity.status(500).body("Something went wrong saving the rating");
 
         // Update average
@@ -156,61 +161,7 @@ public class RatingController {
         return ResponseEntity.ok(savedRating.get());
     }
 
-    // UPDATE METHODS // TODO: Figure out whether you want methods for individual changes
 
-    @PostMapping("/update")
-    public ResponseEntity updateRatingGenerally(@RequestBody Rating rating) {
-        System.out.println("UPDATE RATING GENERALLY CALLED for " + rating);
-
-        // Validate rating
-        if (!hasValidRatingValue(rating)) return ResponseEntity.status(400).body("Invalid ratingValue");
-        if (!ratingValidator.hasValidFilm(rating)) return ResponseEntity.status(400).body("No valid film attached to the rating");
-        if (!ratingValidator.hasValidUser(rating)) return ResponseEntity.status(400).body("Invalid user attached to the rating");
-        if (ratingValidator.isInDatabase(rating).isEmpty()) return ResponseEntity.status(400).body("Rating doesn't exist"); // TODO: Can take this out if you don't care about new/update
-
-        // TODO: Check if it's by the user or an admin
-
-        // Save rating and update its average
-        Optional<Rating> savedRating = ratingService.updateRating(rating);
-        if (savedRating.isEmpty()) return ResponseEntity.status(500).body("Something went wrong saving the rating");
-
-        // Update average
-        filmService.calculateAndUpdateAverageRatingByFilmId(rating.getFilm().getId());
-
-        return ResponseEntity.ok(savedRating.get());
-    }
-
-    @PostMapping("{ratingId}/updateReview")     // TODO: Might get removed if the generalupdate is enough
-    public ResponseEntity updateRatingWithReview(@PathVariable String ratingId, @RequestBody String review) {
-
-        if (!isValidString(ratingId) || !isValidString(review)) return ResponseEntity.status(400).body("Invalid input");
-
-        Optional<Rating> existingRating = ratingValidator.ratingIdInDatabase(ratingId);
-        if (existingRating.isEmpty()) return ResponseEntity.status(404).body("Rating not found");
-
-        // TODO: Check if it's by the user or an admin
-
-        Optional<Rating> savedRating = ratingService.updateRatingWithReview(existingRating.get(),review);
-        if (savedRating.isEmpty()) return ResponseEntity.status(500).body("Something went wrong updating the rating");
-
-        return ResponseEntity.ok(savedRating.get());
-    }
-
-    @PostMapping("{ratingId}/updateRating")     // TODO: Might get removed if the generalupdate is enough
-    public ResponseEntity updateRatingWithRatingValue(@PathVariable String ratingId, @RequestBody Integer ratingValue) {
-
-        if (!isValidString(ratingId) || !isValidRatingValue(ratingValue)) return ResponseEntity.status(400).body("Invalid input");
-
-        Optional<Rating> existingRating = ratingValidator.ratingIdInDatabase(ratingId);
-        if (existingRating.isEmpty()) return ResponseEntity.status(404).body("Rating not found");
-
-        // TODO: Check if it's by the user or an admin
-
-        Optional<Rating> savedRating = ratingService.updateRatingWithRatingValue(existingRating.get(),ratingValue);
-        if (savedRating.isEmpty()) return ResponseEntity.status(500).body("Something went wrong updating the rating");
-
-        return ResponseEntity.ok(savedRating.get());
-    }
 
     // DELETE METHODS
 

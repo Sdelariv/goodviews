@@ -51,6 +51,8 @@ public class GoodviewsApplication {
 
         User waddles = userService.findByUsername("waddles").get();
 
+        filmService.createFilmByImdbId("tt10127546");
+
 
 
 

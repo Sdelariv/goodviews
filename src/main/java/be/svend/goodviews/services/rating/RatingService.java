@@ -144,6 +144,10 @@ public class RatingService {
 
         Rating ratingToUpdate = mergeWithNewData(existingRating.get(),updatedRating);
 
+        // Log-update
+        System.out.println("Updated " + ratingToUpdate);
+        logUpdateService.createRatingUpdate(ratingToUpdate); // TODO: Move to controller?
+
         return saveRating(ratingToUpdate);
     }
 
