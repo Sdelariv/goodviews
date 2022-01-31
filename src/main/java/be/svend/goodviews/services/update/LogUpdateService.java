@@ -140,6 +140,13 @@ public class LogUpdateService {
     public void createCommentUpdate(Rating rating, Comment comment) {
         CommentLogUpdate commentUpdate = new CommentLogUpdate(rating,comment);
         save(commentUpdate);
+
+        // Make older comment-updates for that rating not show up on the timeline
+        List<CommentLogUpdate> previousCommentUpdates = commentLogUpdateRepo.findByRating(rating);
+        for (CommentLogUpdate previousCommentUpdate: previousCommentUpdates) {
+            previousCommentUpdate.setClassified(true);
+            save(previousCommentUpdate);
+        }
     }
 
     public void createUpdateCommentUpdate(Comment comment) {
