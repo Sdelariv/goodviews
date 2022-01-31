@@ -77,6 +77,7 @@ public class FilmController {
         return ResponseEntity.ok(foundFilms);
     }
 
+    @CrossOrigin
     @GetMapping("/findByPartialTitle")
     public ResponseEntity findByPartialTitle(@RequestParam String partialTitle) {
         System.out.println("FIND BY PARTIAL TITLE CALLED with: " + partialTitle);
@@ -87,7 +88,7 @@ public class FilmController {
 
         if (foundFilms.isEmpty()) return ResponseEntity.notFound().build();
 
-        return ResponseEntity.ok(foundFilms);
+        return ResponseEntity.ok(foundFilms.stream().distinct());
     }
 
     @GetMapping("/findByGenre")

@@ -18,6 +18,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.util.List;
 import java.util.Optional;
 
 @SpringBootApplication
@@ -36,6 +37,7 @@ public class GoodviewsApplication {
         LogUpdateService logUpdateService = ctx.getBean(LogUpdateService.class);
         FilmService filmService = ctx.getBean(FilmService.class);
         WantToSeeService wantToSeeService = ctx.getBean(WantToSeeService.class);
+        FilmRepository filmRepo = ctx.getBean(FilmRepository.class);
 
         User bibi = new User();
         bibi.setUsername("bibi");
@@ -50,9 +52,6 @@ public class GoodviewsApplication {
         sven.setPassword("myPassword");
 
         User waddles = userService.findByUsername("waddles").get();
-
-        filmService.createFilmByImdbId("tt10127546");
-
 
 
 

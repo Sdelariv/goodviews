@@ -35,6 +35,8 @@ public class FilmValidator {
      * @return Film with its properties saved and fetched from the database
      */
     public Film initialise(Film film) {
+        if (film.getTitle().contains("u0026apos;")) film.setTitle(film.getTitle().replaceAll("u0026apos;","'"));
+        if (film.getTitle().contains("u0026amp;")) film.setTitle(film.getTitle().replaceAll("u0026amp;","&"));
         film.setGenres(genreService.saveGenres(film.getGenres()));
         film.setTags(tagService.saveTags(film.getTags()));
         film.setDirector(personService.createPersons(film.getDirector()));
