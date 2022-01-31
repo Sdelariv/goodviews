@@ -165,7 +165,8 @@ public class RatingController {
 
     // DELETE METHODS
 
-    @DeleteMapping("{ratingId}")
+    @CrossOrigin
+    @DeleteMapping("delete/{ratingId}")
     public ResponseEntity deleteRatingByRatingId(@PathVariable String ratingId) {
         System.out.println("DELETE RATING CALLED for id: " + ratingId);
 

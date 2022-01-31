@@ -14,6 +14,7 @@ import be.svend.goodviews.repositories.update.RatingLogUpdateRepository;
 import be.svend.goodviews.services.users.FriendFinder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -48,26 +49,27 @@ public class LogUpdateService {
     // FIND METHODS
 
     public List<TimelineDTO> findTimelinebyUserAndOffset(User user, Integer offset) {
+        System.out.println(LocalTime.now() + " Finding friends");
         List<User> friends = friendFinder.findAllFriendsByUser(user);
 
-        List<LogUpdate> logUpdatesInvolvingFriends = new ArrayList<>();
-
-        for (User friend: friends) {
-            logUpdatesInvolvingFriends.addAll(logUpdateRepo.findByUserAndIsClassifiedFalse(friend));
-            logUpdatesInvolvingFriends.addAll(logUpdateRepo.findByOtherUserAndIsClassifiedFalse(friend));
-        }
+        System.out.println(LocalTime.now() + " Collecting updates");
+        List<LogUpdate> logUpdatesInvolvingFriends = logUpdateRepo.findByUserInAndIsClassifiedFalseOrOtherUserInAndIsClassifiedFalse(friends,friends);
 
         // Sort
-        logUpdatesInvolvingFriends.stream().sorted(Comparator.comparing(e -> e.getDateTime())).collect(Collectors.toList());
+        System.out.println(LocalTime.now() + " Sorting");
+        logUpdatesInvolvingFriends.stream().distinct().sorted(Comparator.comparing(e -> e.getDateTime())).collect(Collectors.toList());
         Collections.reverse(logUpdatesInvolvingFriends);
 
         // Offset
+        System.out.println(LocalTime.now() + " Offsetting");
         if (offset >= logUpdatesInvolvingFriends.size()) return Collections.emptyList();
         logUpdatesInvolvingFriends.subList(offset,logUpdatesInvolvingFriends.size());
 
         // Create DTO
+        System.out.println(LocalTime.now() + " Creating DTOs");
         List<TimelineDTO> timeline = createDTOs(logUpdatesInvolvingFriends, user);
 
+        System.out.println(LocalTime.now() + " Sending");
         return timeline;
 
     }
@@ -78,11 +80,7 @@ public class LogUpdateService {
         List<User> friends = friendFinder.findAllFriendsByUser(user);
 
         List<LogUpdate> logUpdatesInvolvingFriends = new ArrayList<>();
-
-        for (User friend: friends) {
-            logUpdatesInvolvingFriends.addAll(logUpdateRepo.findByUserAndIsClassifiedFalse(friend));
-            logUpdatesInvolvingFriends.addAll(logUpdateRepo.findByOtherUserAndIsClassifiedFalse(friend));
-        }
+        logUpdatesInvolvingFriends.addAll(logUpdateRepo.findByUserInAndIsClassifiedFalseOrOtherUserInAndIsClassifiedFalse(friends, friends));
 
         return logUpdatesInvolvingFriends.stream().distinct().sorted(Comparator.comparing(lu -> lu.getDateTime())).collect(Collectors.toList());
     }

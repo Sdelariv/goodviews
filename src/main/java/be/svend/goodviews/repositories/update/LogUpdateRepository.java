@@ -18,4 +18,7 @@ public interface LogUpdateRepository extends JpaRepository<LogUpdate, Long> {
 
     List<LogUpdate> findByOtherUserAndIsClassifiedFalse(User user);
 
+    List<LogUpdate> findByUserInAndIsClassifiedFalseOrOtherUserInAndIsClassifiedFalse(List<User> users, List<User> users2);
+
+
 }
