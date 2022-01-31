@@ -125,7 +125,6 @@ public class LogUpdateService {
 
     public void createRatingUpdate(Rating rating) {
         RatingLogUpdate ratingLogUpdate = new RatingLogUpdate(rating);
-        save(ratingLogUpdate);
 
         // Make older notifications classified so they don't show up in the timeline anymore
         List<RatingLogUpdate> previousRatingLogUpdates = ratingLogUpdateRepo.findByRating(ratingLogUpdate.getRating());
@@ -133,11 +132,12 @@ public class LogUpdateService {
             previousRatingLogUpdate.setClassified(true);
             save(previousRatingLogUpdate);
         }
+
+        save(ratingLogUpdate);
     }
 
     public void createCommentUpdate(Rating rating, Comment comment) {
         CommentLogUpdate commentUpdate = new CommentLogUpdate(rating,comment);
-        save(commentUpdate);
 
         // Make older comment-updates for that rating not show up on the timeline
         List<CommentLogUpdate> previousCommentUpdates = commentLogUpdateRepo.findByRating(rating);
@@ -145,6 +145,8 @@ public class LogUpdateService {
             previousCommentUpdate.setClassified(true);
             save(previousCommentUpdate);
         }
+
+        save(commentUpdate);
     }
 
     public void createUpdateCommentUpdate(Comment comment) {
