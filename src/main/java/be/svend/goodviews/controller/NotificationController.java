@@ -8,6 +8,7 @@ import be.svend.goodviews.services.notification.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -81,6 +82,7 @@ public class NotificationController {
         List<Notification> notifications = notificationService.findByTargetUsername(username);
 
         notifications = notifications.stream().filter(n -> !(n instanceof FriendRequestNotification)).collect(Collectors.toList());
+        Collections.reverse(notifications);
 
         Integer maxNumber = 10;
         if (notifications.size() < 10) maxNumber = notifications.size();
@@ -97,7 +99,7 @@ public class NotificationController {
         List<Notification> friendRequests = notificationService.findByTargetUsername(username);
 
         friendRequests = friendRequests.stream().filter(n -> (n instanceof FriendRequestNotification)).collect(Collectors.toList());
-
+        Collections.reverse(friendRequests);
 
         return ResponseEntity.ok(friendRequests);
     }
