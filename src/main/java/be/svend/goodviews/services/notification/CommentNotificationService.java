@@ -57,16 +57,12 @@ public class CommentNotificationService {
     // CREATE METHODS
 
     public boolean sendCommentNotification(Comment comment) {
-        // Check if comment exists
-        Optional<Comment> foundComment = commentValidator.isExistingComment(comment);
-        if (foundComment.isEmpty()) return false;
+        // Create Reply Notifications
+        sendReplyCommentNotification(comment);
 
         // Create Comment Notification (should work)
         Optional<CommentNotification> commentNotification = createCommentNotification(comment);
         if (commentNotification.isEmpty()) return false;
-
-        // Create Reply Notifications
-        sendReplyCommentNotification(comment);
 
         // Send(Save)
         notificationRepo.save(commentNotification.get());
@@ -102,57 +98,41 @@ public class CommentNotificationService {
     // INTERNAL METHODS
 
     private Optional<CommentNotification> createCommentNotification(Comment comment) {
+        if (comment.getUser().equals(comment.getRating().getUser())) return Optional.empty();
+
         CommentNotification commentNotification = new CommentNotification();
+
         commentNotification.setComment(comment);
+        commentNotification.setRating(comment.getRating());
+        commentNotification.setMessage(comment.getUser().getUsername() + " has commented on your rating of " + comment.getRating().getFilm().getTitle());
 
         commentNotification.setOriginUser(comment.getUser());
-
-        if (comment.getRating() == null) {
-            System.out.println("Something went wrong fetching the rating");
-            return Optional.empty();
-        }
-        commentNotification.setRating(comment.getRating());
         commentNotification.setTargetUser(comment.getRating().getUser());
 
         return Optional.of(commentNotification);
     }
 
-    // TODO: Clean up this method
     private List<CommentNotification> createReplyNotifications(Comment comment) {
-        // Find rating-thread
-        Rating ratingWithComment = comment.getRating();
-        if (ratingWithComment == null) {
-            System.out.println("Something went wrong fetching the rating");
-            return Collections.emptyList();
-        }
-        List<Comment> ratingComments = commentRepo.findAllByRating(ratingWithComment);
+        // Find all Commenters of the thread
+        List<Comment> ratingComments = commentRepo.findAllByRating(comment.getRating());
+        List<User> threadCommenters = ratingComments.stream().map(c -> c.getUser()).distinct().collect(Collectors.toList());
+        User threadOwner = comment.getRating().getUser();
+        User newCommenter = comment.getUser();
 
-        // Make list of ReplyNotifications for people who already commented (not the commenter itself or the thread-owner)
+        // Create notification for everyone else
         List<CommentNotification> replyNotifications = new ArrayList<>();
-        List<User> usersAlreadyDone = new ArrayList<>();
+        for (User threadCommenter: threadCommenters) {
+            if (threadCommenter.equals(threadOwner)) continue;
+            if (threadCommenter.equals(newCommenter)) continue;
+                CommentNotification replyNotification = new CommentNotification();
+                replyNotification.setOriginUser(comment.getUser());
+                replyNotification.setTargetUser(threadCommenter);
+                replyNotification.setRating(comment.getRating());
+                replyNotification.setComment(comment);
+                replyNotification.setMessage(comment.getUser().getUsername() + " has replied to a conversation you are in");
 
-        for (Comment commentInThread: ratingComments) {
-            // Check if it's the thread-owner
-            if (commentInThread.getUser() == null || comment.getRating().getUser() == null) continue;
-            if (commentInThread.getUser().equals(comment.getRating().getUser())) continue;
-
-            // Check if it's the commenter themselves
-            if (commentInThread.getUser() == null || comment.getUser() == null) continue;
-            if (commentInThread.getUser().equals(comment.getUser())) continue;
-
-            // Check if we already had that user
-            if (usersAlreadyDone.contains(commentInThread.getUser())) continue;
-
-            CommentNotification replyNotification = new CommentNotification();
-            replyNotification.setOriginUser(comment.getUser());
-            replyNotification.setTargetUser(commentInThread.getUser());
-            replyNotification.setRating(ratingWithComment);
-            replyNotification.setComment(commentInThread);
-            replyNotification.setMessage(comment.getUser().getUsername() + " has replied to a conversation you are in");
-
-            replyNotifications.add(replyNotification);
-            usersAlreadyDone.add(commentInThread.getUser());
-            System.out.println("Notified about reply");
+                replyNotifications.add(replyNotification);
+                System.out.println("Notified about reply");
         }
 
         return replyNotifications.stream().distinct().collect(Collectors.toList());

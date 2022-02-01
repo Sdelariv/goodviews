@@ -1,6 +1,7 @@
 package be.svend.goodviews.controller;
 
 import be.svend.goodviews.models.Comment;
+import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.services.comment.CommentService;
 import be.svend.goodviews.services.comment.CommentValidator;
 import be.svend.goodviews.services.rating.RatingValidator;
@@ -72,16 +73,17 @@ public class CommentController {
 
     // CREATE METHODS
 
+    @CrossOrigin
     @PostMapping("/create")
     public ResponseEntity createNewComment(@RequestBody Comment comment) {
         System.out.println("CREATE NEW COMMENT CALLED for " + comment);
 
         // Validate comment
         if (commentValidator.hasExistingUser(comment).isEmpty()) return ResponseEntity.status(400).body("Invalid user");
-        if (commentValidator.hasExistingRating(comment).isEmpty())
-            return ResponseEntity.status(400).body("Invalid rating");
-        if (commentValidator.isExistingComment(comment).isPresent())
-            return ResponseEntity.status(400).body("Comment already exists");
+        if (commentValidator.isExistingComment(comment).isPresent()) return ResponseEntity.status(400).body("Comment already exists");
+        Optional<Rating> foundRating = commentValidator.hasExistingRating(comment);
+        if (foundRating.isEmpty()) return ResponseEntity.status(400).body("Invalid rating");
+        comment.setRating(foundRating.get());
 
         // TODO: Check if the comment is made by the user, or is it added automatically?
 
