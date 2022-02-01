@@ -45,7 +45,7 @@ public class RatingController {
 
     // FIND METHODS
 
-    @CrossOrigin // TODO: Take away if no longer localhost
+    @CrossOrigin
     @GetMapping("/{id}")
     public ResponseEntity findRatingById(@PathVariable String id) {
         System.out.println("FIND RATINGS BY ID FOR " + id);
@@ -161,7 +161,41 @@ public class RatingController {
         return ResponseEntity.ok(savedRating.get());
     }
 
+    // UPDATE METHODS
 
+    @CrossOrigin
+    @RequestMapping("/addLike")
+    public ResponseEntity updateRatingWithLike(@RequestParam String username, @RequestParam String ratingId) {
+        System.out.println("UPDATE RATING WITH LIKE CALLED for " + username + " on " + ratingId);
+
+        if (!isValidString(username) || !isValidString(ratingId)) return ResponseEntity.status(400).body("Invalid input format");
+
+        Optional<User> foundUser = userService.findByUsername(username);
+        if (foundUser.isEmpty()) return ResponseEntity.status(400).body("No such user");
+        Optional<Rating> foundRating = ratingService.findById(ratingId);
+        if (foundRating.isEmpty()) return ResponseEntity.status(400).body("No such rating");
+
+        ratingService.addLikeToRating(foundRating.get(),foundUser.get());
+
+        return ResponseEntity.ok("Like saved");
+    }
+
+    @CrossOrigin
+    @RequestMapping("/removeLike")
+    public ResponseEntity updateRatingRemovingLike(@RequestParam String username, @RequestParam String ratingId) {
+        System.out.println("UPDATE RATING WITH REMOVING LIKE CALLED for " + username + " on " + ratingId);
+
+        if (!isValidString(username) || !isValidString(ratingId)) return ResponseEntity.status(400).body("Invalid input format");
+
+        Optional<User> foundUser = userService.findByUsername(username);
+        if (foundUser.isEmpty()) return ResponseEntity.status(400).body("No such user");
+        Optional<Rating> foundRating = ratingService.findById(ratingId);
+        if (foundRating.isEmpty()) return ResponseEntity.status(400).body("No such rating");
+
+        ratingService.removeLikeFromRatingByUser(foundRating.get(),foundUser.get());
+
+        return ResponseEntity.ok("Unlike saved");
+    }
 
     // DELETE METHODS
 
