@@ -51,6 +51,24 @@ public class UserController {
         return ResponseEntity.ok(foundUsers);
     }
 
+    @CrossOrigin
+    @RequestMapping("checkPassword")
+    public ResponseEntity checkPasswordAndUsernameMatch(@RequestBody User user) {
+        System.out.println("CHECK PASSWORD AND USERNAME MATCH CALLED FOR " + user.toString());
+
+        user.setPassword(user.getPasswordHash()); // Hashing the password
+        String password = user.getPasswordHash();
+
+        Optional<User> foundUser = userService.findByUsername(user.getUsername());
+        if (foundUser.isEmpty()) return ResponseEntity.status(404).body("No such user");
+
+        if (!foundUser.get().getPasswordHash().equals(password)) return ResponseEntity.status(401).body("Wrong password");
+
+        // TODO: Save login
+
+        return ResponseEntity.ok().body("Logged in");
+    }
+
     // CREATE METHODS
 
     @PostMapping("/add")
