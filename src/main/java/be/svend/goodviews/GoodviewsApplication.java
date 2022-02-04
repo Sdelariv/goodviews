@@ -51,8 +51,12 @@ public class GoodviewsApplication {
         sven.setLastName("Delarivière");
         sven.setPassword("myPassword");
 
+        User flora = new User();
+        flora.setUsername("Flozzette");
+
         User waddles = userService.findByUsername("waddles").get();
 
+        friendshipService.requestFriendship(flora, sven);
 
 
 

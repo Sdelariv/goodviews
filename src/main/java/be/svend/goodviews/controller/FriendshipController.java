@@ -66,6 +66,7 @@ public class FriendshipController {
         return ResponseEntity.ok(friendships);
     }
 
+    @CrossOrigin
     @GetMapping("/{username}/friendRequests")
     public ResponseEntity findFriendRequestsForUsername(@PathVariable String username) {
         System.out.println("FIND FRIENDSHIPREQUESTS BY USERNAME for: " + username);
@@ -146,6 +147,7 @@ public class FriendshipController {
 
     // UPDATE METHODS
 
+    @CrossOrigin
     @PostMapping("/acceptRequest")
     public ResponseEntity acceptFriendRequest(@RequestParam String friendshipRequestId){
         System.out.println("ACCEPT FRIEND REQUEST CALLED for: " + friendshipRequestId);
@@ -167,6 +169,7 @@ public class FriendshipController {
 
     // DELETE METHODS
 
+    @CrossOrigin
     @DeleteMapping("/denyFriendRequest")
     public ResponseEntity denyFriendRequest(@RequestParam String friendshipRequestId) {
         System.out.println("DENY FRIEND REQUEST CALLED for: " + friendshipRequestId);
