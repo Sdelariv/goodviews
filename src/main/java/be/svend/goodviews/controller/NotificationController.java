@@ -103,4 +103,18 @@ public class NotificationController {
 
         return ResponseEntity.ok(friendRequests);
     }
+
+    // UPDATE METHODS
+
+    @CrossOrigin
+    @RequestMapping("/markAllAsSeen")
+    public ResponseEntity updateGeneralNotificationsAsSeen(@RequestParam String username) {
+        System.out.println("UPDATE GENERAL NOTIFICATIONS AS SEEN CALLED for: " + username);
+
+        if (!isValidString(username)) return ResponseEntity.badRequest().body("Invalid input format");
+
+        notificationService.updateGeneralNotificationsAsSeenByUsername(username);
+
+        return ResponseEntity.ok().body("Notifications seen");
+    }
 }

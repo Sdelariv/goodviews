@@ -1,10 +1,7 @@
 package be.svend.goodviews.services.notification;
 
-import be.svend.goodviews.models.Film;
-import be.svend.goodviews.models.Friendship;
 import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.models.User;
-import be.svend.goodviews.models.notification.CommentNotification;
 import be.svend.goodviews.models.notification.FriendRequestNotification;
 import be.svend.goodviews.models.notification.Notification;
 
@@ -15,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Service for general notification-methods
@@ -50,6 +47,12 @@ public class NotificationService {
         return notificationRepo.findByOriginUser(originUser);
     }
 
+    public List<Notification> findGeneralNotificationsByTargetUsernameAndSeen(String username) {
+        List<Notification> allNotifications = notificationRepo.findByTargetUser_UsernameAndSeenFalse(username);
+        allNotifications = allNotifications.stream().filter(n -> !(n instanceof FriendRequestNotification)).collect(Collectors.toList());
+        return allNotifications;
+    }
+
 
     // CREATE METHODS
 
@@ -65,6 +68,15 @@ public class NotificationService {
 
     // UPDATE METHODS
 
+    public boolean updateGeneralNotificationsAsSeenByUsername(String username) {
+        List<Notification> allGeneralNotifications = findGeneralNotificationsByTargetUsernameAndSeen(username);
+        for (Notification notification: allGeneralNotifications) {
+            notification.setSeen(true);
+            notificationRepo.save(notification);
+        }
+
+        return true;
+    }
 
 
     // DELETE
@@ -108,4 +120,6 @@ public class NotificationService {
         notification.setOriginUser(null);
         notificationRepo.save(notification);
     }
+
+
 }

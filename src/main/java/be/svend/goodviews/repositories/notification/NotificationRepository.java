@@ -26,4 +26,6 @@ public interface NotificationRepository extends JpaRepository<Notification,Long>
 
     Integer countNotificationsByTargetUser_UsernameAndSeenFalse(String username);
 
+    List<Notification> findByTargetUser_UsernameAndSeenFalse(String username);
+
 }
