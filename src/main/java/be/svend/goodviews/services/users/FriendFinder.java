@@ -38,4 +38,18 @@ public class FriendFinder {
 
         return friendsOfUser;
     }
+
+    public List<User> findFriendsRequestedByUser(User user) {
+        Optional<User> friendInDb = userValidator.isExistingUser(user);
+        if (friendInDb.isEmpty()) return Collections.emptyList();
+
+        List<User> friendsRequestedByUser = new ArrayList<>();
+
+        List<Friendship> friendshipsRequested = friendshipRepo.findAllByFriendAAndAcceptedFalse(user);
+        for (Friendship friendship: friendshipsRequested) {
+            friendsRequestedByUser.add(friendship.getFriendB());
+        }
+
+        return friendsRequestedByUser;
+    }
 }

@@ -121,12 +121,34 @@ public class FriendshipController {
         return ResponseEntity.ok(scrubbedFriends);
     }
 
+    @CrossOrigin
+    @GetMapping("/{username}/friendRequestlist")
+    public ResponseEntity findFriendsRequestedByUsername(@PathVariable String username) {
+        System.out.println("FIND FRIENDS BY USERNAME for: " + username);
+        if (!isValidString(username)) return ResponseEntity.badRequest().body("Invalid username format");
+
+        // TODO: Check if user has clearance for that request (admin or relevant user)
+
+        Optional<User> user = userValidator.isExistingUserWithUsername(username);
+        if (user.isEmpty()) return ResponseEntity.status(400).body("No such user");
+
+        List<User> friends = friendFinder.findFriendsRequestedByUser(user.get());
+        if (friends.isEmpty()) return ResponseEntity.notFound().build();
+
+        // Scrub
+        List<User> scrubbedFriends = new ArrayList<>();
+        friends.forEach(u -> scrubbedFriends.add(UserScrubber.scrubAllExceptUsername(u)));
+
+        return ResponseEntity.ok(scrubbedFriends);
+    }
+
 
 
     // CREATE METHODS
 
+    @CrossOrigin
     @PostMapping("/sendRequest")
-    public ResponseEntity createFriendRequest(@PathVariable String senderUsername, @PathVariable String targetUsername) {
+    public ResponseEntity createFriendRequest(@RequestParam String senderUsername, @RequestParam String targetUsername) {
         System.out.println("CREATE FRIEND REQUEST CALLED for: " + senderUsername + " and " + targetUsername);
 
         if (!isValidString(senderUsername) || (!isValidString(targetUsername))) return ResponseEntity.badRequest().body("Invalid format");
