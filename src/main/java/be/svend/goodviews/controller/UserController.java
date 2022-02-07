@@ -2,6 +2,7 @@ package be.svend.goodviews.controller;
 
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.services.StringValidator;
+import be.svend.goodviews.services.users.UserScrubber;
 import be.svend.goodviews.services.users.UserService;
 import be.svend.goodviews.services.users.UserValidator;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,7 @@ public class UserController {
 
     // FIND METHODS
 
+    @CrossOrigin
     @GetMapping("/{username}")
     public ResponseEntity findUserByUsername(@PathVariable String username) {
         System.out.println("FIND USER BY USERNAME called for: " + username);
@@ -39,7 +41,7 @@ public class UserController {
         Optional<User> foundUser = userService.findByUsername(username);
 
         if (foundUser.isEmpty()) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(foundUser.get());
+        return ResponseEntity.ok(UserScrubber.scrubAllExceptUsername(foundUser.get()));
     }
 
     @GetMapping("/findAll")

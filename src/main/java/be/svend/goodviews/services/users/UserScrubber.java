@@ -9,6 +9,8 @@ public class UserScrubber {
 
         User newUser = new User();
         newUser.setUsername(user.getUsername());
+        newUser.setLastName(user.getLastName());
+        newUser.setFirstName(user.getFirstName());
 
         return newUser;
     }

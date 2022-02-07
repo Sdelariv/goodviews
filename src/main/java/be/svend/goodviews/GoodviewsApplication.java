@@ -56,7 +56,6 @@ public class GoodviewsApplication {
 
         User waddles = userService.findByUsername("waddles").get();
 
-        friendshipService.requestFriendship(flora, sven);
 
 
 
