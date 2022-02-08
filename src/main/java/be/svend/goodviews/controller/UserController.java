@@ -73,6 +73,7 @@ public class UserController {
 
     // CREATE METHODS
 
+    @CrossOrigin
     @PostMapping("/add")
     public ResponseEntity addUser(@RequestBody User user) {
         System.out.println("ADDING USER called for: " + user.toString());

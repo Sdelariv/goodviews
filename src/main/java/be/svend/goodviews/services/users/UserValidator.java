@@ -39,7 +39,7 @@ public class UserValidator {
 
         if (user.getUsername().equals("findAll")) return false;
 
-        if (userRepo.findByUsername(user.getUsername()).isPresent()) return false;
+        if (userRepo.findByUsernameIgnoreCase(user.getUsername()).isPresent()) return false;
 
         return true;
     }
@@ -83,7 +83,7 @@ public class UserValidator {
         if (user == null) return Optional.empty();
         if (user.getUsername() == null) return Optional.empty();
 
-        Optional<User> existingUser = userRepo.findByUsername(user.getUsername());
+        Optional<User> existingUser = userRepo.findByUsernameIgnoreCase(user.getUsername());
         if (existingUser.isEmpty()) return Optional.empty();
 
         return existingUser;
@@ -97,7 +97,7 @@ public class UserValidator {
     public Optional<User> isExistingUserWithUsername(String username) {
         if (username == null) return Optional.empty();
 
-        Optional<User> existingUser = userRepo.findByUsername(username);
+        Optional<User> existingUser = userRepo.findByUsernameIgnoreCase(username);
         if (existingUser.isEmpty()) return Optional.empty();
 
         return existingUser;

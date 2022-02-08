@@ -31,7 +31,7 @@ public class CommentValidator {
 
     public Optional<User> hasExistingUser(Comment comment) {
         if (comment.getUser() == null || comment.getUser().getUsername() == null) return Optional.empty();
-        return userRepo.findByUsername(comment.getUser().getUsername());
+        return userRepo.findByUsernameIgnoreCase(comment.getUser().getUsername());
     }
 
     public Optional<Rating> hasExistingRating(Comment comment) {

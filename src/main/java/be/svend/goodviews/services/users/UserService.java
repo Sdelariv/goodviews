@@ -52,7 +52,7 @@ public class UserService {
     // FIND METHODS
 
     public Optional<User> findByUsername(String username) {
-        Optional<User> foundUser = userRepo.findByUsername(username);
+        Optional<User> foundUser = userRepo.findByUsernameIgnoreCase(username);
 
         if (foundUser.isPresent()) System.out.println("Found user: " + foundUser.get().getUsername());
 
@@ -220,7 +220,7 @@ public class UserService {
     private Optional<User> saveUser(User user) {
         userRepo.save(user);
         System.out.println("Saving " + user.getUsername());
-        return userRepo.findByUsername(user.getUsername());
+        return userRepo.findByUsernameIgnoreCase(user.getUsername());
     }
 
 
