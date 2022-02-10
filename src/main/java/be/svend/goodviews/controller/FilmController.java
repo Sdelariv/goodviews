@@ -91,6 +91,7 @@ public class FilmController {
         return ResponseEntity.ok(foundFilms.stream().distinct());
     }
 
+    @CrossOrigin
     @GetMapping("/findByGenre")
     public ResponseEntity findByGenreName(@RequestParam String genreName) {
         System.out.println("FIND BY GENRE NAME CALLED with: " + genreName);
@@ -106,6 +107,7 @@ public class FilmController {
         return ResponseEntity.ok(foundFilms);
     }
 
+    @CrossOrigin
     @GetMapping("/findByTag")
     public ResponseEntity findByTagName(@RequestParam String tagName) {
         System.out.println("FIND BY TAG NAME CALLED with: " + tagName);
@@ -121,6 +123,7 @@ public class FilmController {
         return ResponseEntity.ok(foundFilms);
     }
 
+
     @GetMapping("/findByPerson")
     public ResponseEntity findByPerson(@RequestBody Person person) {
         System.out.println("FIND BY PERSON CALLED with: " + person);
@@ -134,8 +137,9 @@ public class FilmController {
         return ResponseEntity.ok(filmsInvolvingPerson.stream().distinct().collect(Collectors.toList()));
     }
 
-  @GetMapping("/findByPersonName")
-  public ResponseEntity findByPersonName(@RequestParam String name) {
+    @CrossOrigin
+    @GetMapping("/findByPersonName")
+    public ResponseEntity findByPersonName(@RequestParam String name) {
       System.out.println("FIND BY PERSON-NAME CALLED with: " + name);
 
       if (!isValidString(name)) return ResponseEntity.badRequest().body("Invalid name");

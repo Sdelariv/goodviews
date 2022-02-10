@@ -8,6 +8,7 @@ import be.svend.goodviews.services.users.UserValidator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,6 +43,21 @@ public class UserController {
 
         if (foundUser.isEmpty()) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(UserScrubber.scrubAllExceptUsername(foundUser.get()));
+    }
+
+    @CrossOrigin
+    @GetMapping("/findByPartialUsername")
+    public ResponseEntity findUserByPartialUsername(@RequestParam String username) {
+        System.out.println("FIND USER BY USERNAME called for: " + username);
+
+        if (!isValidString(username)) return ResponseEntity.badRequest().body("Not a valid string input");
+
+        List<User> foundUsers = userService.findByPartialUsername(username);
+
+        List<User> scrubbedUsers  = new ArrayList<>();
+        foundUsers.forEach(u -> scrubbedUsers.add(UserScrubber.scrubAllExceptUsername(u)));
+
+        return ResponseEntity.ok(scrubbedUsers);
     }
 
     @GetMapping("/findAll")

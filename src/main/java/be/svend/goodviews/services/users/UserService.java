@@ -59,6 +59,12 @@ public class UserService {
         return foundUser;
     }
 
+    public List<User> findByPartialUsername(String username) {
+        List<User> foundUsers = userRepo.findByUsernameContainingIgnoreCase(username);
+
+        return foundUsers;
+    }
+
     public List<User> findAllUsers() {
         return userRepo.findAll();
     }
