@@ -97,36 +97,7 @@ public class User {
         this.typeOfUser = typeOfUser;
     }
 
-    /*
-    public List<User> getFriendList() {
-        return friendList;
-    }
 
-    public void setFriendList(List<User> friendList) {
-        this.friendList = friendList;
-    }
-
-    public boolean addFriend(User user) {
-        if (this.friendList == null) friendList = new ArrayList<>();
-        if (user.equals(this)) return false;
-
-        if (this.friendList.contains(user)) return false;
-
-        this.friendList.add(user);
-        return true;
-    }
-
-    public boolean removeFriend(User user) {
-        if (this.friendList == null) return false;
-        if (user.equals(this)) return false;
-
-        if (!this.friendList.contains(user)) return false;
-
-        this.friendList.remove(user);
-        return true;
-    }
-
-     */
 
     // OTHER
 

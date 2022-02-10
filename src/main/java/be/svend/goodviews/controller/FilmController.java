@@ -153,7 +153,7 @@ public class FilmController {
       }
 
       if (filmsInvolvingPerson.isEmpty()) return  ResponseEntity.notFound().build();
-      return ResponseEntity.ok(filmsInvolvingPerson);
+      return ResponseEntity.ok(filmsInvolvingPerson.stream().distinct());
   }
 
     @GetMapping("/findAll")
