@@ -1,9 +1,9 @@
 package be.svend.goodviews.controller;
 
-import be.svend.goodviews.models.Film;
-import be.svend.goodviews.models.Genre;
-import be.svend.goodviews.models.Person;
-import be.svend.goodviews.models.Tag;
+import be.svend.goodviews.DTOs.FilmInfoDTO;
+import be.svend.goodviews.DTOs.creators.FilmInfoDTOCreator;
+import be.svend.goodviews.models.*;
+import be.svend.goodviews.services.LoginService;
 import be.svend.goodviews.services.crew.PersonService;
 import be.svend.goodviews.services.crew.PersonValidator;
 import be.svend.goodviews.services.film.FilmService;
@@ -14,6 +14,7 @@ import be.svend.goodviews.services.rating.RatingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,10 +35,12 @@ public class FilmController {
     TagService tagService;
     GenreService genreService;
     RatingService ratingService;
+    LoginService loginService;
+    FilmInfoDTOCreator filmInfoDTOCreator;
 
     public FilmController(FilmService filmService, FilmValidator filmValidator,
                           PersonValidator personValidator, PersonService personService,
-                          TagService tagService, GenreService genreService, RatingService ratingService) {
+                          TagService tagService, GenreService genreService, RatingService ratingService, LoginService loginService, FilmInfoDTOCreator filmInfoDTOCreator) {
         this.filmService = filmService;
         this.filmValidator = filmValidator;
 
@@ -47,6 +50,8 @@ public class FilmController {
         this.tagService = tagService;
         this.genreService = genreService;
         this.ratingService = ratingService;
+        this.loginService = loginService;
+        this.filmInfoDTOCreator = filmInfoDTOCreator;
     }
 
     // FIND METHODS
@@ -63,6 +68,30 @@ public class FilmController {
         if (foundFilm.isEmpty()) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(foundFilm.get());
     }
+
+
+    @CrossOrigin
+    @GetMapping("/findFilmAndRatingsByIdAndForUser")
+    public ResponseEntity findFilmAndRatingsByIdAndForUser(@RequestParam String filmId, HttpServletRequest request) {
+        System.out.println("FIND FILM BY ID called for: " + filmId);
+        String ip = request.getRemoteAddr();
+        System.out.println("AND FOR: " + ip);
+
+        if (!isValidString(filmId)) return ResponseEntity.badRequest().body("Invalid id format");
+        if (!isValidFilmIdFormat(filmId)) return ResponseEntity.badRequest().body("Invalid id format");
+
+        Optional<Film> foundFilm = filmService.findById(filmId);
+        if (foundFilm.isEmpty()) return ResponseEntity.notFound().build();
+
+        Optional<User> foundUser = loginService.findUserByIp(ip);
+        if (foundUser.isEmpty()) return ResponseEntity.status(400).body("User not found");
+
+        FilmInfoDTO filmInfoDTO = filmInfoDTOCreator.createFilmInfoDTO(foundFilm.get(),foundUser.get());
+
+        return ResponseEntity.ok(filmInfoDTO);
+    }
+
+
 
     @GetMapping("/findByTitle")
     public ResponseEntity findByTitle(@RequestParam String title) {

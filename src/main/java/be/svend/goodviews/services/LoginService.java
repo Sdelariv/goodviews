@@ -21,6 +21,12 @@ public class LoginService {
         return loginRepo.findByIp(ip);
     }
 
+    public Optional<User> findUserByIp(String ip) {
+        Optional<Login> login = findByIp(ip);
+        if (login.isPresent()) return Optional.of(login.get().getUser());
+        else return Optional.empty();
+    }
+
     public Optional<Login> findByUsername(String username) {
         return loginRepo.findByUser_Username(username);
     }

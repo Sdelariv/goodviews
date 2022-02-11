@@ -50,6 +50,25 @@ public class WantToSeeController {
         return ResponseEntity.ok(foundWantToSees);
     }
 
+    @CrossOrigin
+    @GetMapping("/findByUsernameAndFilmId")
+    public ResponseEntity findWantToSeeByUsernameAndFilmId(@RequestParam String username, @RequestParam String filmId) {
+        System.out.println("FIND WANT-TO-SEES BY USERNAME AND FILM ID called for: " + username);
+
+        if (!isValidString(username) || !isValidString(filmId)) return ResponseEntity.badRequest().body("Invalid input format");
+
+        Optional<User> foundUser = userValidator.isExistingUserWithUsername(username);
+        if (foundUser.isEmpty()) return ResponseEntity.status(400).body("No user user");
+
+        Optional<Film> foundFilm = filmValidator.isExistingFilmId(filmId);
+        if (foundFilm.isEmpty()) return ResponseEntity.status(400).body("No user film");
+
+        Optional<WantToSee> foundWantToSee = wtsService.findByUserAndFilm(foundUser.get(), foundFilm.get());
+        if (foundWantToSee.isEmpty()) return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok(foundWantToSee.get().getId());
+    }
+
 
     // CREATE METHODS
 
