@@ -1,6 +1,7 @@
 package be.svend.goodviews.services.update;
 
 import be.svend.goodviews.DTOs.*;
+import be.svend.goodviews.DTOs.creators.TimeLineDTOService;
 import be.svend.goodviews.models.*;
 import be.svend.goodviews.models.update.*;
 import be.svend.goodviews.repositories.CommentRepository;
@@ -25,13 +26,15 @@ public class LogUpdateService {
     FriendshipLogUpdateRepository friendshipLogUpdateRepo;
     CommentLogUpdateRepository commentLogUpdateRepo;
 
+    TimeLineDTOService timeLineDTOService;
+
     CommentRepository commentRepo;
     RatingRepository ratingRepo;
     WantToSeeRepository wtsRepo;
 
     FriendFinder friendFinder;
 
-    public LogUpdateService(LogUpdateRepository logUpdateRepo, RatingLogUpdateRepository ratingLogUpdateRepo, FriendshipLogUpdateRepository friendshipLogUpdateRepo, CommentLogUpdateRepository commentLogUpdateRepo, CommentRepository commentRepo, RatingRepository ratingRepo, WantToSeeRepository wtsRepo, FriendFinder friendFinder) {
+    public LogUpdateService(LogUpdateRepository logUpdateRepo, RatingLogUpdateRepository ratingLogUpdateRepo, FriendshipLogUpdateRepository friendshipLogUpdateRepo, CommentLogUpdateRepository commentLogUpdateRepo, CommentRepository commentRepo, RatingRepository ratingRepo, WantToSeeRepository wtsRepo, FriendFinder friendFinder, TimeLineDTOService timeLineDTOService) {
         this.logUpdateRepo = logUpdateRepo;
         this.ratingLogUpdateRepo = ratingLogUpdateRepo;
         this.friendshipLogUpdateRepo = friendshipLogUpdateRepo;
@@ -40,6 +43,7 @@ public class LogUpdateService {
         this.ratingRepo = ratingRepo;
         this.wtsRepo = wtsRepo;
         this.friendFinder = friendFinder;
+        this.timeLineDTOService = timeLineDTOService;
     }
 
 
@@ -73,7 +77,6 @@ public class LogUpdateService {
         return timeline;
 
     }
-
 
 
     public List<LogUpdate> findByUserFriendsExcludingClassified(User user) {
@@ -237,17 +240,13 @@ public class LogUpdateService {
 
         for (LogUpdate update: logUpdatesInvolvingFriends) {
             if (update instanceof RatingLogUpdate) {
-                List<Comment> commentList = commentRepo.findAllByRating(((RatingLogUpdate) update).getRating());
-                boolean userHasSeen = wtsRepo.findByUserAndFilm(user, ((RatingLogUpdate) update).getRating().getFilm()).isPresent();
-                int userHasRated = findUserRating(((RatingLogUpdate) update).getRating().getFilm(), user);
-
-                RatingUpdateDTO ratingDTO = new RatingUpdateDTO((RatingLogUpdate) update, commentList, userHasSeen, userHasRated);
+                RatingUpdateDTO ratingDTO = timeLineDTOService.createRatingDTO((RatingLogUpdate) update, user);
                 timeline.add(ratingDTO);
             }
             if (update instanceof CommentLogUpdate) {
                 List<Comment> commentList = commentRepo.findAllByRating(((CommentLogUpdate) update).getRating());
                 boolean userHasSeen = wtsRepo.findByUserAndFilm(user, ((CommentLogUpdate) update).getRating().getFilm()).isPresent();
-                int userHasRated = findUserRating(((CommentLogUpdate) update).getRating().getFilm(), user);
+                int userHasRated = timeLineDTOService.findUserRating(((CommentLogUpdate) update).getRating().getFilm(), user);
 
                 CommentUpdateDTO commentDTO = new CommentUpdateDTO((CommentLogUpdate) update, commentList, userHasSeen, userHasRated);
                 timeline.add(commentDTO);
@@ -258,7 +257,7 @@ public class LogUpdateService {
             }
             if (update instanceof WtsLogUpdate) {
                 boolean userHasSeen = wtsRepo.findByUserAndFilm(user, (((WtsLogUpdate) update).getFilm())).isPresent();
-                int userHasRated = findUserRating(((WtsLogUpdate) update).getFilm(), user);
+                int userHasRated = timeLineDTOService.findUserRating(((WtsLogUpdate) update).getFilm(), user);
 
                 WtsUpdateDTO wtsDTO = new WtsUpdateDTO((WtsLogUpdate) update, userHasRated, userHasSeen);
                 timeline.add(wtsDTO);
@@ -272,15 +271,4 @@ public class LogUpdateService {
         return timeline;
     }
 
-    private int findUserRating(Film film, User user) {
-        int userHasRated = -1;
-        Optional<Rating> rating = ratingRepo.findById(user.getUsername() + film.getId());
-
-
-        if (rating.isPresent()) {
-            userHasRated = rating.get().getRatingValue();
-        }
-
-        return userHasRated;
-    }
 }

@@ -46,6 +46,7 @@ public class CommentUpdateDTO extends TimelineDTO{
     }
 
     public void setComment(Comment comment) {
+        comment.setUser(UserScrubber.scrubAllExceptUsername(comment.getUser()));
         this.comment = comment;
     }
 
@@ -62,6 +63,9 @@ public class CommentUpdateDTO extends TimelineDTO{
     }
 
     public void setCommentList(List<Comment> commentList) {
+        for (Comment comment: commentList) {
+            comment.setUser(UserScrubber.scrubAllExceptUsername(comment.getUser()));
+        }
         this.commentList = commentList;
     }
 

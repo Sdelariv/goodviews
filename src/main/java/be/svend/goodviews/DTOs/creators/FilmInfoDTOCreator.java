@@ -10,8 +10,10 @@ import be.svend.goodviews.services.rating.WantToSeeService;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class FilmInfoDTOCreator {
@@ -31,6 +33,7 @@ public class FilmInfoDTOCreator {
         foundUserRating.ifPresent(filmInfoDTO::setUserRating);
 
         List<Rating> foundRatings = ratingService.findByFilmId(film.getId());
+        foundRatings = foundRatings.stream().sorted(Comparator.comparing(Rating::getDateOfRating)).collect(Collectors.toList());
         Collections.reverse(foundRatings);
         filmInfoDTO.setRatings(foundRatings);
 

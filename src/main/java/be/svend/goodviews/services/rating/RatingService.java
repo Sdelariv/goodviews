@@ -1,8 +1,12 @@
 package be.svend.goodviews.services.rating;
 
+import be.svend.goodviews.DTOs.RatingDTO;
+import be.svend.goodviews.models.Comment;
 import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.models.User;
+import be.svend.goodviews.repositories.CommentRepository;
 import be.svend.goodviews.repositories.RatingRepository;
+import be.svend.goodviews.repositories.WantToSeeRepository;
 import be.svend.goodviews.services.comment.CommentService;
 import be.svend.goodviews.services.notification.LikeNotificationService;
 import be.svend.goodviews.services.notification.NotificationService;
@@ -23,24 +27,30 @@ public class RatingService {
     RatingValidator ratingValidator;
 
     CommentService commentService;  // Needed to delete comments before deleting ratings
+    CommentRepository commentRepo; // To fetch comments for a ratingDTO
+
     NotificationService notificationService; // For deleting rating from notifications
     LikeNotificationService likeNotificationService; // For notifying about likes
+
     WantToSeeService wantToSeeService; // To delete wantToSee of films seen
+    WantToSeeRepository wtsRepo; // To check whether user wants to see it for ratingDTO
 
     LogUpdateService logUpdateService; // For logupdates
 
     public RatingService(RatingRepository ratingRepo, RatingValidator ratingValidator,
-                         CommentService commentService,
+                         CommentService commentService, CommentRepository commentRepo,
                          NotificationService notificationService, LikeNotificationService likeNotificationService,
-                         WantToSeeService wantToSeeService,
+                         WantToSeeService wantToSeeService, WantToSeeRepository wtsRepo,
                          LogUpdateService logUpdateService) {
         this.ratingRepo = ratingRepo;
         this.ratingValidator = ratingValidator;
 
         this.commentService = commentService;
+        this.commentRepo = commentRepo;
         this.notificationService = notificationService;
         this.likeNotificationService = likeNotificationService;
         this.wantToSeeService = wantToSeeService;
+        this.wtsRepo = wtsRepo;
 
         this.logUpdateService = logUpdateService;
     }
@@ -149,28 +159,6 @@ public class RatingService {
         logUpdateService.createRatingUpdate(ratingToUpdate); // TODO: Move to controller?
 
         return saveRating(ratingToUpdate);
-    }
-
-    // TODO: Figure out whether this is the best place and tactic:
-
-    public Optional<Rating> updateRatingWithRatingValue(Rating rating, Integer ratingValue) {
-        rating.setRatingValue(ratingValue);
-        rating.setDateOfRating(LocalDate.now());
-
-        return updateRating(rating);
-    }
-
-    public Optional<Rating> updateRatingValueByUserAndFilmId(String userId, String filmId, Integer ratingValue) {
-        if (!isValidRatingValue(ratingValue)) return Optional.empty();
-
-        Optional<Rating> existingRating = ratingValidator.ratingIdInDatabase(userId+filmId);
-        if (existingRating.isEmpty()) return Optional.empty();
-
-        Rating ratingToUpdate = existingRating.get();;
-        ratingToUpdate.setRatingValue(ratingValue);
-        ratingToUpdate.setDateOfRating(LocalDate.now());
-
-        return updateRating(ratingToUpdate);
     }
 
     public Optional<Rating> updateRatingWithReview(Rating rating, String review) {
@@ -314,4 +302,18 @@ public class RatingService {
     }
 
 
+    public RatingDTO createRatingDTO(Rating rating, User user) {
+        List<Comment> commentList = commentRepo.findAllByRating(rating);
+
+        boolean userHasSeen = wtsRepo.findByUserAndFilm(user, rating.getFilm()).isPresent();
+
+        Optional<Rating> userRating = ratingRepo.findById(user.getUsername() + rating.getFilm().getId());
+
+        int userHasRated = -1;
+        if (userRating.isPresent()) userHasRated = userRating.get().getRatingValue();
+
+        RatingDTO ratingDTO = new RatingDTO(rating, commentList, userHasSeen, userHasRated);
+
+        return ratingDTO;
+    }
 }

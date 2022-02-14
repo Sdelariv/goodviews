@@ -1,6 +1,7 @@
 package be.svend.goodviews.DTOs;
 
 import be.svend.goodviews.models.User;
+import be.svend.goodviews.services.users.UserScrubber;
 
 import java.time.LocalDateTime;
 
@@ -35,7 +36,7 @@ public class TimelineDTO {
     }
 
     public void setUser(User user) {
-        this.user = user;
+        this.user = UserScrubber.scrubAllExceptUsername(user);
     }
 
     public User getOtherUser() {

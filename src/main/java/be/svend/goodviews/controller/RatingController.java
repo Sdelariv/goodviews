@@ -1,5 +1,6 @@
 package be.svend.goodviews.controller;
 
+import be.svend.goodviews.DTOs.RatingDTO;
 import be.svend.goodviews.models.Film;
 import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.models.User;
@@ -7,6 +8,7 @@ import be.svend.goodviews.repositories.RatingRepository;
 import be.svend.goodviews.services.film.FilmService;
 import be.svend.goodviews.services.rating.RatingService;
 import be.svend.goodviews.services.rating.RatingValidator;
+import be.svend.goodviews.services.users.UserScrubber;
 import be.svend.goodviews.services.users.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -58,6 +60,24 @@ public class RatingController {
         return ResponseEntity.ok(rating.get());
     }
 
+    @CrossOrigin
+    @GetMapping("/findByIdforUser")
+    public ResponseEntity findRatingById(@RequestParam String ratingId, @RequestParam String username) {
+        System.out.println("FIND RATINGS BY ID FOR " + ratingId);
+
+        if (!isValidString(ratingId) || !isValidString(username)) return ResponseEntity.badRequest().body("Invalid input format");
+
+        Optional<Rating> rating = ratingService.findById(ratingId);
+        if (rating.isEmpty()) return ResponseEntity.notFound().build();
+
+        Optional<User> foundUser = userService.findByUsername(username);
+        if (foundUser.isEmpty()) return ResponseEntity.notFound().build();
+
+        RatingDTO ratingDTO = ratingService.createRatingDTO(rating.get(),foundUser.get());
+
+        return ResponseEntity.ok(ratingDTO);
+    }
+
     @GetMapping("/findByFilmId")
     public ResponseEntity findRatingsByFilmId(@RequestParam String filmId) {
         System.out.println("FIND RATING BY FILM ID CALLED with " + filmId);
@@ -105,6 +125,10 @@ public class RatingController {
         System.out.println("FIND LATEST RATINGS CALLED");
 
         List<Rating> latestRatings = ratingRepo.findTop3ByOrderByDateOfRatingDesc();
+
+        for (Rating rating: latestRatings) {
+            rating.setUser(UserScrubber.scrubAllExceptUsername(rating.getUser()));
+        }
 
         return ResponseEntity.ok(latestRatings);
     }
@@ -195,6 +219,26 @@ public class RatingController {
         ratingService.removeLikeFromRatingByUser(foundRating.get(),foundUser.get());
 
         return ResponseEntity.ok("Unlike saved");
+    }
+
+    @CrossOrigin
+    @PostMapping("/addReview")
+    public ResponseEntity updateRatingWithReview(@RequestBody Rating rating) {
+        System.out.println("UPDATE RATING WITH REVIEW CALLED FOR:" + rating.toString());
+        String username = rating.getUser().getUsername();
+        String review = rating.getReview();
+
+        if (!isValidString(username) || !isValidString(review)) return ResponseEntity.status(400).body("Invalid input format");
+        String ratingId = username + rating.getFilm().getId();
+
+        Optional<User> foundUser = userService.findByUsername(username);
+        if (foundUser.isEmpty()) return ResponseEntity.status(400).body("No such user");
+        Optional<Rating> foundRating = ratingService.findById(ratingId);
+        if (foundRating.isEmpty()) return ResponseEntity.status(400).body("No such rating");
+
+        ratingService.updateRatingWithReview(foundRating.get(), review);
+
+        return ResponseEntity.ok("Review saved");
     }
 
     // DELETE METHODS

@@ -1,14 +1,16 @@
 package be.svend.goodviews.DTOs;
 
+
 import be.svend.goodviews.models.Comment;
 import be.svend.goodviews.models.Rating;
-import be.svend.goodviews.models.update.RatingLogUpdate;
 import be.svend.goodviews.services.rating.RatingScrubber;
 import be.svend.goodviews.services.users.UserScrubber;
 
 import java.util.List;
 
-public class RatingUpdateDTO extends TimelineDTO {
+public class RatingDTO {
+
+    private Long id;
 
     private Rating rating;
 
@@ -18,23 +20,22 @@ public class RatingUpdateDTO extends TimelineDTO {
 
     private Integer userHasRated;
 
-    public RatingUpdateDTO(RatingLogUpdate ratingLogUpdate, List<Comment> commentList, boolean userWantsToSee, int userHasRated) {
-        super.setType(UpdateType.RATING);
-        super.setId(ratingLogUpdate.getId());
+    public RatingDTO(Rating rating, List<Comment> commentList, boolean userWantsToSee, int userHasRated) {
+        this.setRating(rating);
 
-        super.setUpdateString(ratingLogUpdate.getUpdateString());
-        super.setDateTime(ratingLogUpdate.getDateTime());
-        super.setUser(ratingLogUpdate.getUser());
-
-        this.setRating(ratingLogUpdate.getRating());
         this.setCommentList(commentList);
 
         this.setUserWantsToSee(userWantsToSee);
         this.setUserHasRated(userHasRated);
     }
 
-    // GETTERS & SETTERS
+    public Long getId() {
+        return id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Rating getRating() {
         return rating;
@@ -67,7 +68,7 @@ public class RatingUpdateDTO extends TimelineDTO {
         return userHasRated;
     }
 
-    public void setUserHasRated(int userHasRated) {
+    public void setUserHasRated(Integer userHasRated) {
         this.userHasRated = userHasRated;
     }
 }
