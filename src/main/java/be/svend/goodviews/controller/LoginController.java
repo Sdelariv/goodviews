@@ -6,6 +6,7 @@ import be.svend.goodviews.models.User;
 import be.svend.goodviews.services.LoginService;
 import be.svend.goodviews.services.users.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,13 +47,13 @@ public class LoginController {
     public ResponseEntity createLogin(@RequestBody User user, HttpServletRequest request) {
         System.out.println("LOGIN CALLED FOR " + user.toString());
         String ip = request.getRemoteAddr();
-
-        user.setPassword(user.getPasswordHash()); // Hashing the password
         String password = user.getPasswordHash();
 
         Optional<User> foundUser = userService.findByUsername(user.getUsername());
         if (foundUser.isEmpty()) return ResponseEntity.status(404).body("No such user");
 
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+        if (!encoder.matches(password,foundUser.get().getPasswordHash()))
         if (!foundUser.get().getPasswordHash().equals(password)) return ResponseEntity.status(401).body("Wrong password");
 
         loginService.createLogin(user,ip);

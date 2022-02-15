@@ -54,7 +54,9 @@ public class GoodviewsApplication {
         User flora = new User();
         flora.setUsername("Flozzette");
 
-        User waddles = userService.findByUsername("waddles").get();
+        User victoria = new User();
+        victoria.setUsername("VictoriaWF");
+
 
         filmService.createFilmByImdbId("tt2953050");
 
