@@ -30,7 +30,13 @@ public class FilmInfoDTOCreator {
         filmInfoDTO.setFilm(film);
 
         Optional<Rating> foundUserRating = ratingService.findById(user.getUsername() + film.getId());
-        foundUserRating.ifPresent(filmInfoDTO::setUserRating);
+        if (foundUserRating.isPresent()) {
+            filmInfoDTO.setUserRating(foundUserRating.get());
+        } else {
+            Rating rating = new Rating();
+            rating.setFilm(film);
+            filmInfoDTO.setUserRating(rating);
+        }
 
         List<Rating> foundRatings = ratingService.findByFilmId(film.getId());
         foundRatings = foundRatings.stream().sorted(Comparator.comparing(Rating::getDateOfRating)).collect(Collectors.toList());
