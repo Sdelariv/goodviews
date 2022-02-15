@@ -68,6 +68,8 @@ public class NotificationController {
 
             List<Notification> notifications = notificationService.findByTargetUsername(username);
 
+            notifications = NotificationScrubber.scrubUsers(notifications);
+
             notifications = notifications.stream().filter(n -> !(n instanceof FriendRequestNotification)).collect(Collectors.toList());
 
             return ResponseEntity.ok(notifications);
@@ -100,6 +102,8 @@ public class NotificationController {
         if (!isValidString(username)) return ResponseEntity.badRequest().body("Invalid input format");
 
         List<Notification> friendRequests = notificationService.findByTargetUsername(username);
+
+        friendRequests = NotificationScrubber.scrubUsers(friendRequests);
 
         friendRequests = friendRequests.stream().filter(n -> (n instanceof FriendRequestNotification)).collect(Collectors.toList());
         Collections.reverse(friendRequests);

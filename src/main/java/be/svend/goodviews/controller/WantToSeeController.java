@@ -48,6 +48,8 @@ public class WantToSeeController {
         List<WantToSee> foundWantToSees = wtsService.findByUser(foundUser.get()).stream().sorted(Comparator.comparing(wts -> wts.getDateCreated())).collect(Collectors.toList());
         Collections.reverse(foundWantToSees);
 
+        foundWantToSees.forEach(wts -> wts.setUser(UserScrubber.scrubAllExceptUsername(wts.getUser())));
+
         return ResponseEntity.ok(foundWantToSees);
     }
 
