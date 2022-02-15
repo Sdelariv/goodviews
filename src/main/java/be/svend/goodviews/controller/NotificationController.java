@@ -71,6 +71,7 @@ public class NotificationController {
             notifications = NotificationScrubber.scrubUsers(notifications);
 
             notifications = notifications.stream().filter(n -> !(n instanceof FriendRequestNotification)).collect(Collectors.toList());
+            Collections.reverse(notifications);
 
             return ResponseEntity.ok(notifications);
     }
