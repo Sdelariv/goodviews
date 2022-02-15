@@ -5,6 +5,7 @@ import be.svend.goodviews.models.User;
 import be.svend.goodviews.models.WantToSee;
 import be.svend.goodviews.services.film.FilmValidator;
 import be.svend.goodviews.services.rating.WantToSeeService;
+import be.svend.goodviews.services.users.UserScrubber;
 import be.svend.goodviews.services.users.UserValidator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -66,6 +67,7 @@ public class WantToSeeController {
         Optional<WantToSee> foundWantToSee = wtsService.findByUserAndFilm(foundUser.get(), foundFilm.get());
         if (foundWantToSee.isEmpty()) return ResponseEntity.notFound().build();
 
+        foundWantToSee.get().setUser(UserScrubber.scrubAllExceptUsername(foundWantToSee.get().getUser()));
         return ResponseEntity.ok(foundWantToSee.get().getId());
     }
 

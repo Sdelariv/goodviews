@@ -2,6 +2,7 @@ package be.svend.goodviews.controller;
 
 import be.svend.goodviews.models.Comment;
 import be.svend.goodviews.models.Rating;
+import be.svend.goodviews.services.comment.CommentScrubber;
 import be.svend.goodviews.services.comment.CommentService;
 import be.svend.goodviews.services.comment.CommentValidator;
 import be.svend.goodviews.services.rating.RatingValidator;
@@ -53,6 +54,7 @@ public class CommentController {
         if (ratingValidator.ratingIdInDatabase(ratingId).isEmpty()) return ResponseEntity.status(404).body("Rating not in database");
 
         List<Comment> commentsOfRating = commentService.findByRatingId(ratingId);
+        commentsOfRating = CommentScrubber.scrubUsers(commentsOfRating);
 
         return ResponseEntity.ok(commentsOfRating);
     }

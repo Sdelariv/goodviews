@@ -4,6 +4,7 @@ import be.svend.goodviews.models.notification.FriendRequestNotification;
 import be.svend.goodviews.models.notification.Notification;
 import be.svend.goodviews.repositories.notification.FriendRequestNotificationRepository;
 import be.svend.goodviews.repositories.notification.NotificationRepository;
+import be.svend.goodviews.services.notification.NotificationScrubber;
 import be.svend.goodviews.services.notification.NotificationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -80,6 +81,8 @@ public class NotificationController {
         if (!isValidString(username)) return ResponseEntity.badRequest().body("Invalid input format");
 
         List<Notification> notifications = notificationService.findByTargetUsername(username);
+
+        notifications = NotificationScrubber.scrubUsers(notifications);
 
         notifications = notifications.stream().filter(n -> !(n instanceof FriendRequestNotification)).collect(Collectors.toList());
         Collections.reverse(notifications);

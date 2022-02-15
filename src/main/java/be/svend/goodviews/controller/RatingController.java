@@ -6,6 +6,7 @@ import be.svend.goodviews.models.Rating;
 import be.svend.goodviews.models.User;
 import be.svend.goodviews.repositories.RatingRepository;
 import be.svend.goodviews.services.film.FilmService;
+import be.svend.goodviews.services.rating.RatingScrubber;
 import be.svend.goodviews.services.rating.RatingService;
 import be.svend.goodviews.services.rating.RatingValidator;
 import be.svend.goodviews.services.users.UserScrubber;
@@ -57,7 +58,9 @@ public class RatingController {
         Optional<Rating> rating = ratingService.findById(id);
         if (rating.isEmpty()) return ResponseEntity.notFound().build();
 
-        return ResponseEntity.ok(rating.get());
+        Rating scrubbedRating = RatingScrubber.scrubRatingOfUserInfo(rating.get());
+
+        return ResponseEntity.ok(scrubbedRating);
     }
 
     @CrossOrigin
