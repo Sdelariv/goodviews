@@ -37,7 +37,7 @@ public class NotificationController {
     @CrossOrigin
     @GetMapping("/findNumberByUsername")
     public ResponseEntity findNumberOfNotificationsByUsername(@RequestParam String username) {
-        System.out.println("FIND NUMBER OF NOTIFICATIONS BY USERNAME CALLED for " + username);
+        System.out.println("FIND NUMBER-OF-NOTIFICATIONS BY USERNAME CALLED for " + username);
 
         if (!isValidString(username)) return ResponseEntity.badRequest().body("Invalid input format");
 
@@ -50,7 +50,7 @@ public class NotificationController {
     @CrossOrigin
     @GetMapping("/findNumberOfFriendRequestsByUsername")
     public ResponseEntity findNumberOfNFriendRequestsByUsername(@RequestParam String username) {
-        System.out.println("FIND NUMBER OF FRIEND REQUESTS BY USERNAME CALLED for " + username);
+        System.out.println("FIND NUMBER-OF-FRIEND REQUESTS BY USERNAME CALLED for " + username);
 
         if (!isValidString(username)) return ResponseEntity.badRequest().body("Invalid input format");
 
